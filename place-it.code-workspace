@@ -2,6 +2,12 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../p5-places/p5-place"
+		},
+		{
+			"path": "../p5-places/place-backend"
 		}
 	],
 	"settings": {

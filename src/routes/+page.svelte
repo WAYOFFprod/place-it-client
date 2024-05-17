@@ -1,2 +1,12 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+	import Canva from '$lib/components/canva.svelte';
+</script>
+
+<Canva></Canva>
+
+<style lang="postcss">
+	:global(html),
+	:global(body) {
+		overflow: hidden;
+	}
+</style>
