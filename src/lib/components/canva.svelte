@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import P5 from 'p5';
 	import GridManager from '$lib/p5/GridManager';
+	import Palette from './color/palette.svelte';
+	import { selectedColor } from '$lib/stores/colorStore';
 
 	const width = 512;
 	const height = 512;
@@ -13,6 +15,8 @@
 	const zoomSensitivity = 0.1;
 	let scaleFactor = 1;
 	let currentScale = 0;
+
+	let color: string;
 
 	let isDragging = false;
 
@@ -43,7 +47,18 @@
 		y: 0
 	};
 
+	selectedColor.subscribe((newColor) => {
+		color = newColor;
+	});
+
 	let p5: P5;
+
+	const isTargeting = (target: EventTarget | null, id: string) => {
+		if (target == null) return false;
+		const targetId = (target as HTMLElement).id;
+		if (targetId != id) return false;
+		return true;
+	};
 
 	const initCanvas = () => {
 		// initialize scale factor
@@ -100,7 +115,8 @@
 		const script = (canvas: P5) => {
 			p5 = canvas;
 			p5.setup = () => {
-				p5.createCanvas(width, height);
+				const cnv = p5.createCanvas(width, height);
+				cnv.id('place-it-canvas');
 				p5.noSmooth();
 				p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
 
@@ -121,7 +137,6 @@
 
 				p5.translate(screenOffset.x, screenOffset.y);
 				p5.scale(currentScale);
-				// p5.translate(-screenOffset.x, 0);
 
 				// drawDebug();
 
@@ -131,6 +146,8 @@
 			};
 
 			p5.mousePressed = (e: MouseEvent) => {
+				if (!isTargeting(e.target, 'place-it-canvas')) return;
+
 				isDragging = true;
 
 				// grab.canvas.start.x = canvas.mouseX - screenOffset.x * scaleFactor;
@@ -143,6 +160,8 @@
 
 			/* Clicking on canvas */
 			p5.mouseReleased = (e: MouseEvent) => {
+				if (!isTargeting(e.target, 'place-it-canvas')) return;
+
 				if (hasMovedSinceDragStart()) return;
 
 				isDragging = false;
@@ -157,7 +176,7 @@
 						x: x,
 						y: y
 					},
-					'#00ff00'
+					color
 				);
 			};
 
@@ -196,4 +215,10 @@
 	});
 </script>
 
+<!-- overlay -->
+<div class="flex absolute inset-0 justify-center items-center space-between pointer-events-none">
+	<Palette childClass={'shrink self-end pointer-events-auto'}></Palette>
+</div>
+
+<!-- canvas -->
 <div bind:this={container} class="h-full w-full"></div>

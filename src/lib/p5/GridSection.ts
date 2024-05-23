@@ -9,15 +9,13 @@ export default class GridSection {
   colors = [] as string[]
   sectionWidth: number
 
-  color: string;
+  color: string = '#ffffff';
 
-  constructor(p5: P5, params: {x: number, y: number, sectionOffset: number, sectionWidth: number, color: string}) {
+  constructor(p5: P5, params: {x: number, y: number, sectionOffset: number, sectionWidth: number}) {
     this.position = {
       x: params.x,
       y: params.y
     }
-
-    this.color = params.color;
 
     this.sectionWidth = params.sectionWidth
     this.p5 = p5

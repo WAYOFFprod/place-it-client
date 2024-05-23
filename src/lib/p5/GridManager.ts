@@ -3,29 +3,6 @@ import GridSection from './GridSection';
 
 const PIXEL_IN_GRID = 128;
 
-
-const colors = [
-  "#292f56",
-  "#35335e",
-  "#403764",
-  "#4d3a6b",
-  "#5a3e71",
-  "#674176",
-  "#74447a",
-  "#81477d",
-  "#8e4a7f",
-  "#9b4d81",
-  "#a85082",
-  "#b55482",
-  "#c15981",
-  "#cc5d80",
-  "#d7637d",
-  "#e1697b",
-  "#ea7178",
-  "#f37874",
-  "#fa8170"
-];
-
 export default class GridManager {
   p5: P5
   gridSections: GridSection[];
@@ -51,7 +28,6 @@ export default class GridManager {
           y: y,
           sectionOffset: 0,
           sectionWidth: PIXEL_IN_GRID,
-          color: colors[x + (this.sectionGrid.width * y)]
         }))
       }
     }
