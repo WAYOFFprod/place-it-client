@@ -62,7 +62,6 @@
 	const drawDebug = () => {
 		// crosshair
 		p5.stroke(2);
-		console.log(screenCenter.x * currentScale);
 		const x = screenCenter.x / currentScale;
 		p5.line(x, 0, x, p5.windowHeight);
 	};
@@ -152,7 +151,7 @@
 				// const y = Math.floor(p5.mouseY / scaleFactor - screenOffset.y);
 				const x = Math.floor((p5.mouseX - screenOffset.x) / currentScale);
 				const y = Math.floor((p5.mouseY - screenOffset.y) / currentScale);
-				console.log('pixel', x, y);
+
 				gridManager.drawPixelOnCanvas(
 					{
 						x: x,
