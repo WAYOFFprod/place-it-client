@@ -74,13 +74,6 @@
 		screenOffset.y = screenCenter.y - y;
 	};
 
-	const drawDebug = () => {
-		// crosshair
-		p5.stroke(2);
-		const x = screenCenter.x / currentScale;
-		p5.line(x, 0, x, p5.windowHeight);
-	};
-
 	const hasMovedSinceDragStart = () => {
 		if (isDragging) {
 			isDragging = false;
@@ -138,8 +131,6 @@
 				p5.translate(screenOffset.x, screenOffset.y);
 				p5.scale(currentScale);
 
-				// drawDebug();
-
 				// draw content
 				gridManager.updateCanvasPosition();
 				p5.pop();
@@ -150,8 +141,6 @@
 
 				isDragging = true;
 
-				// grab.canvas.start.x = canvas.mouseX - screenOffset.x * scaleFactor;
-				// grab.canvas.start.y = canvas.mouseY - screenOffset.y * scaleFactor;
 				grabStart.x = p5.mouseX;
 				grabStart.y = p5.mouseY;
 				dragOffset.x = p5.mouseX - screenOffset.x;
@@ -166,8 +155,6 @@
 
 				isDragging = false;
 
-				// const x = Math.floor(p5.mouseX / scaleFactor - screenOffset.x);
-				// const y = Math.floor(p5.mouseY / scaleFactor - screenOffset.y);
 				const x = Math.floor((p5.mouseX - screenOffset.x) / currentScale);
 				const y = Math.floor((p5.mouseY - screenOffset.y) / currentScale);
 
