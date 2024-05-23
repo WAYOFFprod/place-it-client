@@ -30,7 +30,6 @@ export default class GridSection {
   }
 
   draw = () => {
-    this.p5.strokeWeight(0)
     this.img.loadPixels();
 
     for (const key in this.colors) {
@@ -39,7 +38,7 @@ export default class GridSection {
         const id = parseInt(key);
         const x =  (id % this.sectionWidth)
         const y =  Math.floor(id / this.sectionWidth)
-        
+
         // only render if in bounding box
         this.img.set(x, y, [this.p5.red(color), this.p5.green(color), this.p5.blue(color), 255]);
       }
@@ -51,6 +50,7 @@ export default class GridSection {
 
   updateCanvasPosition = () => {
     this.p5.fill(this.color)
+    this.p5.noStroke()
     this.p5.rect(this.offset.x, this.offset.y, this.sectionWidth, this.sectionWidth);
     this.p5.image(this.img, this.offset.x, this.offset.y)
   }
@@ -79,6 +79,4 @@ export default class GridSection {
       return false
     }
   }
-
-  private 
 }

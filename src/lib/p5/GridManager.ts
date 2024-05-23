@@ -60,6 +60,9 @@ export default class GridManager {
   drawPixelOnCanvas = (absolutePosition: Coord, color: string) => {
     const relPosition = this.getRelativePixelPosition(absolutePosition);
     const i = this.getGridSectionIndex(absolutePosition);
+    if(!this.isSectionIndexInBound(i)) {
+      return
+    }
     this.gridSections[i].drawPixel(relPosition, color);
   }
 
@@ -80,6 +83,26 @@ export default class GridManager {
       x: absolutePosition.x % PIXEL_IN_GRID,
       y: absolutePosition.y % PIXEL_IN_GRID
     }
+  }
+
+  private getCoordFromIndex(index: number, width: number): Coord {
+    return {
+      x: index % width,
+      y: Math.floor(index / width)
+    }
+  }
+
+  private isSectionIndexInBound(index: number): boolean {
+    const coord = this.getCoordFromIndex(index, this.sectionGrid.width)
+    
+    if(coord.x < 0 || coord.x >= this.sectionGrid.width) {
+      console.error("grid section not in bound x", coord.x);
+      return false;
+    } else if(coord.y < 0 || coord.y >= this.sectionGrid.height) {
+      console.error("grid section not in bound y", coord.y);
+      return false;
+    }
+    return true;
   }
   
 }
