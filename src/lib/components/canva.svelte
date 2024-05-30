@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import P5 from 'p5';
+	import P5, { Renderer } from 'p5';
 	import GridManager from '$lib/p5/GridManager';
 	import Palette from './color/palette.svelte';
 	import { selectedColor } from '$lib/stores/colorStore';
+	import { io } from 'socket.io-client';
 
-	const width = 512;
-	const height = 512;
+	const socket = io('http://localhost:3000');
+
+	const width = 64;
+	const height = 64;
 
 	let container: HTMLElement;
 
@@ -21,11 +24,6 @@
 	let isDragging = false;
 
 	let screenOffset: Coord = {
-		x: 0,
-		y: 0
-	};
-
-	let zoomOffset: Coord = {
 		x: 0,
 		y: 0
 	};
@@ -51,6 +49,11 @@
 		color = newColor;
 	});
 
+	// listen to socket server message
+	socket.on('new-pixel-from-others', (coord, color) => {
+		gridManager.drawPixelOnCanvas(coord, color);
+	});
+
 	let p5: P5;
 
 	const isTargeting = (target: EventTarget | null, id: string) => {
@@ -66,6 +69,8 @@
 		const heightDiff = p5.windowHeight / height;
 		// get scale factor by getting the one from the axies with the least pixels
 		currentScale = widthDiff < heightDiff ? widthDiff : heightDiff;
+
+		// currentScale = 1;
 
 		// set initial offset to center image
 		const x = (width / 2) * currentScale;
@@ -93,14 +98,19 @@
 
 	const adjustForZoomMovement = () => {
 		currentScale = currentScale * scaleFactor;
+
+		// get mouse position relative to canvas zoom
 		const relMouse = {
 			x: p5.mouseX * scaleFactor,
 			y: p5.mouseY * scaleFactor
 		};
+
+		// get the current screen offset relative to the canvas
 		const relOffset = {
 			x: screenOffset.x * scaleFactor,
 			y: screenOffset.y * scaleFactor
 		};
+
 		screenOffset.x = p5.mouseX - relMouse.x + relOffset.x;
 		screenOffset.y = p5.mouseY - relMouse.y + relOffset.y;
 	};
@@ -110,8 +120,8 @@
 			p5.setup = () => {
 				const cnv = p5.createCanvas(width, height);
 				cnv.id('place-it-canvas');
-				p5.noSmooth();
 				p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+				p5.noSmooth();
 
 				screenCenter = {
 					x: p5.windowWidth / 2,
@@ -159,6 +169,14 @@
 				const y = Math.floor((p5.mouseY - screenOffset.y) / currentScale);
 
 				gridManager.drawPixelOnCanvas(
+					{
+						x: x,
+						y: y
+					},
+					color
+				);
+				socket.emit(
+					'new-pixel',
 					{
 						x: x,
 						y: y

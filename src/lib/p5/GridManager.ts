@@ -1,13 +1,16 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
 
-const PIXEL_IN_GRID = 128;
+const PIXEL_IN_GRID = 32;
+
+
 
 export default class GridManager {
   p5: P5
   gridSections: GridSection[];
   canvas: {width: number, height: number};
   sectionGrid: {width: number, height: number};
+  color: string = '#ffffff';
 
   constructor(p5: P5, canvas: {width: number, height: number}) {
     // init values
@@ -43,6 +46,9 @@ export default class GridManager {
   }
 
   updateCanvasPosition = () => {
+    this.p5.fill(this.color)
+    this.p5.noStroke()
+    this.p5.rect(0, 0, this.canvas.width, this.canvas.height);
     for (let i = 0; i < this.gridSections.length; i++) {
       this.gridSections[i].updateCanvasPosition()
     }

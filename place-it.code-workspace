@@ -4,10 +4,10 @@
 			"path": "."
 		},
 		{
-			"path": "../p5-places/p5-place"
+			"path": "../place-it-websocket"
 		},
 		{
-			"path": "../p5-places/place-backend"
+			"path": "../place-it-server"
 		}
 	],
 	"settings": {

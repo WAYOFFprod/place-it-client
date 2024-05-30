@@ -9,8 +9,6 @@ export default class GridSection {
   colors = [] as string[]
   sectionWidth: number
 
-  color: string = '#ffffff';
-
   constructor(p5: P5, params: {x: number, y: number, sectionOffset: number, sectionWidth: number}) {
     this.position = {
       x: params.x,
@@ -47,9 +45,6 @@ export default class GridSection {
   }
 
   updateCanvasPosition = () => {
-    this.p5.fill(this.color)
-    this.p5.noStroke()
-    this.p5.rect(this.offset.x, this.offset.y, this.sectionWidth, this.sectionWidth);
     this.p5.image(this.img, this.offset.x, this.offset.y)
   }
 
