@@ -1,7 +1,7 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
 
-const PIXEL_IN_GRID = 32;
+const PIXEL_IN_SECTION = 32;
 
 
 
@@ -18,19 +18,21 @@ export default class GridManager {
     this.gridSections = [];
     this.canvas = canvas;
     this.sectionGrid = {
-      width: Math.floor(this.canvas.width / PIXEL_IN_GRID),
-      height: Math.floor(this.canvas.height / PIXEL_IN_GRID)
+      width: Math.floor(this.canvas.width / PIXEL_IN_SECTION),
+      height: Math.floor(this.canvas.height / PIXEL_IN_SECTION)
     }
 
 
+    console.log((this.canvas.width % PIXEL_IN_SECTION) * PIXEL_IN_SECTION)
     // create gridSections
-    for(let y = 0; y < this.canvas.width / PIXEL_IN_GRID; y++) {
-      for(let x = 0; x < this.canvas.width / PIXEL_IN_GRID; x++) {
+    for(let y = 0; y < this.canvas.height / PIXEL_IN_SECTION; y++) {
+      for(let x = 0; x < this.canvas.width / PIXEL_IN_SECTION; x++) {
         this.gridSections.push(new GridSection(p5, {
           x: x,
           y: y,
           sectionOffset: 0,
-          sectionWidth: PIXEL_IN_GRID,
+          sectionWidth: PIXEL_IN_SECTION,
+          sectionHeight: PIXEL_IN_SECTION
         }))
       }
     }
@@ -55,15 +57,15 @@ export default class GridManager {
   }
 
   private getGridSectionIndex(position: Coord): number {
-    const gridX = Math.floor(position.x / PIXEL_IN_GRID)
-    const gridY = Math.floor(position.y / PIXEL_IN_GRID)
+    const gridX = Math.floor(position.x / PIXEL_IN_SECTION)
+    const gridY = Math.floor(position.y / PIXEL_IN_SECTION)
     return gridX + (this.sectionGrid.width * gridY)
   }
   /* return the position of a pixel as if all grid start at 0 */
   private getRelativePixelPosition(absolutePosition: Coord): Coord {
     return {
-      x: absolutePosition.x % PIXEL_IN_GRID,
-      y: absolutePosition.y % PIXEL_IN_GRID
+      x: absolutePosition.x % PIXEL_IN_SECTION,
+      y: absolutePosition.y % PIXEL_IN_SECTION
     }
   }
 

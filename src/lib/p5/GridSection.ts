@@ -8,20 +8,22 @@ export default class GridSection {
   offset: Coord
   colors = [] as string[]
   sectionWidth: number
+  sectionHeight: number
 
-  constructor(p5: P5, params: {x: number, y: number, sectionOffset: number, sectionWidth: number}) {
+  constructor(p5: P5, params: {x: number, y: number, sectionOffset: number, sectionWidth: number, sectionHeight: number}) {
     this.position = {
       x: params.x,
       y: params.y
     }
 
     this.sectionWidth = params.sectionWidth
+    this.sectionHeight = params.sectionHeight
     this.p5 = p5
 
-    this.img  = p5.createImage(params.sectionWidth, params.sectionWidth)
+    this.img  = p5.createImage(params.sectionWidth, params.sectionHeight)
     this.offset = {
       x: params.x * params.sectionWidth,
-      y: params.y * params.sectionWidth,
+      y: params.y * params.sectionHeight,
     }
   }
 

@@ -8,8 +8,8 @@
 
 	const socket = io('http://localhost:3000');
 
-	const width = 64;
-	const height = 64;
+	const width = 32;
+	const height = 16;
 
 	let container: HTMLElement;
 
