@@ -37,7 +37,9 @@ jobs:
       - name: Build
         run: npm run build
       - name: cleanup
-        run: ls
+        run: rm -r README.md node_modules package-lock.json package.json place-it.code-workspace postcss.config.js src static svelte.config.js tailwind.config.js tsconfig.json vite.config.ts
+      - name: move files to root
+        run: mv build/* ./
       - name: copy file via ssh
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -45,5 +47,5 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          source: 'build/*'
+          source: '*'
           target: 'place-it.wayoff.tv'
