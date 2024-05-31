@@ -11,7 +11,7 @@ name: Create and publish to swisscenter
 
 on:
   push:
-    branches: ["release"]
+    branches: ['release']
 
 env:
   REGISTRY: ghcr.io
@@ -26,9 +26,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: select version
+        uses: actions/setup-node@v4
         with:
-          submodules: "true"
+          node-version: 20
+          cache: 'npm'
       - name: Install
         run: npm install
       - name: Build
@@ -40,5 +43,5 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          source: "*, !**/.git*, !**/.git*/**, !**/node_modules/**, "
-          target: "place-it.wayoff.tv"
+          source: '*, !**/.git*, !**/.git*/**, !**/node_modules/**, '
+          target: 'place-it.wayoff.tv'
