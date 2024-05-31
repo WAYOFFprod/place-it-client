@@ -3,13 +3,10 @@
 	import P5, { Renderer } from 'p5';
 	import GridManager from '$lib/p5/GridManager';
 	import { selectedColor } from '$lib/stores/colorStore';
-	import { io } from 'socket.io-client';
 
 	import Palette from './color/palette.svelte';
 	import Button from './button.svelte';
-	import CanvasRequest from '$lib/utility/CanvasRequest';
-
-	const socket = io('http://localhost:3000');
+	import Networker from '$lib/utility/Networker';
 
 	let width = 32;
 	let height = 16;
@@ -18,6 +15,7 @@
 	let updateColorPalette: (newColors: [string]) => void;
 
 	let gridManager: GridManager;
+	const networker = new Networker();
 
 	const zoomSensitivity = 0.1;
 	let scaleFactor = 1;
@@ -49,19 +47,23 @@
 		y: 0
 	};
 
-	const canvasRequest = new CanvasRequest();
-
 	selectedColor.subscribe((newColor) => {
 		color = newColor;
 	});
 
 	// listen to socket server message
-	socket.on('new-pixel-from-others', (coord, color) => {
-		gridManager.drawPixelOnCanvas(coord, color);
-	});
+
+	// socket.on('new-pixel-from-others', (coord, color) => {
+	// 	gridManager.drawPixelOnCanvas(coord, color);
+	// });
 
 	let p5: P5;
 	let isReady = false;
+
+	const reloadCanva = () => {
+		isReady = false;
+		initCanvas();
+	};
 
 	const isTargeting = (target: EventTarget | null, id: string) => {
 		if (target == null) return false;
@@ -72,7 +74,7 @@
 
 	const initCanvas = async () => {
 		// load data
-		const data = await canvasRequest.getCanva();
+		const data = await networker.getCanva();
 
 		// set width and height
 		width = data.width;
@@ -94,11 +96,18 @@
 
 		// initialise canvas and palette
 		gridManager = new GridManager(p5, size);
-		gridManager.loadImage(data.image, size);
+		networker.connectToSocket(gridManager, reloadCanva);
 
+		gridManager.loadImage(data.image, size);
+		color = data.colors[0];
 		updateColorPalette(data.colors);
 
 		isReady = true;
+	};
+
+	const resetCanva = async () => {
+		await networker.clearCanva();
+		reloadCanva();
 	};
 
 	const hasMovedSinceDragStart = () => {
@@ -188,24 +197,12 @@
 
 				isDragging = false;
 
-				const x = Math.floor((p5.mouseX - screenOffset.x) / currentScale);
-				const y = Math.floor((p5.mouseY - screenOffset.y) / currentScale);
+				const coords: Coord = {
+					x: Math.floor((p5.mouseX - screenOffset.x) / currentScale),
+					y: Math.floor((p5.mouseY - screenOffset.y) / currentScale)
+				};
 
-				gridManager.drawPixelOnCanvas(
-					{
-						x: x,
-						y: y
-					},
-					color
-				);
-				socket.emit(
-					'new-pixel',
-					{
-						x: x,
-						y: y
-					},
-					color
-				);
+				networker.placePixel(coords, color);
 			};
 
 			/* Scrolling */
@@ -237,6 +234,7 @@
 			/* destroy if unmounted */
 			return () => {
 				p5.remove();
+				networker.disconnect();
 			};
 		}
 	});
@@ -246,7 +244,7 @@
 <div class="flex absolute inset-0 justify-center items-center space-between pointer-events-none">
 	<Palette bind:setColors={updateColorPalette} childClass={'shrink self-end pointer-events-auto'}
 	></Palette>
-	<Button childClass={'shrink self-end pointer-events-auto'}></Button>
+	<Button on:resetCanva={resetCanva} childClass={'shrink self-end pointer-events-auto'}></Button>
 </div>
 
 <!-- canvas -->

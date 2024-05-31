@@ -1,6 +1,5 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
-import ImageConverter from '$lib/utility/ImageConverter';
 
 const PIXEL_IN_SECTION = 10;
 
@@ -45,8 +44,7 @@ export default class GridManager {
 
   handleImage = (fullImage: P5.Image) => {
     for (let i = 0; i < this.gridSections.length; i++) {
-      const coords = this.getCoordFromIndex(i, PIXEL_IN_SECTION);
-
+      const coords = this.getCoordFromIndex(i, this.sectionGrid.width);
       let c: P5.Image = fullImage.get(
         coords.x * PIXEL_IN_SECTION,
         coords.y * PIXEL_IN_SECTION,
@@ -58,16 +56,15 @@ export default class GridManager {
     }
   }
 
-  drawPixelOnCanvas = (absolutePosition: Coord, color: string | null) => {
-    if(!color) {
-      return console.error("no color selected");
-    }
+  drawPixelOnCanvas = (absolutePosition: Coord, color: string) => {
     if(!this.isSectionIndexInBound(absolutePosition)) {
       return
     }
+    
     const relPosition = this.getRelativePixelPosition(absolutePosition);
     const i = this.getGridSectionIndex(absolutePosition);
     this.gridSections[i].drawPixel(relPosition, color);
+    return this.getAbsolutePixelPosition(absolutePosition);
   }
 
   updateCanvasPosition = () => {
@@ -84,6 +81,11 @@ export default class GridManager {
     const gridY = Math.floor(position.y / PIXEL_IN_SECTION)
     return gridX + (this.sectionGrid.width * gridY)
   }
+
+  private getAbsolutePixelPosition(position: Coord): number {
+    return position.x + (this.canvas.width * position.y)
+  }
+
   /* return the position of a pixel as if all grid start at 0 */
   private getRelativePixelPosition(absolutePosition: Coord): Coord {
     return {
