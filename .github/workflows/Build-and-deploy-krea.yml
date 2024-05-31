@@ -36,6 +36,8 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
+      - name: cleanup
+        run: ls
       - name: copy file via ssh
         uses: appleboy/scp-action@v0.1.7
         with:
