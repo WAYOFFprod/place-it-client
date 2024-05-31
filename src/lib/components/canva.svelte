@@ -7,6 +7,7 @@
 	import Palette from './color/palette.svelte';
 	import Button from './button.svelte';
 	import Networker from '$lib/utility/Networker';
+	import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
 
 	let width = 32;
 	let height = 16;
@@ -15,7 +16,7 @@
 	let updateColorPalette: (newColors: [string]) => void;
 
 	let gridManager: GridManager;
-	const networker = new Networker();
+	const networker = new Networker(PUBLIC_SERVER_URL, PUBLIC_WEBSOCKET_URL);
 
 	const zoomSensitivity = 0.1;
 	let scaleFactor = 1;

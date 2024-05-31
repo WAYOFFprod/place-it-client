@@ -1,3 +1,4 @@
+
 import type GridManager from "$lib/p5/GridManager";
 import ServerRequests from "./ServerRequests";
 import { Socket, io } from 'socket.io-client';
@@ -6,12 +7,10 @@ export default class Networker {
   server: ServerRequests
   socket: Socket
   gridManager: GridManager | undefined
-  constructor() {
+  constructor(server: string, websocket: string) {
 
-    this.server = new ServerRequests('https://server.place-it.wayoff.tv');
-    this.socket = io('https://place-it-websocket-release.onrender.com');
-    // this.server = new ServerRequests('http://localhost/api');
-    // this.socket = io('http://localhost:3000');
+    this.server = new ServerRequests(server+'/api');
+    this.socket = io(websocket);
   }
 
   connectToSocket = (gridManager: GridManager, callback: () => void) => {
