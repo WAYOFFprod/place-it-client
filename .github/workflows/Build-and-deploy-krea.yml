@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Checkout
+        run: git checkout -b deploy
       - name: select version
         uses: actions/setup-node@v4
         with:
