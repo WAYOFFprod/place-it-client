@@ -27,9 +27,12 @@ export default class GridSection {
     }
   }
 
+  initilizeImage = (image: P5.Image) => {
+    this.img = image;
+  }
+
   draw = () => {
     this.img.loadPixels();
-
     for (const key in this.colors) {
       if (Object.hasOwnProperty.call(this.colors, key)) { 
         const color = this.colors[key];

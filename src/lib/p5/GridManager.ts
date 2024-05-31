@@ -1,7 +1,8 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
+import ImageConverter from '$lib/utility/ImageConverter';
 
-const PIXEL_IN_SECTION = 32;
+const PIXEL_IN_SECTION = 10;
 
 
 
@@ -12,7 +13,7 @@ export default class GridManager {
   sectionGrid: {width: number, height: number};
   color: string = '#ffffff';
 
-  constructor(p5: P5, canvas: {width: number, height: number}) {
+  constructor(p5: P5, canvas: Size2D) {
     // init values
     this.p5 = p5;
     this.gridSections = [];
@@ -22,8 +23,6 @@ export default class GridManager {
       height: Math.floor(this.canvas.height / PIXEL_IN_SECTION)
     }
 
-
-    console.log((this.canvas.width % PIXEL_IN_SECTION) * PIXEL_IN_SECTION)
     // create gridSections
     for(let y = 0; y < this.canvas.height / PIXEL_IN_SECTION; y++) {
       for(let x = 0; x < this.canvas.width / PIXEL_IN_SECTION; x++) {
@@ -34,11 +33,35 @@ export default class GridManager {
           sectionWidth: PIXEL_IN_SECTION,
           sectionHeight: PIXEL_IN_SECTION
         }))
+
+        
       }
     }
   }
 
-  drawPixelOnCanvas = (absolutePosition: Coord, color: string) => {
+  loadImage = (base64Image: string, size: Size2D) => {
+    this.p5.loadImage(base64Image, this.handleImage);
+  }
+
+  handleImage = (fullImage: P5.Image) => {
+    for (let i = 0; i < this.gridSections.length; i++) {
+      const coords = this.getCoordFromIndex(i, PIXEL_IN_SECTION);
+
+      let c: P5.Image = fullImage.get(
+        coords.x * PIXEL_IN_SECTION,
+        coords.y * PIXEL_IN_SECTION,
+        PIXEL_IN_SECTION,
+        PIXEL_IN_SECTION
+      );
+
+      this.gridSections[i].initilizeImage(c)
+    }
+  }
+
+  drawPixelOnCanvas = (absolutePosition: Coord, color: string | null) => {
+    if(!color) {
+      return console.error("no color selected");
+    }
     if(!this.isSectionIndexInBound(absolutePosition)) {
       return
     }

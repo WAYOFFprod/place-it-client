@@ -2,16 +2,20 @@
 	import { onMount } from 'svelte';
 	import P5, { Renderer } from 'p5';
 	import GridManager from '$lib/p5/GridManager';
-	import Palette from './color/palette.svelte';
 	import { selectedColor } from '$lib/stores/colorStore';
 	import { io } from 'socket.io-client';
 
+	import Palette from './color/palette.svelte';
+	import Button from './button.svelte';
+	import CanvasRequest from '$lib/utility/CanvasRequest';
+
 	const socket = io('http://localhost:3000');
 
-	const width = 32;
-	const height = 16;
+	let width = 32;
+	let height = 16;
 
 	let container: HTMLElement;
+	let updateColorPalette: (newColors: [string]) => void;
 
 	let gridManager: GridManager;
 
@@ -19,7 +23,7 @@
 	let scaleFactor = 1;
 	let currentScale = 0;
 
-	let color: string;
+	let color: string | null;
 
 	let isDragging = false;
 
@@ -45,6 +49,8 @@
 		y: 0
 	};
 
+	const canvasRequest = new CanvasRequest();
+
 	selectedColor.subscribe((newColor) => {
 		color = newColor;
 	});
@@ -55,6 +61,7 @@
 	});
 
 	let p5: P5;
+	let isReady = false;
 
 	const isTargeting = (target: EventTarget | null, id: string) => {
 		if (target == null) return false;
@@ -63,13 +70,20 @@
 		return true;
 	};
 
-	const initCanvas = () => {
+	const initCanvas = async () => {
+		// load data
+		const data = await canvasRequest.getCanva();
+
+		// set width and height
+		width = data.width;
+		height = data.height;
+		const size: Size2D = { width: width, height: height };
+
 		// initialize scale factor
 		const widthDiff = p5.windowWidth / width;
 		const heightDiff = p5.windowHeight / height;
 		// get scale factor by getting the one from the axies with the least pixels
 		currentScale = widthDiff < heightDiff ? widthDiff : heightDiff;
-
 		// currentScale = 1;
 
 		// set initial offset to center image
@@ -77,6 +91,14 @@
 		const y = (height / 2) * currentScale;
 		screenOffset.x = screenCenter.x - x;
 		screenOffset.y = screenCenter.y - y;
+
+		// initialise canvas and palette
+		gridManager = new GridManager(p5, size);
+		gridManager.loadImage(data.image, size);
+
+		updateColorPalette(data.colors);
+
+		isReady = true;
 	};
 
 	const hasMovedSinceDragStart = () => {
@@ -130,6 +152,7 @@
 			};
 
 			p5.draw = () => {
+				if (!isReady) return;
 				p5.background(150);
 
 				p5.push();
@@ -208,7 +231,6 @@
 		/* Instantiate canva */
 		if (container) {
 			const p5 = new P5(script, container);
-			gridManager = new GridManager(p5, { width: width, height: height });
 
 			initCanvas();
 
@@ -222,7 +244,9 @@
 
 <!-- overlay -->
 <div class="flex absolute inset-0 justify-center items-center space-between pointer-events-none">
-	<Palette childClass={'shrink self-end pointer-events-auto'}></Palette>
+	<Palette bind:setColors={updateColorPalette} childClass={'shrink self-end pointer-events-auto'}
+	></Palette>
+	<Button childClass={'shrink self-end pointer-events-auto'}></Button>
 </div>
 
 <!-- canvas -->
