@@ -42,5 +42,8 @@
 		"p5": "^1.9.3",
 		"pngjs": "^7.0.0",
 		"socket.io-client": "^4.7.5"
+	},
+	"resolutions": {
+		"rollup": "npm:@rollup/wasm-node"
 	}
 }
