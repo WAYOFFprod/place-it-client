@@ -8,7 +8,7 @@ export default class Networker {
   gridManager: GridManager | undefined
   constructor() {
 
-    this.server = new ServerRequests('https://server.place-it.wayoff.tv/');
+    this.server = new ServerRequests('https://server.place-it.wayoff.tv');
     this.socket = io('https://place-it-websocket-release.onrender.com');
     // this.server = new ServerRequests('http://localhost/api');
     // this.socket = io('http://localhost:3000');
