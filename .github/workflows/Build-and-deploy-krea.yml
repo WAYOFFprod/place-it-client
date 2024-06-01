@@ -40,6 +40,9 @@ jobs:
         run: rm -r README.md node_modules package-lock.json package.json place-it.code-workspace postcss.config.js src static svelte.config.js tailwind.config.js tsconfig.json vite.config.ts
       - name: move files to root
         run: mv build/* ./
+        env:
+          PUBLIC_SERVER_URL: ${{vars.SERVER_URL}}
+          PUBLIC_WEBSOCKET_URL: ${{vars.WEBSOCKET_URL}}
       - name: copy file via ssh
         uses: appleboy/scp-action@v0.1.7
         with:
