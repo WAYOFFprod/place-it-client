@@ -1,0 +1,20 @@
+ARG NODE_VERSION=18.19.0
+
+FROM node:${NODE_VERSION}-alpine
+
+WORKDIR /
+
+ARG PORT=3000
+
+ENV NPM_CONFIG_LOGLEVEL info
+ENV NODE_ENV=production
+
+ENV PORT=$PORT
+
+COPY ./ ./
+# Optional, only needed if you rely on unbundled dependencies
+# COPY --from=build /src/node_modules /src/node_modules
+
+
+EXPOSE 3000
+CMD [ "node", "dist/index.js" ]
