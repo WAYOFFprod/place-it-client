@@ -99,9 +99,13 @@
 		gridManager = new GridManager(p5, size);
 		networker.connectToSocket(gridManager, reloadCanva);
 
-		gridManager.loadImage(data.image, size);
+		const pixels = networker.tempPoints as {[key: string]: string};
+		gridManager.loadImage(data.image, size, pixels);
 		color = data.colors[0];
 		updateColorPalette(data.colors);
+
+
+		gridManager.drawPixelsFromIndex();
 
 		isReady = true;
 	};

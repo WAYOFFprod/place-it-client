@@ -38,8 +38,9 @@ export default class GridManager {
     }
   }
 
-  loadImage = (base64Image: string, size: Size2D) => {
+  loadImage = (base64Image: string, size: Size2D, data: {[key: string]: string}) => {
     this.p5.loadImage(base64Image, this.handleImage);
+    
   }
 
   handleImage = (fullImage: P5.Image) => {
@@ -53,6 +54,18 @@ export default class GridManager {
       );
 
       this.gridSections[i].initilizeImage(c)
+    }
+  }
+
+  drawPixelsFromIndex = (data: {[key: string]: string}) => {
+    if(data != null) {
+      for (const [id, color] of Object.entries(data)) {
+        const index = parseInt(id);
+        const absolutePosition = this.getCoordFromIndex(index, this.canvas.width)
+        const gridIndex = this.getGridSectionIndex(absolutePosition);
+        const relPosition = this.getRelativePixelPosition(absolutePosition);
+        this.gridSections[gridIndex].drawPixel(relPosition, color);
+      }
     }
   }
 

@@ -7,16 +7,30 @@ export default class Networker {
   server: ServerRequests
   socket: Socket
   gridManager: GridManager | undefined
+  tempPoints: {[key: string]: string} | undefined
   constructor(server: string, websocket: string) {
 
     this.server = new ServerRequests(server+'/api');
     this.socket = io(websocket);
+
+    this.socket.on("connect", () => {
+      this.socket.emit('get-pixels');
+    });
+
+    this.socket.on('init-pixels', (payload) => {
+      if(payload) {
+        this.tempPoints = payload.pixels
+        console.log("points", this.tempPoints)
+      }
+    });
+
+    this.socket.on('disconnect', () => {
+      console.log('user disconnected');
+    });
   }
 
   connectToSocket = (gridManager: GridManager, callback: () => void) => {
     this.gridManager = gridManager;
-
-    this.socket.connect();
     // listen to socket server message
     this.socket.on('new-pixel-from-others', (coord, color) => {
       if(!this.gridManager) return console.error("missing grid manager");
@@ -26,6 +40,7 @@ export default class Networker {
     this.socket.on('reset-others', () => {
       callback()
     });
+
   }
 
   getCanva = async (id: number = 1) => {

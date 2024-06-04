@@ -54,6 +54,7 @@ export default class GridSection {
   }
 
   drawPixel(position: Coord, c: string) {
+    console.log(position, c)
     const i = position.x + (this.sectionWidth * position.y)
     
     this.colors[i] = c
