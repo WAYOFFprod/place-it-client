@@ -5,31 +5,35 @@ import { Socket, io } from 'socket.io-client';
 
 export default class Networker {
   server: ServerRequests
-  socket: Socket
+  socket: Socket | undefined
   gridManager: GridManager | undefined
   tempPoints: {[key: string]: string} | undefined
+  websocket: string
   constructor(server: string, websocket: string) {
-
+    this.websocket = websocket
     this.server = new ServerRequests(server+'/api');
-    this.socket = io(websocket);
+  }
 
+  connectToSocket = (gridManager: GridManager, callback: () => void) => {
+    this.gridManager = gridManager;
+    this.socket = io(this.websocket);
+    
     this.socket.on("connect", () => {
+      if(this.socket != undefined)
       this.socket.emit('get-pixels');
     });
 
     this.socket.on('init-pixels', (payload) => {
+      if(this.gridManager != undefined)
       if(payload) {
         this.tempPoints = payload.pixels
-        console.log("points", this.tempPoints)
+        this.gridManager.attemptAddAdditionalPixels(this.tempPoints);
       }
     });
 
     this.socket.on('disconnect', () => {
       console.log('user disconnected');
     });
-  }
-
-  connectToSocket = (gridManager: GridManager, callback: () => void) => {
     this.gridManager = gridManager;
     // listen to socket server message
     this.socket.on('new-pixel-from-others', (coord, color) => {
@@ -56,6 +60,7 @@ export default class Networker {
       return console.error("missing grid manager");
     }
     const index = this.gridManager.drawPixelOnCanvas(coord, color);
+    if(this.socket != undefined)
     this.socket.emit('new-pixel', index, coord, color);
   }
 
@@ -65,11 +70,13 @@ export default class Networker {
       height: 20
     }
     const response = await this.server.post("/canvas/create", size);
+    if(this.socket != undefined)
     this.socket.emit('reset');
     return response;
   }
 
   disconnect = () => {
+    if(this.socket != undefined)
     this.socket.disconnect();
   }
 
