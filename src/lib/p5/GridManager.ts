@@ -38,22 +38,40 @@ export default class GridManager {
     }
   }
 
-  loadImage = (base64Image: string, size: Size2D, data: {[key: string]: string}) => {
+  additionalData: {[key: string]: string} = {};
+
+  loadImage = async (base64Image: string, size: Size2D, data: {[key: string]: string}) => {
+    this.additionalData = data;
     this.p5.loadImage(base64Image, this.handleImage);
-    
   }
 
   handleImage = (fullImage: P5.Image) => {
+    // load pixel in each section image
+    let imageSections: P5.Image[] = [];
     for (let i = 0; i < this.gridSections.length; i++) {
       const coords = this.getCoordFromIndex(i, this.sectionGrid.width);
-      let c: P5.Image = fullImage.get(
+      imageSections[i] = fullImage.get(
         coords.x * PIXEL_IN_SECTION,
         coords.y * PIXEL_IN_SECTION,
         PIXEL_IN_SECTION,
         PIXEL_IN_SECTION
       );
+    }
+    
+    // initialise each section image
+    for (let i = 0; i < this.gridSections.length; i++) {
+      if(this.gridSections[i]) {
+        this.gridSections[i].initilizeImage(imageSections[i])
+      }
+    };
 
-      this.gridSections[i].initilizeImage(c)
+    // add pixels that were on the live server
+    if(this.additionalData) {
+      for (const [id, color] of Object.entries(this.additionalData)) {
+        const coords = this.getCoordFromIndex(parseInt(id), this.canvas.width);
+        const gridIndex = this.getGridSectionIndex(coords);
+        this.gridSections[gridIndex].drawPixel(coords, color);
+      }
     }
   }
 

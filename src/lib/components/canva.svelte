@@ -105,7 +105,7 @@
 		updateColorPalette(data.colors);
 
 
-		gridManager.drawPixelsFromIndex();
+		// gridManager.drawPixelsFromIndex();
 
 		isReady = true;
 	};
