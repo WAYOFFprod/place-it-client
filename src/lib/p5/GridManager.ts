@@ -12,6 +12,7 @@ export default class GridManager {
   sectionGrid: {width: number, height: number};
   color: string = '#ffffff';
   pixelsAdded = false;
+  imageLoaded = false;
 
   constructor(p5: P5, canvas: Size2D) {
     // init values
@@ -65,22 +66,21 @@ export default class GridManager {
         this.gridSections[i].initilizeImage(imageSections[i])
       }
     };
+    this.imageLoaded = true;
 
     // add pixels that were on the live server
     this.attemptAddAdditionalPixels(this.additionalData);
   }
 
   attemptAddAdditionalPixels(additionalData: {[key: string]: string} = {}) {
-    if(!this.pixelsAdded) {
+    if(!this.pixelsAdded && this.imageLoaded) {
       if(Object.keys(additionalData).length > 0) {
         for (const [id, color] of Object.entries(additionalData)) {
           const absolutePosition = this.getCoordFromIndex(parseInt(id), this.canvas.width);
           const gridIndex = this.getGridSectionIndex(absolutePosition);
           const relPosition = this.getRelativePixelPosition(absolutePosition);
           this.gridSections[gridIndex].drawPixel(relPosition, color);
-          console.log("COORD", relPosition)
         }
-        console.log("pixel added", additionalData);
         this.pixelsAdded = true
       }
     }

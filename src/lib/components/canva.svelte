@@ -97,7 +97,7 @@
 
 		// initialise canvas and palette
 		gridManager = new GridManager(p5, size);
-		console.log("HER NOW")
+
 		networker.connectToSocket(gridManager, reloadCanva);
 
 		const pixels = networker.tempPoints as {[key: string]: string};
