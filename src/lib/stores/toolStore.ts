@@ -24,9 +24,6 @@ let activeTool: Tool | undefined
 let savedTool: Tool | undefined = activeTool
 
 const selectedTool = writable<Tool | undefined>();
-// selectedTool.subscribe((newTool:  Tool | undefined) => {
-//   activeTool = newTool
-// })
 
 const setTool = (toolType: ToolType, p5: P5) => {
   activeToolType = toolClasses[toolType];
