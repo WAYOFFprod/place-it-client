@@ -75,24 +75,20 @@ export default class GridManager {
   attemptAddAdditionalPixels(additionalData: {[key: string]: string} = {}) {
     if(!this.pixelsAdded && this.imageLoaded) {
       if(Object.keys(additionalData).length > 0) {
-        for (const [id, color] of Object.entries(additionalData)) {
-          const absolutePosition = this.getCoordFromIndex(parseInt(id), this.canvas.width);
-          const gridIndex = this.getGridSectionIndex(absolutePosition);
-          const relPosition = this.getRelativePixelPosition(absolutePosition);
-          this.gridSections[gridIndex].drawPixel(relPosition, color);
-        }
-        this.pixelsAdded = true
+        this.drawPixelsFromIndex(additionalData)
       }
     }
   }
 
   drawPixelsFromIndex = (data: {[key: string]: string}) => {
+    
     if(data != null) {
       for (const [id, color] of Object.entries(data)) {
         const index = parseInt(id);
         const absolutePosition = this.getCoordFromIndex(index, this.canvas.width)
         const gridIndex = this.getGridSectionIndex(absolutePosition);
         const relPosition = this.getRelativePixelPosition(absolutePosition);
+        
         this.gridSections[gridIndex].drawPixel(relPosition, color);
       }
     }

@@ -1,13 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import P5, { Renderer } from 'p5';
+	import P5 from 'p5';
 	import GridManager from '$lib/p5/GridManager';
 	import { selectedColor } from '$lib/stores/colorStore';
+	import { ToolType, backToTool, selectedTool, setTempTool, setTool } from '$lib/stores/toolStore';
 
 	import Palette from './color/palette.svelte';
 	import Button from './button.svelte';
 	import Networker from '$lib/utility/Networker';
 	import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
+	import Toolbar from '$lib/components/toolbar/toolbar.svelte';
+	import Tool from './toolbar/ToolClass';
 
 	let width = 32;
 	let height = 16;
@@ -24,7 +27,8 @@
 
 	let color: string | null;
 
-	let isDragging = false;
+	let isMouseDown = false;
+	let isMouseDragging = false;
 
 	let screenOffset: Coord = {
 		x: 0,
@@ -35,30 +39,36 @@
 		x: 0,
 		y: 0
 	};
-
 	// original position on start of dragging
 	let grabStart: Coord = {
 		x: 0,
 		y: 0
 	};
 
-	// original position adjusted to screenoffset at the start of dragging
 	let dragOffset: Coord = {
 		x: 0,
 		y: 0
 	};
 
+	let p5: P5;
+
+
 	selectedColor.subscribe((newColor) => {
 		color = newColor;
 	});
 
-	// listen to socket server message
+	let currentTool: Tool | undefined
+	let currentToolType: typeof Tool = Tool
 
-	// socket.on('new-pixel-from-others', (coord, color) => {
-	// 	gridManager.drawPixelOnCanvas(coord, color);
-	// });
+	selectedTool.subscribe((newTool: Tool | undefined) => {
+		if(newTool == undefined) return;
+		currentTool = newTool;
+		const type = currentTool.getType()
+		if(type == null) return;
+		currentToolType = type;
+	});
 
-	let p5: P5;
+	
 	let isReady = false;
 
 	const reloadCanva = () => {
@@ -104,12 +114,13 @@
 		gridManager.loadImage(data.image, size, pixels);
 		color = data.colors[0];
 		updateColorPalette(data.colors);
-
-
-		// gridManager.drawPixelsFromIndex();
-
+		initToolbar();
 		isReady = true;
 	};
+
+	const initToolbar = () => {
+		setTool(ToolType.Cursor, p5);
+	}
 
 	const resetCanva = async () => {
 		await networker.clearCanva();
@@ -117,8 +128,8 @@
 	};
 
 	const hasMovedSinceDragStart = () => {
-		if (isDragging) {
-			isDragging = false;
+		if (isMouseDown) {
+			isMouseDown = false;
 			const dragVector = p5.createVector(grabStart.x, grabStart.y);
 			const ogVector = p5.createVector(p5.mouseX, p5.mouseY);
 			if (dragVector.dist(ogVector) > 5) {
@@ -126,11 +137,6 @@
 			}
 		}
 		return false;
-	};
-
-	const adjustForMouseDraging = () => {
-		screenOffset.x = p5.mouseX - dragOffset.x;
-		screenOffset.y = p5.mouseY - dragOffset.y;
 	};
 
 	const adjustForZoomMovement = () => {
@@ -172,8 +178,8 @@
 
 				p5.push();
 
-				if (isDragging) {
-					adjustForMouseDraging();
+				if (isMouseDown) {
+					if(currentTool) screenOffset = currentTool.mouseMove(isMouseDown);
 				}
 
 				p5.translate(screenOffset.x, screenOffset.y);
@@ -187,12 +193,12 @@
 			p5.mousePressed = (e: MouseEvent) => {
 				if (!isTargeting(e.target, 'place-it-canvas')) return;
 
-				isDragging = true;
-
+				isMouseDown = true;
 				grabStart.x = p5.mouseX;
-				grabStart.y = p5.mouseY;
-				dragOffset.x = p5.mouseX - screenOffset.x;
-				dragOffset.y = p5.mouseY - screenOffset.y;
+    		grabStart.y = p5.mouseY;
+
+				if(currentTool) isMouseDown = isMouseDragging = currentTool.mousePressed(screenOffset);
+				
 			};
 
 			/* Clicking on canvas */
@@ -200,14 +206,16 @@
 				if (!isTargeting(e.target, 'place-it-canvas')) return;
 
 				if (hasMovedSinceDragStart()) return;
+				if(currentTool) currentTool.mouseReleased();
 
-				isDragging = false;
+				isMouseDown = false;
+				if(isMouseDragging) return;
+				isMouseDragging = false;
 
 				const coords: Coord = {
 					x: Math.floor((p5.mouseX - screenOffset.x) / currentScale),
 					y: Math.floor((p5.mouseY - screenOffset.y) / currentScale)
 				};
-
 				networker.placePixel(coords, color);
 			};
 
@@ -220,12 +228,29 @@
 				}
 				adjustForZoomMovement();
 			});
-
+			p5.keyPressed = () => {
+				switch (p5.keyCode) {
+					case p5.OPTION:
+						setTempTool(ToolType.Hand, p5);
+						break;
+					default:
+						break;
+				}
+				adjustForZoomMovement();
+			};
 			p5.keyReleased = () => {
-				if (p5.keyCode === p5.UP_ARROW) {
-					scaleFactor = 1 + zoomSensitivity;
-				} else {
-					scaleFactor = 1 - zoomSensitivity;
+				switch (p5.keyCode) {
+					case p5.UP_ARROW:
+						scaleFactor = 1 + zoomSensitivity;
+						break;
+					case p5.DOWN_ARROW:
+						scaleFactor = 1 - zoomSensitivity;
+						break;
+					case p5.OPTION:
+						backToTool()
+						break;
+					default:
+						break;
 				}
 				adjustForZoomMovement();
 			};
@@ -244,14 +269,25 @@
 			};
 		}
 	});
+
 </script>
 
-<!-- overlay -->
-<div class="flex absolute inset-0 justify-center items-center space-between pointer-events-none">
-	<Palette bind:setColors={updateColorPalette} childClass={'shrink self-end pointer-events-auto'}
-	></Palette>
-	<Button on:resetCanva={resetCanva} childClass={'shrink self-end pointer-events-auto'}></Button>
+<div id="canvas-container" class="relative cursor-{currentToolType.cursor}">
+	<!-- overlay -->
+	<div class="absolute top-0 bottom-[50px] left-0 right-0 pointer-events-none">
+		<!-- bootom panel -->
+		<div class="absolute bottom-0 left-0 right-0 flex justify-center">
+			<Palette bind:setColors={updateColorPalette} childClass={'pointer-events-auto'}
+			></Palette>
+		</div>
+
+		<!-- other -->
+		<Toolbar childClass={'absolute pointer-events-auto'} p5="{p5}"></Toolbar>
+		<Button on:resetCanva={resetCanva} childClass={'absolute top-0 right-0'}></Button>
+	</div>
+
+	<!-- canvas -->
+	<div bind:this={container} class="w-full"></div>
 </div>
 
-<!-- canvas -->
-<div bind:this={container} class="h-full w-full"></div>
+
