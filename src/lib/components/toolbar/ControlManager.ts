@@ -1,18 +1,19 @@
 import P5 from 'p5'
 import Tool from "$lib/components/toolbar/ToolClass";
-import { ToolType, backToTool, selectedTool, setTempTool, setTool, toolClasses } from '$lib/stores/toolStore';
+import { ToolType, selectedTool} from '$lib/stores/toolStore';
 import type Networker from '$lib/utility/Networker';
 import { selectedColor } from '$lib/stores/colorStore';
+import ToolManager from './tools/ToolManager';
 export default class ControlManager {
   p5: P5
-  activeTool: Tool | undefined;
-  activeToolType: typeof Tool = Tool
   networker: Networker
+  toolManager: ToolManager
 
   isMouseDown: boolean = false
   isMouseDragging: boolean = false
 
   static screenOffset: Coord
+  static currentScale:number
 
   	// original position on start of dragging
 	grabStart: Coord = {
@@ -21,68 +22,66 @@ export default class ControlManager {
 	};
 
   scaleFactor = 0;
-  currentScale:number
 
   color: string | undefined
 
-  constructor(initialTool: ToolType, p5: P5, initialOffset: Coord, currentScale: number, networker: Networker) {
+  constructor(p5: P5, size: Size2D, networker: Networker) {
     this.p5 = p5;
-    ControlManager.screenOffset = initialOffset;
     this.networker = networker;
-    this.setTool(initialTool);
-    this.currentScale = currentScale;
     
-    selectedTool.subscribe((newTool: Tool | undefined) => {
-      if(newTool == undefined) return;
-      this.activeTool = newTool;
-      const type = this.activeTool.getType()
-      if(type == null) return;
-      this.activeToolType = type;
-    });
+    this.toolManager = new ToolManager(ToolType.Cursor, p5);
+
+		// initialize scale factor
+		const widthRatio = p5.windowWidth / size.width;
+		const heightRatio = p5.windowHeight / size.height;
+		// get scale factor by getting the one from the axies with the least pixels
+    ControlManager.currentScale = widthRatio < heightRatio ? widthRatio : heightRatio;
+		// ControlManager.currentScale = 1;
+    
+		// set initial offset to center image
+		const x = (size.width / 2) * ControlManager.currentScale;
+		const y = (size.height / 2) * ControlManager.currentScale;
+    
+    const screenCenter = {
+      x: this.p5.windowWidth / 2,
+      y: this.p5.windowHeight / 2
+    };
+    
+    ControlManager.screenOffset = {
+      x: screenCenter.x - x,
+      y: screenCenter.y - y
+    };
 
     selectedColor.subscribe((newColor) => {
       this.color = newColor;
     });
-  }
-
-  setTool(newTool: ToolType) {
-    setTool(newTool, this.p5)
+    console.log("ControlManager.screenOffset", ControlManager.screenOffset)
   }
 
   updateOffset() {
-    if (this.isMouseDown) {
-      if (this.activeTool) {
-        ControlManager.screenOffset = this.activeTool.mouseMove(this.isMouseDown);
-      }
+    if(this.isMouseDown) {
+      this.toolManager.updateOffset()
     }
-    return ControlManager.screenOffset
-  }
-  getScale() {
-    return this.currentScale
   }
 
   mousePressed() {
 
     this.grabStart.x = this.p5.mouseX;
     this.grabStart.y = this.p5.mouseY;
-
-    this.isMouseDown = true;
-    if(this.activeTool) {
-      this.isMouseDown = this.activeTool.mousePressed(ControlManager.screenOffset);
-    }
+    
+    this.isMouseDown = this.toolManager.mousePressed()
   }
   mouseReleased() {
     if (this.hasMovedSinceDragStart()) return;
 
-    if(this.activeTool) {
-      this.activeTool.mouseReleased();
-    }
+    this.toolManager.mouseReleased();
     
     this.isMouseDown = false;
 
+    // calculate on which pixel the mouse is over
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / this.currentScale),
-      y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / this.currentScale)
+      x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / ControlManager.currentScale),
+      y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / ControlManager.currentScale)
     };
 
     if(this.color)
@@ -103,30 +102,24 @@ export default class ControlManager {
 	};
 
   scroll(scaleFactor: number) {
-    if(this.activeTool) {
-      // adjust for ZoomMovement
-      this.scaleFactor = scaleFactor
-      
-      this.currentScale = this.currentScale * this.scaleFactor;
-
-      // get mouse position relative to canvas zoom
-      const relMouse = {
-        x: this.p5.mouseX * this.scaleFactor,
-        y: this.p5.mouseY * this.scaleFactor
-      };
-
-      // get the current screen offset relative to the canvas
-      const relOffset = {
-        x: ControlManager.screenOffset.x * this.scaleFactor,
-        y: ControlManager.screenOffset.y * this.scaleFactor
-      };
-
-      ControlManager.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
-      ControlManager.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
-    }
-  }
-
-  placePixel(color: string | null) {
+    // adjust for ZoomMovement
+    this.scaleFactor = scaleFactor
     
+    ControlManager.currentScale = ControlManager.currentScale * this.scaleFactor;
+
+    // get mouse position relative to canvas zoom
+    const relMouse = {
+      x: this.p5.mouseX * this.scaleFactor,
+      y: this.p5.mouseY * this.scaleFactor
+    };
+
+    // get the current screen offset relative to the canvas
+    const relOffset = {
+      x: ControlManager.screenOffset.x * this.scaleFactor,
+      y: ControlManager.screenOffset.y * this.scaleFactor
+    };
+
+    ControlManager.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
+    ControlManager.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
   }
 }

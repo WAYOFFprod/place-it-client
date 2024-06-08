@@ -19,21 +19,17 @@
 	let container: HTMLElement;
 	let updateColorPalette: (newColors: [string]) => void;
 
+	let p5: P5;
+	let controlManager: ControlManager
 	let gridManager: GridManager;
 	const networker = new Networker(PUBLIC_SERVER_URL, PUBLIC_WEBSOCKET_URL);
 
 	const zoomSensitivity = 0.1;
 
-	let controlManager: ControlManager
 
-	let screenCenter: Coord = {
-		x: 0,
-		y: 0
-	};
-
-	let p5: P5;
 
 	let currentToolType: typeof Tool = Tool
+
 
 	selectedTool.subscribe((newTool: Tool | undefined) => {
 		if(newTool == undefined) return;
@@ -66,20 +62,8 @@
 		height = data.height;
 		const size: Size2D = { width: width, height: height };
 
-		// initialize scale factor
-		const widthDiff = p5.windowWidth / width;
-		const heightDiff = p5.windowHeight / height;
-		// get scale factor by getting the one from the axies with the least pixels
-		const currentScale = widthDiff < heightDiff ? widthDiff : heightDiff;
-		// currentScale = 1;
-
-		// set initial offset to center image
-		const x = (width / 2) * currentScale;
-		const y = (height / 2) * currentScale;
-
-		// initialise canvas and palette
 		gridManager = new GridManager(p5, size);
-
+		
 		networker.connectToSocket(gridManager, reloadCanva);
 
 		const pixels = networker.tempPoints as {[key: string]: string};
@@ -88,10 +72,7 @@
 		updateColorPalette(data.colors);
 		
 
-		controlManager = new ControlManager(ToolType.Cursor, p5, {
-			x: screenCenter.x - x,
-			y: screenCenter.y - y
-		}, currentScale, networker)
+		controlManager = new ControlManager(p5, size, networker)
 
 		isReady = true;
 	};
@@ -110,10 +91,6 @@
 				p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
 				p5.noSmooth();
 
-				screenCenter = {
-					x: p5.windowWidth / 2,
-					y: p5.windowHeight / 2
-				};
 			};
 
 			p5.draw = () => {
@@ -122,11 +99,10 @@
 
 				p5.push();
 
-				const screenOffset = controlManager.updateOffset();
-				const currentScale = controlManager.getScale();
+				controlManager.updateOffset();
 
-				p5.translate(screenOffset.x, screenOffset.y);
-				p5.scale(currentScale);
+				p5.translate(ControlManager.screenOffset.x, ControlManager.screenOffset.y);
+				p5.scale(ControlManager.currentScale);
 
 				// draw content
 				gridManager.updateCanvasPosition();
