@@ -81,14 +81,13 @@ export default class GridManager {
   }
 
   drawPixelsFromIndex = (data: {[key: string]: string}) => {
-    
     if(data != null) {
       for (const [id, color] of Object.entries(data)) {
         const index = parseInt(id);
         const absolutePosition = this.getCoordFromIndex(index, this.canvas.width)
         const gridIndex = this.getGridSectionIndex(absolutePosition);
         const relPosition = this.getRelativePixelPosition(absolutePosition);
-        
+
         this.gridSections[gridIndex].drawPixel(relPosition, color);
       }
     }
@@ -96,7 +95,7 @@ export default class GridManager {
 
   drawPixelOnCanvas = (absolutePosition: Coord, color: string) => {
     if(!this.isSectionIndexInBound(absolutePosition)) {
-      return
+      return false
     }
     
     const relPosition = this.getRelativePixelPosition(absolutePosition);

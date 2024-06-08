@@ -11,6 +11,7 @@
 	import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
 	import Toolbar from '$lib/components/toolbar/toolbar.svelte';
 	import Tool from './toolbar/ToolClass';
+	import ControlManager from './toolbar/ControlManager';
 
 	let width = 32;
 	let height = 16;
@@ -22,28 +23,15 @@
 	const networker = new Networker(PUBLIC_SERVER_URL, PUBLIC_WEBSOCKET_URL);
 
 	const zoomSensitivity = 0.1;
-	let scaleFactor = 1;
 	let currentScale = 0;
 
-	let color: string | null;
-
-	let isMouseDown = false;
-	let isMouseDragging = false;
-
-	let screenOffset: Coord = {
-		x: 0,
-		y: 0
-	};
+	let controlManager: ControlManager
 
 	let screenCenter: Coord = {
 		x: 0,
 		y: 0
 	};
-	// original position on start of dragging
-	let grabStart: Coord = {
-		x: 0,
-		y: 0
-	};
+
 
 	let dragOffset: Coord = {
 		x: 0,
@@ -52,18 +40,11 @@
 
 	let p5: P5;
 
-
-	selectedColor.subscribe((newColor) => {
-		color = newColor;
-	});
-
-	let currentTool: Tool | undefined
 	let currentToolType: typeof Tool = Tool
 
 	selectedTool.subscribe((newTool: Tool | undefined) => {
 		if(newTool == undefined) return;
-		currentTool = newTool;
-		const type = currentTool.getType()
+		const type = newTool.getType()
 		if(type == null) return;
 		currentToolType = type;
 	});
@@ -96,14 +77,12 @@
 		const widthDiff = p5.windowWidth / width;
 		const heightDiff = p5.windowHeight / height;
 		// get scale factor by getting the one from the axies with the least pixels
-		currentScale = widthDiff < heightDiff ? widthDiff : heightDiff;
+		const currentScale = widthDiff < heightDiff ? widthDiff : heightDiff;
 		// currentScale = 1;
 
 		// set initial offset to center image
 		const x = (width / 2) * currentScale;
 		const y = (height / 2) * currentScale;
-		screenOffset.x = screenCenter.x - x;
-		screenOffset.y = screenCenter.y - y;
 
 		// initialise canvas and palette
 		gridManager = new GridManager(p5, size);
@@ -112,51 +91,23 @@
 
 		const pixels = networker.tempPoints as {[key: string]: string};
 		gridManager.loadImage(data.image, size, pixels);
-		color = data.colors[0];
+		// color = data.colors[0];
 		updateColorPalette(data.colors);
-		initToolbar();
+		
+
+		controlManager = new ControlManager(ToolType.Cursor, p5, {
+			x: screenCenter.x - x,
+			y: screenCenter.y - y
+		}, currentScale, networker)
+
 		isReady = true;
 	};
-
-	const initToolbar = () => {
-		setTool(ToolType.Cursor, p5);
-	}
 
 	const resetCanva = async () => {
 		await networker.clearCanva();
 		reloadCanva();
 	};
 
-	const hasMovedSinceDragStart = () => {
-		if (isMouseDown) {
-			isMouseDown = false;
-			const dragVector = p5.createVector(grabStart.x, grabStart.y);
-			const ogVector = p5.createVector(p5.mouseX, p5.mouseY);
-			if (dragVector.dist(ogVector) > 5) {
-				return true;
-			}
-		}
-		return false;
-	};
-
-	const adjustForZoomMovement = () => {
-		currentScale = currentScale * scaleFactor;
-
-		// get mouse position relative to canvas zoom
-		const relMouse = {
-			x: p5.mouseX * scaleFactor,
-			y: p5.mouseY * scaleFactor
-		};
-
-		// get the current screen offset relative to the canvas
-		const relOffset = {
-			x: screenOffset.x * scaleFactor,
-			y: screenOffset.y * scaleFactor
-		};
-
-		screenOffset.x = p5.mouseX - relMouse.x + relOffset.x;
-		screenOffset.y = p5.mouseY - relMouse.y + relOffset.y;
-	};
 	onMount(() => {
 		const script = (canvas: P5) => {
 			p5 = canvas;
@@ -178,9 +129,8 @@
 
 				p5.push();
 
-				if (isMouseDown) {
-					if(currentTool) screenOffset = currentTool.mouseMove(isMouseDown);
-				}
+				const screenOffset = controlManager.updateOffset();
+				const currentScale = controlManager.getScale();
 
 				p5.translate(screenOffset.x, screenOffset.y);
 				p5.scale(currentScale);
@@ -192,42 +142,24 @@
 
 			p5.mousePressed = (e: MouseEvent) => {
 				if (!isTargeting(e.target, 'place-it-canvas')) return;
-
-				isMouseDown = true;
-				grabStart.x = p5.mouseX;
-    		grabStart.y = p5.mouseY;
-
-				if(currentTool) isMouseDown = isMouseDragging = currentTool.mousePressed(screenOffset);
-				
+				controlManager.mousePressed()
 			};
 
 			/* Clicking on canvas */
 			p5.mouseReleased = (e: MouseEvent) => {
 				if (!isTargeting(e.target, 'place-it-canvas')) return;
-
-				if (hasMovedSinceDragStart()) return;
-				if(currentTool) currentTool.mouseReleased();
-
-				isMouseDown = false;
-				if(isMouseDragging) return;
-				isMouseDragging = false;
-
-				const coords: Coord = {
-					x: Math.floor((p5.mouseX - screenOffset.x) / currentScale),
-					y: Math.floor((p5.mouseY - screenOffset.y) / currentScale)
-				};
-				networker.placePixel(coords, color);
+				controlManager.mouseReleased()
 			};
 
 			/* Scrolling */
 			window.addEventListener('wheel', function (e) {
 				if (e.deltaY > 0) {
-					scaleFactor = 1 + zoomSensitivity;
+					controlManager.scroll(1 + zoomSensitivity)
 				} else {
-					scaleFactor = 1 - zoomSensitivity;
+					controlManager.scroll(1 - zoomSensitivity)
 				}
-				adjustForZoomMovement();
 			});
+
 			p5.keyPressed = () => {
 				switch (p5.keyCode) {
 					case p5.OPTION:
@@ -236,15 +168,14 @@
 					default:
 						break;
 				}
-				adjustForZoomMovement();
 			};
 			p5.keyReleased = () => {
 				switch (p5.keyCode) {
 					case p5.UP_ARROW:
-						scaleFactor = 1 + zoomSensitivity;
+						controlManager.scroll(1 + zoomSensitivity)
 						break;
 					case p5.DOWN_ARROW:
-						scaleFactor = 1 - zoomSensitivity;
+						controlManager.scroll(1 - zoomSensitivity)
 						break;
 					case p5.OPTION:
 						backToTool()
@@ -252,7 +183,6 @@
 					default:
 						break;
 				}
-				adjustForZoomMovement();
 			};
 		};
 
