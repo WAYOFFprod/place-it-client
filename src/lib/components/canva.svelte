@@ -23,17 +23,10 @@
 	const networker = new Networker(PUBLIC_SERVER_URL, PUBLIC_WEBSOCKET_URL);
 
 	const zoomSensitivity = 0.1;
-	let currentScale = 0;
 
 	let controlManager: ControlManager
 
 	let screenCenter: Coord = {
-		x: 0,
-		y: 0
-	};
-
-
-	let dragOffset: Coord = {
 		x: 0,
 		y: 0
 	};
