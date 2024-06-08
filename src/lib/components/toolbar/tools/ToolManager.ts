@@ -30,6 +30,8 @@ export default class ToolManager {
       ControlManager.screenOffset = this.activeTool.mouseMove(true);
     }
   }
+
+  // returns boolean representing if tool should toggle mousedown variable
   mousePressed() {
     if(this.activeTool) {
       return this.activeTool.mousePressed(ControlManager.screenOffset);

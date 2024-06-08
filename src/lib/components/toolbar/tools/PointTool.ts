@@ -2,23 +2,25 @@ import { ToolType } from "$lib/stores/toolStore";
 import Tool from "../ToolClass";
 import CursorIcon from "$lib/icons/cursor.svelte"
 import Networker from "$lib/utility/Networker";
-import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
+
+import ControlManager from "../ControlManager";
+import { selectedColor } from "$lib/stores/colorStore";
 
 export default class PointTool extends Tool {
   static cursor = "pointer"
   static type = ToolType.Cursor
   static icon = CursorIcon
 
-  networker: Networker = new Networker(PUBLIC_SERVER_URL, PUBLIC_WEBSOCKET_URL);
+  color: string | undefined;
 
-  // dragOffset: Coord = {
-	// 	x: 0,
-	// 	y: 0
-	// };
-  // screenOffset: Coord = {
-	// 	x: 0,
-	// 	y: 0
-	// };
+  networker: Networker = Networker.getInstance();
+
+
+  init() {
+    selectedColor.subscribe((newColor) => {
+      this.color = newColor;
+    });
+  }
 
   keyDown() {
 
@@ -28,23 +30,19 @@ export default class PointTool extends Tool {
 
   }
 
-  // mousePressed() {
-    // this.dragOffset.x = this.p5.mouseX - this.screenOffset.x;
-    // this.dragOffset.y = this.p5.mouseY - this.screenOffset.y;
-  // }
-
   mouseReleased() {
-
-    // const coords: Coord = {
-    //   x: Math.floor((this.p5.mouseX - this.screenOffset.x) / this.currentScale),
-    //   y: Math.floor((this.p5.mouseY - this.screenOffset.y) / this.currentScale)
-    // };
-    // this.networker.placePixel(coords, color);
+    this.placePixel();
   }
 
-  // mouseMove(isMouseDown: boolean) {
-    
-  // }
+  protected placePixel() {
+    if(!this.color) return;
+      // calculate on which pixel the mouse is over
+    const coords: Coord = {
+      x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / ControlManager.currentScale),
+      y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / ControlManager.currentScale)
+    };
+    this.networker.placePixel(coords, this.color);
+  }
 
   getType: () => null | typeof Tool = () => {
     return PointTool

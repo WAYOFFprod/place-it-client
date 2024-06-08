@@ -1,12 +1,11 @@
 import P5 from 'p5'
 import Tool from "$lib/components/toolbar/ToolClass";
 import { ToolType, selectedTool} from '$lib/stores/toolStore';
-import type Networker from '$lib/utility/Networker';
-import { selectedColor } from '$lib/stores/colorStore';
+import Networker from '$lib/utility/Networker';
 import ToolManager from './tools/ToolManager';
 export default class ControlManager {
   p5: P5
-  networker: Networker
+  networker: Networker = Networker.getInstance();;
   toolManager: ToolManager
 
   isMouseDown: boolean = false
@@ -23,17 +22,16 @@ export default class ControlManager {
 
   scaleFactor = 0;
 
-  color: string | undefined
 
-  constructor(p5: P5, size: Size2D, networker: Networker) {
+  constructor(p5: P5, size: Size2D) {
     this.p5 = p5;
-    this.networker = networker;
     
     this.toolManager = new ToolManager(ToolType.Cursor, p5);
 
 		// initialize scale factor
 		const widthRatio = p5.windowWidth / size.width;
 		const heightRatio = p5.windowHeight / size.height;
+    
 		// get scale factor by getting the one from the axies with the least pixels
     ControlManager.currentScale = widthRatio < heightRatio ? widthRatio : heightRatio;
 		// ControlManager.currentScale = 1;
@@ -51,11 +49,6 @@ export default class ControlManager {
       x: screenCenter.x - x,
       y: screenCenter.y - y
     };
-
-    selectedColor.subscribe((newColor) => {
-      this.color = newColor;
-    });
-    console.log("ControlManager.screenOffset", ControlManager.screenOffset)
   }
 
   updateOffset() {
@@ -77,15 +70,6 @@ export default class ControlManager {
     this.toolManager.mouseReleased();
     
     this.isMouseDown = false;
-
-    // calculate on which pixel the mouse is over
-    const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / ControlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / ControlManager.currentScale)
-    };
-
-    if(this.color)
-    this.networker.placePixel(coords, this.color);
   }
 
 

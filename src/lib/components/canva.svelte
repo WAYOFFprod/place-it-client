@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import P5 from 'p5';
 	import GridManager from '$lib/p5/GridManager';
-	import { selectedColor } from '$lib/stores/colorStore';
 	import { ToolType, backToTool, selectedTool, setTempTool, setTool } from '$lib/stores/toolStore';
 
 	import Palette from './color/palette.svelte';
@@ -22,7 +21,7 @@
 	let p5: P5;
 	let controlManager: ControlManager
 	let gridManager: GridManager;
-	const networker = new Networker(PUBLIC_SERVER_URL, PUBLIC_WEBSOCKET_URL);
+	const networker = Networker.getInstance();
 
 	const zoomSensitivity = 0.1;
 
@@ -61,7 +60,8 @@
 		width = data.width;
 		height = data.height;
 		const size: Size2D = { width: width, height: height };
-
+		controlManager = new ControlManager(p5, size)
+		
 		gridManager = new GridManager(p5, size);
 		
 		networker.connectToSocket(gridManager, reloadCanva);
@@ -72,7 +72,7 @@
 		updateColorPalette(data.colors);
 		
 
-		controlManager = new ControlManager(p5, size, networker)
+		
 
 		isReady = true;
 	};

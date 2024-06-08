@@ -2,13 +2,23 @@
 import type GridManager from "$lib/p5/GridManager";
 import ServerRequests from "./ServerRequests";
 import { Socket, io } from 'socket.io-client';
+import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
 
 export default class Networker {
+  static #instance: Networker
   server: ServerRequests
   socket: Socket | undefined
   gridManager: GridManager | undefined
   tempPoints: {[key: string]: string} | undefined
   websocket: string
+
+  static getInstance() {
+    if (!this.#instance) {
+      this.#instance = new Networker(PUBLIC_SERVER_URL, PUBLIC_WEBSOCKET_URL);
+    }
+    return this.#instance;
+  }
+
   constructor(server: string, websocket: string) {
     this.websocket = websocket
     this.server = new ServerRequests(server+'/api');

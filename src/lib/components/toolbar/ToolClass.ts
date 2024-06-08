@@ -24,6 +24,12 @@ export default class Tool {
 
   constructor(p5: P5) {
     this.p5 = p5
+    this.init()
+  }
+
+
+  protected init() {
+    // do something if need for tool initialisation
   }
 
   keyDown() {
@@ -50,10 +56,12 @@ export default class Tool {
     }
   }
 
+  // returns: boolean that represent if pressing down should be saved
   mousePressed(mousePressed: Coord): boolean {
     return false
   }
 
+  // returns: boolean that represent if it should place pixel
   mouseReleased() {
 
   }
