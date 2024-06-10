@@ -24,7 +24,7 @@
 </script>
 <div class="{childClass} cursor-pointer">
 	<Panel>
-		<div class="grid grid-cols-8 gap-2">
+		<div class="grid grid-cols-8 gap-2 p-2 m-2 ">
 			{#each colors as color}
 				<Swatch {color} on:selectColor={updateSelectColor} selected="{color == currentColor}"></Swatch>
 			{/each}

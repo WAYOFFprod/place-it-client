@@ -4,6 +4,9 @@ import { CompletionTriggerKind } from 'typescript';
 export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
+		fontFamily: {
+			sans: ['NeueBit', 'system-ui']
+		},
 		extend: {
 			cursor: {
 				hand: 'url("/cursors/hand.svg"), pointer',
@@ -30,6 +33,14 @@ export default {
 				'off-white': '#F6F4F4',
 				'dark-grey': '#504F4F',
 				black: '#141414'
+			},
+			fontSize: {
+				'3xl': [
+					'32px',
+					{
+						fontWeight: 700
+					}
+				]
 			}
 		}
 	},
