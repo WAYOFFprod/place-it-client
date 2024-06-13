@@ -28,9 +28,13 @@ export default class ControlManager {
     
     this.toolManager = new ToolManager(ToolType.Cursor, p5);
 
-		// initialize scale factor
-		const widthRatio = p5.windowWidth / size.width;
-		const heightRatio = p5.windowHeight / size.height;
+		this.init(size)
+  }
+
+  init(size: Size2D) {
+    // initialize scale factor
+		const widthRatio = this.p5.windowWidth / size.width;
+		const heightRatio = this.p5.windowHeight / size.height;
     
 		// get scale factor by getting the one from the axies with the least pixels
     ControlManager.currentScale = widthRatio < heightRatio ? widthRatio : heightRatio;
@@ -58,7 +62,6 @@ export default class ControlManager {
   }
 
   mousePressed() {
-
     this.grabStart.x = this.p5.mouseX;
     this.grabStart.y = this.p5.mouseY;
     

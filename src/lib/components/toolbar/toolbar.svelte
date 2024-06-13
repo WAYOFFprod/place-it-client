@@ -1,10 +1,7 @@
 <script lang="ts">
-	import Panel from '$lib/components/panel.svelte';
+	import Panel from '$lib/components/layout/panel.svelte';
 	
 	import Tool from "$lib/components/toolbar/ToolClass";
-	import MoveTool from "$lib/components/toolbar/tools/MoveTool";
-	import PointTool from "$lib/components/toolbar/tools/PointTool";
-	import SelectionTool from "$lib/components/toolbar/tools/SelectionTool";
 
 	import { selectedTool, setTool, toolClasses } from '$lib/stores/toolStore';
 	import ToolIcon from './toolIcon.svelte';
@@ -32,7 +29,7 @@
 
 </script>
 <div class="{childClass} cursor-hand">
-	<Panel>
+	<Panel class="w-fit">
 		<div class="grid grid-cols-1 gap-2 p-2 m-2">
 			{#each tools as t, i}
 			<ToolIcon on:selectTool={updateSelectTool} toolType={t.type} selected="{currentToolType == t}">

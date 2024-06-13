@@ -75,11 +75,16 @@ export default class Networker {
     this.socket.emit('new-pixel', index, coord, color);
   }
 
-  clearCanva = async (id: number = 1) => {
-    const size = {
-      width: 20,
-      height: 20
+  addColors = async (id: number, colors: string[]) => {
+    const payload = {
+      id: id,
+      colors: colors
     }
+    const response = await this.server.post("/canvas/color/add/", payload);
+    return response;
+  }
+
+  createCanva = async (id: number = 1, size: Size2D) => {
     const response = await this.server.post("/canvas/create", size);
     if(this.socket != undefined)
     this.socket.emit('reset');

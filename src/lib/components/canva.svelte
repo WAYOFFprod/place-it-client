@@ -7,10 +7,11 @@
 	import Palette from './color/palette.svelte';
 	import Button from './button.svelte';
 	import Networker from '$lib/utility/Networker';
-	import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
+	import Modal from '$lib/components/modal.svelte';
 	import Toolbar from '$lib/components/toolbar/toolbar.svelte';
 	import Tool from './toolbar/ToolClass';
 	import ControlManager from './toolbar/ControlManager';
+	import { event } from '$lib/stores/eventStore';
 
 	let width = 32;
 	let height = 16;
@@ -37,12 +38,19 @@
 		currentToolType = type;
 	});
 
+	event.subscribe((newEvent) => {
+		if(newEvent == 'clearCanva')
+		reloadCanva();
+  })
+
 	
 	let isReady = false;
 
-	const reloadCanva = () => {
+	const reloadCanva = async () => {
 		isReady = false;
-		initCanvas();
+		const canvasData = await fetchData();
+		controlManager.init(canvasData.size)
+		connect(canvasData);
 	};
 
 	const isTargeting = (target: EventTarget | null, id: string) => {
@@ -52,7 +60,7 @@
 		return true;
 	};
 
-	const initCanvas = async () => {
+	const fetchData = async () => {
 		// load data
 		const data = await networker.getCanva();
 
@@ -60,26 +68,30 @@
 		width = data.width;
 		height = data.height;
 		const size: Size2D = { width: width, height: height };
-		controlManager = new ControlManager(p5, size)
-		
-		gridManager = new GridManager(p5, size);
-		
+		return {
+			data: data,
+			size: size
+		}
+
+	}
+
+	const connect = async (canvasData: CanvaData) => {
+		gridManager = new GridManager(p5, canvasData.size);
+
 		networker.connectToSocket(gridManager, reloadCanva);
 
 		const pixels = networker.tempPoints as {[key: string]: string};
-		gridManager.loadImage(data.image, size, pixels);
+		gridManager.loadImage(canvasData.data.image, canvasData.size, pixels);
 		// color = data.colors[0];
-		updateColorPalette(data.colors);
-		
-
-		
+		updateColorPalette(canvasData.data.colors);
 
 		isReady = true;
-	};
+	}
 
-	const resetCanva = async () => {
-		await networker.clearCanva();
-		reloadCanva();
+	const initCanvas = async () => {
+		const canvasData = await fetchData();
+		controlManager = new ControlManager(p5, canvasData.size)
+		connect(canvasData);
 	};
 
 	onMount(() => {
@@ -158,7 +170,6 @@
 		/* Instantiate canva */
 		if (container) {
 			const p5 = new P5(script, container);
-
 			initCanvas();
 
 			/* destroy if unmounted */
@@ -170,7 +181,7 @@
 	});
 
 </script>
-
+<Modal></Modal>
 <div id="canvas-container" class="relative cursor-{currentToolType.cursor}">
 	<!-- overlay -->
 	<div class="absolute top-0 bottom-[50px] left-0 right-0 pointer-events-none">
@@ -182,7 +193,6 @@
 
 		<!-- other -->
 		<Toolbar childClass={'absolute pointer-events-auto'} p5="{p5}"></Toolbar>
-		<Button on:resetCanva={resetCanva} childClass={'absolute top-0 right-0'}></Button>
 	</div>
 
 	<!-- canvas -->

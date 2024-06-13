@@ -31,6 +31,7 @@ export default class PointTool extends Tool {
   }
 
   mouseReleased() {
+    
     this.placePixel();
   }
 

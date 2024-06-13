@@ -1,8 +1,12 @@
 <script>
 	import Canva from '$lib/components/canva.svelte';
+	import Button from '$lib/components/form/button.svelte';
 	import Header from '$lib/components/header.svelte';
-	import Modal from '$lib/components/modal.svelte';
-	import Create from '$lib/components/modals/create.svelte';
+	import { openedModal } from '$lib/stores/modalStore';
+
+	const onclick = () => {
+    openedModal.set('create')
+  }
 </script>
 
 <div class="flex flex-col h-full">
@@ -10,12 +14,9 @@
 		<div class="flex justify-between">
 			<div>home icon</div>
 			<div>CANVAS NAME</div>
-			<div>share and export</div>
+			<Button stretch={false} type="button" on:click={onclick}>Reset</Button>
 		</div>
 	</Header>
-	<Modal>
-		<Create></Create>
-	</Modal>
 	<Canva></Canva>
 </div>
 

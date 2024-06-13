@@ -7,6 +7,9 @@ export default {
 		fontFamily: {
 			sans: ['NeueBit', 'system-ui']
 		},
+		borderRadius: {
+			DEFAULT: '8px'
+		},
 		extend: {
 			cursor: {
 				hand: 'url("/cursors/hand.svg"), pointer',

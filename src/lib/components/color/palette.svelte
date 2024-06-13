@@ -1,20 +1,23 @@
 <script lang="ts">
-	import { selectedColor } from '$lib/stores/colorStore';
-	import Panel from '$lib/components/panel.svelte';
+	import { storedColors, selectedColor } from '$lib/stores/colorStore';
+	import Panel from '$lib/components/layout/panel.svelte';
 	import Swatch from './swatch.svelte';
 
 	export let childClass: string;
-
-	let colors: string[] = [];
 	let currentColor: string;
+	let colors: string[] = []
 
 	export const setColors = (newColors: [string]) => {
-		colors = newColors;
-		selectedColor.set(colors[0]);
+		storedColors.set(newColors);
+		selectedColor.set(newColors[0]);
 	};
 
 	selectedColor.subscribe((newColor) => {
 		currentColor = newColor;
+	});
+
+	storedColors.subscribe((newColors) => {
+		colors = newColors;
 	});
 
 	const updateSelectColor = (event: CustomEvent<selectColor>) => {
@@ -23,7 +26,7 @@
 
 </script>
 <div class="{childClass} cursor-pointer">
-	<Panel>
+	<Panel class="w-fit">
 		<div class="grid grid-cols-8 gap-2 p-2 m-2 ">
 			{#each colors as color}
 				<Swatch {color} on:selectColor={updateSelectColor} selected="{color == currentColor}"></Swatch>
