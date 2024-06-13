@@ -8,9 +8,9 @@ export let id: string
   {#if label}
     <label class="block" for={id}>{label}</label>
   {/if}
-  <div class="relative flex gap-2">
-    <input id={id} name={id} type="text" placeholder={placeholder} class="border-b-2 autofill:border-red-400 border-black bg-transparent focus:border-fluorescent-cyan-focus grow pr-8" />
-    <div class="absolute right-0 w-5">
+  <div class="relative w-full">
+    <input id={id} name={id} type="text" placeholder={placeholder} class="border-b-2 autofill:border-red-400 border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pr-8 min-w-5" />
+    <div class="absolute  w-5 right-0 bottom-2">
       <slot />
     </div>
   </div>

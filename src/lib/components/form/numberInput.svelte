@@ -12,15 +12,15 @@
     inputValue += change;
   }
 </script>
-<div class="flex gap-2 items-center">
+<div class="flex gap-2 items-center h-7 ">
   {#if label}
     <label for={id}>{label}</label>
   {/if}
-  <div class="relative">
-    <input id={id} name={id} type="number" step={step} placeholder={placeholder} class="w-16 rounded-r border-2 border-l-0 border-black focus:border-fluorescent-cyan-focus ml-4 pl-2 peer" bind:value={inputValue}/>
+  <div class="relative h-7 flex">
+    <input id={id} name={id} type="number" step={step} placeholder={placeholder} class="text-medium w-16 h-7 rounded-r border-2 border-l-0 border-black focus:border-fluorescent-cyan-focus ml-4 pl-2 peer" bind:value={inputValue}/>
     <div class="absolute top-0 bottom-0 left-0 w-4 flex flex-col border-2 border-black hover:border-fluorescent-cyan-focus peer-focus:border-r-fluorescent-cyan-focus items-center rounded-l overflow-hidden">
-      <button on:click={() => click(step)} class="h-1/2 flex justify-center items-center bg-white text-black hover:text-fluorescent-cyan-focus"><ChevronDown classes="w-4 rotate-180"/></button>
-      <button on:click={() => click(-step)} class="h-1/2 flex justify-center items-center bg-white text-black hover:text-fluorescent-cyan-focus"><ChevronDown classes="w-4 "/></button>
+      <button on:click={() => click(step)} type="button" class="h-1/2 flex justify-center items-center bg-white text-black hover:text-fluorescent-cyan-focus"><ChevronDown classes="w-4 rotate-180"/></button>
+      <button on:click={() => click(-step)} type="button" class="h-1/2 flex justify-center items-center bg-white text-black hover:text-fluorescent-cyan-focus"><ChevronDown classes="w-4 "/></button>
     </div>
   </div>
 </div>

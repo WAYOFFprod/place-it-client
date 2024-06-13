@@ -184,9 +184,9 @@
 <Modal></Modal>
 <div id="canvas-container" class="relative cursor-{currentToolType.cursor}">
 	<!-- overlay -->
-	<div class="absolute top-0 bottom-[50px] left-0 right-0 pointer-events-none">
+	<div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none">
 		<!-- bootom panel -->
-		<div class="absolute bottom-0 left-0 right-0 flex justify-center">
+		<div class="absolute bottom-24 right-5 flex justify-center">
 			<Palette bind:setColors={updateColorPalette} childClass={'pointer-events-auto'}
 			></Palette>
 		</div>

@@ -38,6 +38,18 @@ export default {
 				black: '#141414'
 			},
 			fontSize: {
+				md: [
+					'14px',
+					{
+						fontWeight: 400
+					}
+				],
+				xl: [
+					'24px',
+					{
+						fontWeight: 700
+					}
+				],
 				'3xl': [
 					'32px',
 					{
