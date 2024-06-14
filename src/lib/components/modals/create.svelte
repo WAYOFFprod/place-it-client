@@ -75,14 +75,14 @@
     <!-- canvas type -->
     <div class="flex justify-center border-r-2 p-6 border-black">
       <div class="grid grid-cols-2 gap-2 justify-around p-2">
-        <CanvaTypeToggle toggleName="canva-type"><img src="/icons/custom-canva.png" alt="custom canvas icon" /></CanvaTypeToggle>
-        <CanvaTypeToggle toggleName="canva-type"><img src="/icons/custom-canva.png" alt="custom canvas icon" /></CanvaTypeToggle>
-        <CanvaTypeToggle toggleName="canva-type"><img src="/icons/custom-canva.png" alt="custom canvas icon" /></CanvaTypeToggle>
+        <CanvaTypeToggle toggleName="canva-type"><img src="/svg/custom-canva.png" alt="custom canvas icon" /></CanvaTypeToggle>
+        <CanvaTypeToggle toggleName="canva-type"><img src="/svg/custom-canva.png" alt="custom canvas icon" /></CanvaTypeToggle>
+        <CanvaTypeToggle toggleName="canva-type"><img src="/svg/custom-canva.png" alt="custom canvas icon" /></CanvaTypeToggle>
       </div>
     </div>
     <!-- sidebar: canvas settings -->
     <form bind:this={form} class="w-64 p-6 flex flex-col gap-4" on:submit|preventDefault={validate}>
-      <TextInput id="name" label="name"><img src="/icons/edit.svg" alt="edit icon"/></TextInput>
+      <TextInput id="name" label="name"><img src="/svg/edit.svg" alt="edit icon"/></TextInput>
       <div>
         <label class="block" for="width">Dimensions</label>
         <div class="flex flex-row gap-2">
@@ -101,7 +101,7 @@
       </Accordion>
       <div class="grow justify-self-stretch flex items-end">
         <Button type="submit" class="" on:click={validate}> 
-          <img src="/icons/canva-plus.svg" alt="create canvas icon"/>
+          <img src="/svg/canva-plus.svg" alt="create canvas icon"/>
           <span>Créer</span>
         </Button>
       </div>
