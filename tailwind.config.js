@@ -44,6 +44,12 @@ export default {
 						fontWeight: 400
 					}
 				],
+				lg: [
+					'20px',
+					{
+						lineHeight: '20px'
+					}
+				],
 				xl: [
 					'24px',
 					{

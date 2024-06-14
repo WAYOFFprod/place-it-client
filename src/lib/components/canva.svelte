@@ -14,6 +14,7 @@
 	import { event } from '$lib/stores/eventStore';
 	import Chat from './chat/chat.svelte';
 
+	let id = "canvas-container";
 	let width = 32;
 	let height = 16;
 
@@ -134,7 +135,8 @@
 			};
 
 			/* Scrolling */
-			window.addEventListener('wheel', function (e) {
+			window.addEventListener('wheel', function (e: WheelEvent) {
+				if (!isTargeting(e.target, 'place-it-canvas')) return;
 				if (e.deltaY > 0) {
 					controlManager.scroll(1 + zoomSensitivity)
 				} else {
@@ -183,7 +185,7 @@
 
 </script>
 <Modal></Modal>
-<div id="canvas-container" class="relative cursor-{currentToolType.cursor}">
+<div id={id} class="relative cursor-{currentToolType.cursor}">
 	<!-- overlay -->
 	<div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none">
 		<!-- bootom panel -->
@@ -193,7 +195,7 @@
 		</div>
 
 		<div class="absolute bottom-24 left-5 flex justify-center">
-			<Chat></Chat>
+			<Chat class="w-96"></Chat>
 		</div>
 
 		<!-- other -->
