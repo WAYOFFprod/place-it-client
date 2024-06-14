@@ -3,14 +3,17 @@ import type GridManager from "$lib/p5/GridManager";
 import ServerRequests from "./ServerRequests";
 import { Socket, io } from 'socket.io-client';
 import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
+import { chatMessages } from "$lib/stores/chatStore";
 
 export default class Networker {
   static #instance: Networker
+  shortClientId: string | undefined;
   server: ServerRequests
   socket: Socket | undefined
   gridManager: GridManager | undefined
   tempPoints: {[key: string]: string} | undefined
   websocket: string
+  messages: Message[] = []
 
   static getInstance() {
     if (!this.#instance) {
@@ -24,13 +27,14 @@ export default class Networker {
     this.server = new ServerRequests(server+'/api');
   }
 
-  connectToSocket = (gridManager: GridManager, callback: () => void) => {
+  connectToSocket = (gridManager: GridManager, getPixel: () => void) => {
     this.gridManager = gridManager;
     this.socket = io(this.websocket);
     
     this.socket.on("connect", () => {
       if(this.socket != undefined)
       this.socket.emit('canva:get-pixels');
+      this.shortClientId = this.socket?.id?.slice(6);
     });
 
     this.socket.on('canva:init-pixels', (payload) => {
@@ -52,9 +56,13 @@ export default class Networker {
     });
 
     this.socket.on('canva:reset-others', () => {
-      callback()
+      getPixel()
     });
 
+    this.socket.on('chat:get-message', (message: Message) => {
+      this.messages.push(message)
+      chatMessages.set(this.messages);
+    });
   }
 
   getCanva = async (id: number = 1) => {
@@ -89,6 +97,18 @@ export default class Networker {
     if(this.socket != undefined)
     this.socket.emit('canva:reset');
     return response;
+  }
+
+  initMessages() {
+    if(this.socket != undefined)
+    this.socket.emit('chat:init-messages');
+  }
+
+  sendMessage(message: Message) {
+    if(this.socket != undefined)
+      this.socket.emit('chat:new-message', message);
+    this.messages.push(message)
+    chatMessages.set(this.messages);
   }
 
   disconnect = () => {
