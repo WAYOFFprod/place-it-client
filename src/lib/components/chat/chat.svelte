@@ -51,7 +51,7 @@ const entries = [
   }
 ]
 </script>
-<div class="border-2 border-black rounded bg-off-white flex flex-col overflow-hidden pointer-events-auto {$$props.class}">
+<div class="chat border-2 border-black rounded bg-off-white flex flex-col overflow-hidden pointer-events-auto {$$props.class}">
   <!-- chat window -->
   <div class="h-full px-4">
     <button type="button" on:click={() => isOpen = !isOpen} class="flex justify-between items-center h-12 uppercase w-full">
@@ -59,7 +59,7 @@ const entries = [
       <button type="button" ><img src="/svg/chevron-down.svg" alt="down icon"/></button>
     </button>
       <!-- sroll area -->
-    <div class="{isOpen ? 'max-h-28 pt-2': 'max-h-0 pt-0'} overflow-y-scroll">
+    <div class="{isOpen ? 'max-h-32 pt-2': 'max-h-0 pt-0'} overflow-y-scroll pr-3 -mr-2">
       {#each entries as entry}
       <div class="flex items-start gap-2 pb-1">
         <span class="text-md font-normal w-6 shrink-0 pt-0.5">{entry.time}</span>

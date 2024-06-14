@@ -11,30 +11,56 @@
 		src: url(/fonts/PPNeueBit-Bold.otf) format('opentype');
 	}
 
-	input[type='number']::-webkit-inner-spin-button,
-	input[type='number']::-webkit-outer-spin-button {
-		-webkit-appearance: none;
-		margin: 0;
-	}
-	input {
-		outline: none;
-	}
-
-	input[type='checkbox'] {
-		width: 0;
-		height: 0;
-		display: none;
-	}
-
-	.button.yellow {
-		@apply rounded py-1 bg-naples-yellow hover:bg-naples-yellow-focus;
-	}
-
 	body {
 		@apply text-xl;
 	}
 
 	.text-medium {
 		@apply text-md;
+	}
+
+	/* Inputs */
+	input {
+		outline: none;
+	}
+
+	/* Number Input */
+	input[type='number']::-webkit-inner-spin-button,
+	input[type='number']::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	/* Checkbox */
+	input[type='checkbox'] {
+		width: 0;
+		height: 0;
+		display: none;
+	}
+
+	/* Button */
+	.button.yellow {
+		@apply rounded py-1 bg-naples-yellow hover:bg-naples-yellow-focus;
+	}
+
+	/* Scrollbar */
+	.chat {
+		/* width */
+		::-webkit-scrollbar {
+			@apply w-3;
+		}
+
+		/* Track */
+		::-webkit-scrollbar-track {
+			@apply bg-black mb-2;
+			border-left: 5px solid transparent;
+			border-right: 5px solid transparent;
+			background-clip: padding-box;
+		}
+
+		/* Handle */
+		::-webkit-scrollbar-thumb {
+			@apply bg-black;
+		}
 	}
 }
