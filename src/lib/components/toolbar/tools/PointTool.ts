@@ -15,6 +15,7 @@ export default class PointTool extends Tool {
 
   networker: Networker = Networker.getInstance();
 
+  pixels: Coord[] = []
 
   init() {
     selectedColor.subscribe((newColor) => {
@@ -30,9 +31,38 @@ export default class PointTool extends Tool {
 
   }
 
-  mouseReleased() {
-    
+  mousePressed(mousePressed: Coord) {
     this.placePixel();
+    return true
+  }
+
+  mouseReleased() {
+    this.pixels = []
+  }
+
+  mouseMove(isMouseDown: boolean) {
+    if(!this.color || !isMouseDown) return {
+      x: ControlManager.screenOffset.x,
+      y: ControlManager.screenOffset.y
+    };
+
+    // check if mouse position in on new pixel
+    const coords: Coord = {
+      x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / ControlManager.currentScale),
+      y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / ControlManager.currentScale)
+    };
+
+    // if these coords are new in this stroke add it to array and place pixel
+    if(!this.pixels.includes(coords)) {
+      this.pixels.push(coords);
+      this.networker.placePixel(coords, this.color);
+    }
+
+    // return save offset in order to not move screen
+    return {
+      x: ControlManager.screenOffset.x,
+      y: ControlManager.screenOffset.y
+    };
   }
 
   protected placePixel() {
@@ -42,8 +72,10 @@ export default class PointTool extends Tool {
       x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / ControlManager.currentScale),
       y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / ControlManager.currentScale)
     };
+    this.pixels.push(coords);
     this.networker.placePixel(coords, this.color);
   }
+
 
   getType: () => null | typeof Tool = () => {
     return PointTool
