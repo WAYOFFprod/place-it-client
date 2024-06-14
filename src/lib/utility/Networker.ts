@@ -33,7 +33,7 @@ export default class Networker {
     
     this.socket.on("connect", () => {
       if(this.socket != undefined)
-      this.socket.emit('canva:get-pixels');
+      this.socket.emit('init');
       this.shortClientId = this.socket?.id?.slice(6);
     });
 
@@ -61,6 +61,15 @@ export default class Networker {
 
     this.socket.on('chat:get-message', (message: Message) => {
       this.messages.push(message)
+      chatMessages.set(this.messages);
+    });
+
+    this.socket.on('chat:init-messages', (newMessages: string[]) => {
+      const messages = newMessages.map(x => {
+        return JSON.parse(x)
+      })
+      console.log(messages);
+      this.messages = messages
       chatMessages.set(this.messages);
     });
   }
@@ -97,11 +106,6 @@ export default class Networker {
     if(this.socket != undefined)
     this.socket.emit('canva:reset');
     return response;
-  }
-
-  initMessages() {
-    if(this.socket != undefined)
-    this.socket.emit('chat:init-messages');
   }
 
   sendMessage(message: Message) {

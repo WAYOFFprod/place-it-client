@@ -1,5 +1,5 @@
 interface Message {
-  time: string
+  time: number
   user: string
   respondTo?: string
   message: string
