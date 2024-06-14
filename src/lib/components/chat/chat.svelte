@@ -17,7 +17,7 @@
 	const sendMessage = () => {
 		const date = new Date();
 		let msg: Message = {
-			time: date.getHours() + ':' + date.getMinutes(),
+			time: Date.parse(date.toUTCString()),
 			user: networker.shortClientId ?? 'anon',
 			message: message
 		};
@@ -43,6 +43,11 @@
 	const clearRespondTo = () => {
 		respondTo = null;
 	};
+
+	const getDate = (time: number) => {
+		const date = new Date(time);
+		return date.getHours() + ':' + date.getMinutes();
+	};
 </script>
 
 <div
@@ -66,7 +71,7 @@
 		>
 			{#each [...entries].reverse() as entry}
 				<div class="flex items-start gap-2 pb-1">
-					<span class="text-md font-normal w-6 shrink-0 pt-0.5">{entry.time}</span>
+					<span class="text-md font-normal w-6 shrink-0 pt-0.5">{getDate(entry.time)}</span>
 					<span
 						class="text-lg font-bold max-w-20 overflow-hidden text-ellipsis whitespace-nowrap shrink-0"
 						>{entry.user}</span
