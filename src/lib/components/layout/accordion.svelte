@@ -8,7 +8,7 @@ const toggleOpen = () => {
 <div>
   <!-- heading -->
   <button on:click={toggleOpen} type="button" class="flex flex-row justify-between w-full">
-    <slot name="heading"></slot> <img class={isOpen ? '' : '-rotate-90'} src="icons/chevron-down.svg" alt="chevron of accordeon" />
+    <slot name="heading"></slot> <img class={isOpen ? '' : '-rotate-90'} src="/icons/chevron-down.svg" alt="chevron of accordeon" />
   </button>
   <!-- content -->
   <div class="pl-9 py-4 text-medium {isOpen ? 'hidden' : '' }">
