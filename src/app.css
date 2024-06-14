@@ -27,7 +27,7 @@
 	}
 
 	.button.yellow {
-		@apply rounded py-2 bg-naples-yellow hover:bg-naples-yellow-focus;
+		@apply rounded py-1 bg-naples-yellow hover:bg-naples-yellow-focus;
 	}
 
 	body {

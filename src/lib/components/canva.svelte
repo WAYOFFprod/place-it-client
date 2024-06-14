@@ -12,6 +12,7 @@
 	import Tool from './toolbar/ToolClass';
 	import ControlManager from './toolbar/ControlManager';
 	import { event } from '$lib/stores/eventStore';
+	import Chat from './chat/chat.svelte';
 
 	let width = 32;
 	let height = 16;
@@ -191,8 +192,12 @@
 			></Palette>
 		</div>
 
+		<div class="absolute bottom-24 left-5 flex justify-center">
+			<Chat></Chat>
+		</div>
+
 		<!-- other -->
-		<Toolbar childClass={'absolute pointer-events-auto'} p5="{p5}"></Toolbar>
+		<Toolbar class="absolute pointer-events-auto" p5="{p5}"></Toolbar>
 	</div>
 
 	<!-- canvas -->

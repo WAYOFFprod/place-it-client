@@ -67,8 +67,8 @@
 
 <div class="">
   <!-- header -->
-  <div class="border-b-2 border-black py-5 text-center font-sans font-bold text-3xl">
-    Create a new Canvas
+  <div class="border-b-2 border-black py-5 text-center font-sans font-bold text-3xl uppercase">
+    Créer un nouveau canva
   </div>
   <!-- container -->
   <div class="flex flex-row gap-[2px] bg-off-white justify-stretch">
@@ -82,9 +82,9 @@
     </div>
     <!-- sidebar: canvas settings -->
     <form bind:this={form} class="w-64 p-6 flex flex-col gap-4" on:submit|preventDefault={validate}>
-      <TextInput id="name" label="name"><img src="/svg/edit.svg" alt="edit icon"/></TextInput>
+      <TextInput id="name" label="Nom"><img src="/svg/edit.svg" alt="edit icon"/></TextInput>
       <div>
-        <label class="block" for="width">Dimensions</label>
+        <label class="block mb-3" for="width">Dimensions</label>
         <div class="flex flex-row gap-2">
           <NumberInput id="width" label="W:"></NumberInput>
           <NumberInput id="height" label="H:"></NumberInput>

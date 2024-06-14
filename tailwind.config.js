@@ -47,7 +47,8 @@ export default {
 				xl: [
 					'24px',
 					{
-						fontWeight: 700
+						fontWeight: 700,
+						lineHeight: '17.14px'
 					}
 				],
 				'3xl': [

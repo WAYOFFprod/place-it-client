@@ -9,7 +9,6 @@
 
 	import P5 from 'p5';
 
-	export let childClass: string;
 	export let p5: P5;
 	
 	let tools = Object.values(toolClasses);
@@ -28,7 +27,7 @@
 	};
 
 </script>
-<div class="{childClass} cursor-hand">
+<div class="{$$props.class} cursor-hand">
 	<Panel class="w-fit">
 		<div class="grid grid-cols-1 gap-2 p-2 m-2">
 			{#each tools as t, i}
