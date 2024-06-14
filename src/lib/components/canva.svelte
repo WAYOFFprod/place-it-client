@@ -199,7 +199,7 @@
 		</div>
 
 		<!-- other -->
-		<Toolbar class="absolute pointer-events-auto" p5="{p5}"></Toolbar>
+		<Toolbar class="absolute left-5 top-5 pointer-events-auto" p5="{p5}"></Toolbar>
 	</div>
 
 	<!-- canvas -->

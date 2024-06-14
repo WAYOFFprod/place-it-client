@@ -27,9 +27,9 @@
 	};
 
 </script>
-<div class="{$$props.class} cursor-hand">
+<div class="{$$props.class} cursor-hand ">
 	<Panel class="w-fit">
-		<div class="grid grid-cols-1 gap-2 p-2 m-2">
+		<div class="grid grid-cols-1 gap-2 p-2 m-2 ">
 			{#each tools as t, i}
 			<ToolIcon on:selectTool={updateSelectTool} toolType={t.type} selected="{currentToolType == t}">
 				<svelte:component this={t.icon} />
