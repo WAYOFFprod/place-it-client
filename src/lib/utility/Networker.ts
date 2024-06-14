@@ -30,10 +30,10 @@ export default class Networker {
     
     this.socket.on("connect", () => {
       if(this.socket != undefined)
-      this.socket.emit('get-pixels');
+      this.socket.emit('canva:get-pixels');
     });
 
-    this.socket.on('init-pixels', (payload) => {
+    this.socket.on('canva:init-pixels', (payload) => {
       if(this.gridManager != undefined)
       if(payload) {
         this.tempPoints = payload.pixels
@@ -46,12 +46,12 @@ export default class Networker {
     });
     this.gridManager = gridManager;
     // listen to socket server message
-    this.socket.on('new-pixel-from-others', (coord, color) => {
+    this.socket.on('canva:new-pixel-from-others', (coord, color) => {
       if(!this.gridManager) return console.error("missing grid manager");
       this.gridManager.drawPixelOnCanvas(coord, color);
     });
 
-    this.socket.on('reset-others', () => {
+    this.socket.on('canva:reset-others', () => {
       callback()
     });
 
@@ -72,7 +72,7 @@ export default class Networker {
     const index = this.gridManager.drawPixelOnCanvas(coord, color);
     if(!index) return
     if(this.socket != undefined)
-    this.socket.emit('new-pixel', index, coord, color);
+    this.socket.emit('canva:new-pixel', index, coord, color);
   }
 
   addColors = async (id: number, colors: string[]) => {
@@ -87,7 +87,7 @@ export default class Networker {
   createCanva = async (id: number = 1, size: Size2D) => {
     const response = await this.server.post("/canvas/create", size);
     if(this.socket != undefined)
-    this.socket.emit('reset');
+    this.socket.emit('canva:reset');
     return response;
   }
 
