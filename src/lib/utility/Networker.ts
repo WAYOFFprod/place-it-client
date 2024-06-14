@@ -80,7 +80,7 @@ export default class Networker {
       id: id,
       colors: colors
     }
-    const response = await this.server.post("/canvas/color/add/", payload);
+    const response = await this.server.post("/canvas/color/add", payload);
     return response;
   }
 
