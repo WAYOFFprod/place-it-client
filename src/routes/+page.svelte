@@ -11,7 +11,7 @@
 
 <div class="flex flex-col h-full">
 	<Header>
-		<div class="flex justify-between">
+		<div class="flex justify-between h-10">
 			<div>home icon</div>
 			<div>CANVAS NAME</div>
 			<Button stretch={false} type="button" on:click={onclick}>Reset</Button>

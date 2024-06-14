@@ -13,7 +13,7 @@ export default {
 		extend: {
 			cursor: {
 				hand: 'url("/cursors/hand.svg"), pointer',
-				pointer: 'url("/cursors/cursor.svg"), pointer',
+				pointer: 'url("/cursors/cursor.svg") 5 0, pointer',
 				selection: 'url("/cursors/selection.svg"), pointer'
 			},
 			colors: {
@@ -44,10 +44,17 @@ export default {
 						fontWeight: 400
 					}
 				],
+				lg: [
+					'20px',
+					{
+						lineHeight: '20px'
+					}
+				],
 				xl: [
 					'24px',
 					{
-						fontWeight: 700
+						fontWeight: 700,
+						lineHeight: '17.14px'
 					}
 				],
 				'3xl': [

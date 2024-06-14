@@ -14,6 +14,6 @@
 
   $: selectedClass = selected ? 'text-fluorescent-cyan' : 'text-black'
 </script>
-<button class="w-8 h-8 bg-white flex justify-center items-center transition-colors {selectedClass}" on:click|stopPropagation={select}>
+<button class="w-8 h-8  flex justify-center items-center transition-colors {selectedClass}" on:click|stopPropagation={select}>
   <slot/>
 </button>

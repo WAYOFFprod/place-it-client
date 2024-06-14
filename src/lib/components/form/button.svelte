@@ -30,7 +30,7 @@
 </script>
 <div class="{stretch ? 'w-full' : ''} {$$props.class}" role="presentation" on:focus={focus} on:mouseover={mouseEnter} on:mouseleave={mouseLeave}>
   <Panel isSmall={isHovering} class={stretch ? 'w-full' : ''}>
-      <button on:click|preventDefault={click} type={type} class="px-4 flex justify-center items-center gap-4 button yellow {stretch ? 'w-full' : ''}">
+      <button on:click|preventDefault={click} type={type} class="px-4 flex justify-center items-center gap-4 text-xl button yellow {stretch ? 'w-full' : ''}">
         <slot></slot>
       </button>
     </Panel>
