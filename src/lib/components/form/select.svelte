@@ -15,6 +15,7 @@
   const onChange = (event: Event) => {
     const target = event.target as HTMLSelectElement;
     selectedOption = target.value
+    isOpen = false
     // selected = event.target.value;
   }
 
@@ -26,7 +27,7 @@
     <span>{label}</span>
   {/if}
   <div class="rounded w-full border-2 border-black overflow-hidden">
-    <button on:click={toggle} class="px-2 flex w-full items-center justify-between h-9">
+    <button on:click={toggle} type="button" class="px-2 flex w-full items-center justify-between h-9">
       <span>{title}</span>
       <img class="w-4" src="icons/chevron-down.svg" alt="chevron-down" />
     </button>

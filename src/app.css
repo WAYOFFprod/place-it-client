@@ -10,14 +10,7 @@
 		font-display: swap;
 		src: url(./fonts/PPNeueBit-Bold.otf) format('opentype');
 	}
-	/* 
-	@font-face {
-		font-family: 'NeueBit';
-		font-style: regular;
-		font-weight: 400;
-		font-display: swap;
-		src: url(./fonts/NeueBit-Regular.ttf) format('truetype');
-	} */
+
 	input[type='number']::-webkit-inner-spin-button,
 	input[type='number']::-webkit-outer-spin-button {
 		-webkit-appearance: none;

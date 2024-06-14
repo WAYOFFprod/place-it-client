@@ -14,6 +14,7 @@
 
   const dispatch = createEventDispatcher();
   let form: HTMLFormElement
+  let customPalette = true;
   const gameTypeOptions = [
     {
       label: 'Libre',
@@ -89,12 +90,12 @@
           <NumberInput id="height" label="H:"></NumberInput>
         </div>
       </div>
-      <ToggleInput id="community" label="Community" />
+      <ToggleInput id="community" label="Community" disabled={true}/>
       <Accordion>
         <div slot="heading">Options Avancée</div>
         <div slot="content" class="flex flex-col gap-4">
-          <ToggleInput id="joinRequest" label="Joindre sur demande" />
-          <ToggleInput id="limitedPalette" label="Palette limitée" />
+          <ToggleInput id="joinRequest" label="Joindre sur demande" toggle={false} disabled={true}/>
+          <ToggleInput id="limitedPalette" label="Palette limitée" toggle={customPalette} on:change={() => customPalette = !customPalette} disabled={true}/>
           <Select id="gameType" label="Catégorie du canva" placeholder="Type de canva" options={gameTypeOptions}></Select>
         </div>
       </Accordion>

@@ -1,15 +1,21 @@
 <script lang="ts">
+	import { createEventDispatcher } from "svelte";
 	import Background from "../svg/toggle/background.svelte";
 	import Knob from "../svg/toggle/knob.svelte";
 
+  const dispatch = createEventDispatcher();
   export let placeholder: string = ""
   export let label: string
   export let id: string
+  export let toggle = false;
+  export let disabled = false;
 
-  let toggle = false;
+  const change = () => {
+    dispatch('change')
+  }
 </script>
-<div>
-  <input name={id} id={id} type="checkbox" placeholder={placeholder} bind:checked={toggle}  />
+<div class={disabled ? 'text-gray-400' : 'text-black'}>
+  <input name={id} id={id} type="checkbox" placeholder={placeholder} bind:checked={toggle} on:change={change} disabled={disabled} />
   <label class="flex justify-between items-center group cursor-pointer" for={id}>
     <span>{label}</span>
     <div class="relative">

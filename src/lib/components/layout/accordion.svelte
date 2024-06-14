@@ -7,7 +7,7 @@ const toggleOpen = () => {
 </script>
 <div>
   <!-- heading -->
-  <button on:click={toggleOpen} class="flex flex-row justify-between w-full">
+  <button on:click={toggleOpen} type="button" class="flex flex-row justify-between w-full">
     <slot name="heading"></slot> <img class={isOpen ? '' : '-rotate-90'} src="icons/chevron-down.svg" alt="chevron of accordeon" />
   </button>
   <!-- content -->
