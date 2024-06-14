@@ -13,7 +13,7 @@ export default {
 		extend: {
 			cursor: {
 				hand: 'url("/cursors/hand.svg"), pointer',
-				pointer: 'url("/cursors/cursor.svg"), pointer',
+				pointer: 'url("/cursors/cursor.svg") 5 0, pointer',
 				selection: 'url("/cursors/selection.svg"), pointer'
 			},
 			colors: {
