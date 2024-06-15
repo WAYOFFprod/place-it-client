@@ -10,6 +10,8 @@
 	let entries: Message[] = [];
 	let respondTo: string | null = null;
 
+	let input: HTMLInputElement;
+
 	chatMessages.subscribe((newMessages: Message[]) => {
 		entries = newMessages;
 	});
@@ -38,6 +40,7 @@
 
 	const respond = (userName: string) => {
 		respondTo = userName;
+		input.focus();
 	};
 
 	const clearRespondTo = () => {
@@ -117,6 +120,7 @@
 			class="placeholder:text-black px-2 h-10 w-full bg-transparent inline"
 			placeholder="Ecrire un message..."
 			bind:value={message}
+			bind:this={input}
 		/>
 	</div>
 </div>
