@@ -68,7 +68,7 @@ export default class ControlManager {
     this.isMouseDown = this.toolManager.mousePressed()
   }
   mouseReleased() {
-    if (this.hasMovedSinceDragStart()) return;
+    // if (this.hasMovedSinceDragStart()) return;
 
     this.toolManager.mouseReleased();
     

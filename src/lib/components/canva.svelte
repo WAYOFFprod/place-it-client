@@ -124,7 +124,7 @@
 
 			/* Clicking on canvas */
 			p5.mouseReleased = (e: MouseEvent) => {
-				if (!isTargeting(e.target, 'place-it-canvas')) return;
+				// if (!isTargeting(e.target, 'place-it-canvas')) return;
 				controlManager.mouseReleased();
 			};
 
