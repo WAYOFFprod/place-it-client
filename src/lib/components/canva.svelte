@@ -60,12 +60,13 @@
 	const fetchData = async () => {
 		// load data
 		const data = await networker.getCanva();
-
+		console.log(data);
 		// set width and height
 		width = data.width;
 		height = data.height;
 		const size: Size2D = { width: width, height: height };
 		return {
+			id: data.id,
 			data: data,
 			size: size
 		};
@@ -80,7 +81,7 @@
 		gridManager.loadImage(canvasData.data.image, canvasData.size, pixels);
 		// color = data.colors[0];
 		updateColorPalette(canvasData.data.colors);
-
+		networker.loadCanva(canvasData.id);
 		isReady = true;
 	};
 

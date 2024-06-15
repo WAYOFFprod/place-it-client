@@ -79,6 +79,10 @@ export default class Networker {
     return response;
   }
 
+  loadCanva = (canvaId: number) => {
+    this.socket?.emit('switch-room', {"canvaId": canvaId})
+  }
+
   placePixel = (coord: Coord, color: string | null) => {
     if(!color) {
       return console.error("no color selected");
