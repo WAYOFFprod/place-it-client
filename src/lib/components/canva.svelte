@@ -60,7 +60,7 @@
 	const fetchData = async () => {
 		// load data
 		const data = await networker.getCanva();
-		console.log(data);
+
 		// set width and height
 		width = data.width;
 		height = data.height;
