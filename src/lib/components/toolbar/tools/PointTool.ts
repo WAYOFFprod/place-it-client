@@ -37,6 +37,7 @@ export default class PointTool extends Tool {
   }
 
   mouseReleased() {
+    console.log("reset")
     this.pixels = []
   }
 
@@ -53,7 +54,8 @@ export default class PointTool extends Tool {
     };
 
     // if these coords are new in this stroke add it to array and place pixel
-    if(!this.pixels.includes(coords)) {
+    if(!this.pixels.find(coord => coord.x == coords.x && coord.y == coords.y)) {
+      console.log("this.pixels", this.pixels)
       this.pixels.push(coords);
       this.networker.placePixel(coords, this.color);
     }

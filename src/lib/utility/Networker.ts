@@ -50,7 +50,9 @@ export default class Networker {
     });
     this.gridManager = gridManager;
     // listen to socket server message
+    
     this.socket.on('canva:new-pixel-from-others', (coord, color) => {
+      console.log("revcived")
       if(!this.gridManager) return console.error("missing grid manager");
       this.gridManager.drawPixelOnCanvas(coord, color);
     });
@@ -94,6 +96,7 @@ export default class Networker {
     if(!index) return
     if(this.socket != undefined)
     this.socket.emit('canva:new-pixel', index, coord, color);
+    console.log("PLACE PIXEL")
   }
 
   addColors = async (id: number, colors: string[]) => {
