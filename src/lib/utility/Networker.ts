@@ -69,7 +69,7 @@ export default class Networker {
       const messages = newMessages.map(x => {
         return JSON.parse(x)
       })
-      console.log(messages);
+
       this.messages = messages
       chatMessages.set(this.messages);
     });
@@ -92,10 +92,9 @@ export default class Networker {
       return console.error("missing grid manager");
     }
     const index = this.gridManager.drawPixelOnCanvas(coord, color);
-    if(index != false) return
+    if(index === false) return
     if(this.socket != undefined)
     this.socket.emit('canva:new-pixel', index, coord, color);
-    console.log("PLACE PIXEL")
   }
 
   addColors = async (id: number, colors: string[]) => {
