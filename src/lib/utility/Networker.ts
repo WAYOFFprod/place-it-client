@@ -52,7 +52,6 @@ export default class Networker {
     // listen to socket server message
     
     this.socket.on('canva:new-pixel-from-others', (coord, color) => {
-      console.log("revcived")
       if(!this.gridManager) return console.error("missing grid manager");
       this.gridManager.drawPixelOnCanvas(coord, color);
     });

@@ -37,7 +37,6 @@ export default class PointTool extends Tool {
   }
 
   mouseReleased() {
-    console.log("reset")
     this.pixels = []
   }
 
