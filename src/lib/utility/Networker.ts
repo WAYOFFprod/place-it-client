@@ -93,7 +93,7 @@ export default class Networker {
       return console.error("missing grid manager");
     }
     const index = this.gridManager.drawPixelOnCanvas(coord, color);
-    if(!index) return
+    if(index != false) return
     if(this.socket != undefined)
     this.socket.emit('canva:new-pixel', index, coord, color);
     console.log("PLACE PIXEL")
