@@ -1,7 +1,7 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
 
-const PIXEL_IN_SECTION = 10;
+let PIXEL_IN_SECTION = 10;
 
 
 
@@ -20,8 +20,8 @@ export default class GridManager {
     this.gridSections = [];
     this.canvas = canvas;
     this.sectionGrid = {
-      width: Math.floor(this.canvas.width / PIXEL_IN_SECTION),
-      height: Math.floor(this.canvas.height / PIXEL_IN_SECTION)
+      width: Math.ceil(this.canvas.width / PIXEL_IN_SECTION),
+      height: Math.ceil(this.canvas.height / PIXEL_IN_SECTION)
     }
 
     // create gridSections
