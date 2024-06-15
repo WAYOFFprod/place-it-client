@@ -3,6 +3,7 @@ import Tool from "$lib/components/toolbar/ToolClass";
 import { ToolType, selectedTool} from '$lib/stores/toolStore';
 import Networker from '$lib/utility/Networker';
 import ToolManager from './tools/ToolManager';
+import { mouseCoord, zoom } from '$lib/stores/canvaStore';
 export default class ControlManager {
   p5: P5
   networker: Networker = Networker.getInstance();;
@@ -13,6 +14,9 @@ export default class ControlManager {
 
   static screenOffset: Coord
   static currentScale:number
+
+  static MIN_ZOOM = 0.7
+  static MAX_ZOOM = 20
 
   	// original position on start of dragging
 	grabStart: Coord = {
@@ -37,7 +41,7 @@ export default class ControlManager {
 		const heightRatio = this.p5.windowHeight / size.height;
     
 		// get scale factor by getting the one from the axies with the least pixels
-    ControlManager.currentScale = widthRatio < heightRatio ? widthRatio : heightRatio;
+    ControlManager.currentScale = Math.max(widthRatio < heightRatio ? widthRatio : heightRatio, ControlManager.MIN_ZOOM);
 		// ControlManager.currentScale = 1;
     
 		// set initial offset to center image
@@ -55,10 +59,15 @@ export default class ControlManager {
     };
   }
 
-  updateOffset() {
+  checkMousePosition() {
     if(this.isMouseDown) {
       this.toolManager.updateOffset()
     }
+    const coords: Coord = {
+      x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / ControlManager.currentScale),
+      y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / ControlManager.currentScale)
+    };
+    mouseCoord.set(coords)
   }
 
   mousePressed() {
@@ -90,10 +99,15 @@ export default class ControlManager {
 
   scroll(scaleFactor: number) {
     // adjust for ZoomMovement
-    this.scaleFactor = scaleFactor
-    
-    ControlManager.currentScale = ControlManager.currentScale * this.scaleFactor;
+    // this.scaleFactor = scaleFactor
 
+    // ControlManager.currentScale = ControlManager.currentScale * this.scaleFactor;
+    const newCurrentScale = ControlManager.currentScale * scaleFactor;
+    const limitedCurrentScale = Math.min(Math.max(newCurrentScale, ControlManager.MIN_ZOOM), ControlManager.MAX_ZOOM);
+    const limitedScaleFactor = limitedCurrentScale / ControlManager.currentScale
+
+    this.scaleFactor = limitedScaleFactor
+    ControlManager.currentScale = limitedCurrentScale
     // get mouse position relative to canvas zoom
     const relMouse = {
       x: this.p5.mouseX * this.scaleFactor,
@@ -108,5 +122,8 @@ export default class ControlManager {
 
     ControlManager.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
     ControlManager.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
+
+    const percentScale = limitedCurrentScale/ControlManager.MAX_ZOOM * 100 as number
+    zoom.set(percentScale)
   }
 }

@@ -13,6 +13,8 @@
 	import ControlManager from './toolbar/ControlManager';
 	import { event } from '$lib/stores/eventStore';
 	import Chat from './chat/chat.svelte';
+	import ZoomCounter from './metric/zoomCounter.svelte';
+	import CoordViewer from './metric/coordViewer.svelte';
 
 	let id = 'canvas-container';
 	let width = 32;
@@ -24,6 +26,7 @@
 	let p5: P5;
 	let controlManager: ControlManager;
 	let gridManager: GridManager;
+
 	const networker = Networker.getInstance();
 
 	const zoomSensitivity = 0.1;
@@ -107,7 +110,7 @@
 
 				p5.push();
 
-				controlManager.updateOffset();
+				controlManager.checkMousePosition();
 
 				p5.translate(ControlManager.screenOffset.x, ControlManager.screenOffset.y);
 				p5.scale(ControlManager.currentScale);
@@ -189,6 +192,11 @@
 
 		<div class="absolute bottom-24 left-5 flex justify-center">
 			<Chat class="w-[500px]"></Chat>
+		</div>
+
+		<div class="absolute top-5 right-5 flex flex-col items-end gap-4">
+			<ZoomCounter></ZoomCounter>
+			<CoordViewer></CoordViewer>
 		</div>
 
 		<!-- other -->
