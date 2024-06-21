@@ -24,7 +24,8 @@ export default class Networker {
 
   constructor(server: string, websocket: string) {
     this.websocket = websocket
-    this.server = new ServerRequests(server+'/api');
+    this.server = new ServerRequests(server);
+    this.server.get('/sanctum/csrf-cookie');
   }
 
   connectToSocket = (gridManager: GridManager, getPixel: () => void) => {
@@ -75,8 +76,18 @@ export default class Networker {
     });
   }
 
+  // Auth
+
+  login = async (payload: LoginPayload) => {
+    await this.server.get('/sanctum/csrf-cookie')
+    const response = await this.server.post("/auth/login/", payload);
+    console.log(response);
+  }
+
+  // Canvas
+
   getCanva = async (id: number = 1) => {
-    const response = await this.server.get("/canva/"+id);
+    const response = await this.server.get("/canvas/"+id);
     return response;
   }
 
@@ -113,11 +124,14 @@ export default class Networker {
     return response;
   }
 
+  // Messages
+
   sendMessage(message: Message) {
-    if(this.socket != undefined)
+    if(this.socket != undefined) {
       this.socket.emit('chat:new-message', message);
-    this.messages.push(message)
-    chatMessages.set(this.messages);
+      this.messages.push(message)
+      chatMessages.set(this.messages);
+    }
   }
 
   disconnect = () => {

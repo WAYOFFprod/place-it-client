@@ -4,17 +4,26 @@
 	import Header from '$lib/components/header.svelte';
 	import { openedModal } from '$lib/stores/modalStore';
 
-	const onclick = () => {
-    openedModal.set('create')
-  }
+	const onclickReset = () => {
+		openedModal.set('create');
+	};
+
+	const onclickLogin = () => {
+		openedModal.set('login');
+	};
 </script>
 
 <div class="flex flex-col h-full">
 	<Header>
-		<div class="flex justify-between h-10">
-			<div>home icon</div>
+		<div class="flex justify-between h-10 items-center">
+			<a href="/">
+				<img src="/svg/home.svg" alt="home icon" />
+			</a>
 			<div>CANVAS NAME</div>
-			<Button stretch={false} type="button" on:click={onclick}>Reset</Button>
+			<div class="flex gap-2">
+				<Button stretch={false} type="button" on:click={onclickReset}>Reset</Button>
+				<Button stretch={false} type="button" on:click={onclickLogin}>Login</Button>
+			</div>
 		</div>
 	</Header>
 	<Canva></Canva>
