@@ -26,7 +26,7 @@
 		},
 		{
 			label: 'Oeuvre Collaborative',
-			value: 'creative'
+			value: 'artistic'
 		}
 	] as options[];
 
@@ -35,31 +35,39 @@
 		console.log([...formData.entries()]);
 		const width = formData.get('width') as string;
 		const height = formData.get('height') as string;
+		const name = formData.get('name') as string;
+		const joinRequest = formData.get('joinRequest') as string;
+		const community = formData.get('community') as string;
+		const category = formData.get('gameType') as string;
 		if (width == null || height == null) return;
-		const size = {
+		const payload = {
+			name: name,
+			category: category,
+			access: joinRequest ? 'request_only' : 'closed',
+			visibility: community ? 'public' : 'private',
 			width: parseInt(width),
-			height: parseInt(height)
-		} as Size2D;
+			height: parseInt(height),
+			colors: [
+				'#ffd887',
+				'#eb9361',
+				'#da5e4e',
+				'#ab2330',
+				'#dfffff',
+				'#b5de89',
+				'#6aab7c',
+				'#26616b',
+				'#a2dceb',
+				'#759ed0',
+				'#434ea8',
+				'#2a2140',
+				'#e1a7c5',
+				'#ab7ac6',
+				'#735bab',
+				'#3b3772'
+			]
+		} as CreateCanvaPayload;
 		const networker = Networker.getInstance();
-		const canvasId = await networker.createCanva(1, size);
-		const canva = await networker.addColors(canvasId, [
-			'#ffd887',
-			'#eb9361',
-			'#da5e4e',
-			'#ab2330',
-			'#dfffff',
-			'#b5de89',
-			'#6aab7c',
-			'#26616b',
-			'#a2dceb',
-			'#759ed0',
-			'#434ea8',
-			'#2a2140',
-			'#e1a7c5',
-			'#ab7ac6',
-			'#735bab',
-			'#3b3772'
-		]);
+		const canva = await networker.createCanva(payload);
 		dispatch('close');
 		event.set('clearCanva');
 	};
@@ -96,22 +104,16 @@
 					<NumberInput id="height" label="H:" inputValue={64}></NumberInput>
 				</div>
 			</div>
-			<ToggleInput id="community" label="Community" disabled={true} />
+			<ToggleInput id="community" label="Community" />
 			<Accordion>
 				<div slot="heading">Options Avancée</div>
 				<div slot="content" class="flex flex-col gap-4">
-					<ToggleInput
-						id="joinRequest"
-						label="Joindre sur demande"
-						toggle={false}
-						disabled={true}
-					/>
+					<ToggleInput id="joinRequest" label="Joindre sur demande" toggle={false} />
 					<ToggleInput
 						id="limitedPalette"
 						label="Palette limitée"
 						toggle={customPalette}
 						on:change={() => (customPalette = !customPalette)}
-						disabled={true}
 					/>
 					<Select
 						id="gameType"
