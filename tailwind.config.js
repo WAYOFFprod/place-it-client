@@ -8,7 +8,8 @@ export default {
 			sans: ['NeueBit', 'system-ui']
 		},
 		borderRadius: {
-			DEFAULT: '8px'
+			DEFAULT: '8px',
+			full: '9999px'
 		},
 		extend: {
 			cursor: {
@@ -36,6 +37,9 @@ export default {
 				'off-white': '#F6F4F4',
 				'dark-grey': '#504F4F',
 				black: '#141414'
+			},
+			aspectRatio: {
+				'7/5': '7 / 5'
 			},
 			fontSize: {
 				md: [

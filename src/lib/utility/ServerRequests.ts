@@ -26,7 +26,10 @@ export default class ServerRequests {
       const res = await response.json();
 
 
-      return res;
+      return {
+        response: res,
+        status: response.status
+      };
     } catch(error) {
       console.error("Error:", error);
     }
@@ -46,14 +49,12 @@ export default class ServerRequests {
       );
 
       this.xsrfCheck()
-
       if(response.status == 200) {
         const res = await response.json();
         return res;
       }
-
       
-      return true;
+      return response;
     } catch(error) {
       console.error("Error:", error);
       return false

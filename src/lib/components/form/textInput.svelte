@@ -5,17 +5,18 @@
 	export let type: string = 'text';
 </script>
 
-<div>
+<div class={$$props.class}>
 	{#if label}
 		<label class="block mb-3" for={id}>{label}</label>
 	{/if}
-	<div class="relative w-full">
+	<div class="relative w-full flex gap-2">
+		<slot name="startIcon" />
 		<input
 			{id}
 			name={id}
 			{type}
 			{placeholder}
-			class="border-b-2 autofill:border-red-400 border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pr-8 min-w-5"
+			class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pr-8 pb-1 min-w-5"
 		/>
 		<div class="absolute w-5 right-0 bottom-2">
 			<slot />

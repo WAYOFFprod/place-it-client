@@ -7,6 +7,7 @@ let PIXEL_IN_SECTION = 10;
 
 export default class GridManager {
   p5: P5
+  canvasId: number | undefined
   gridSections: GridSection[];
   canvas: {width: number, height: number};
   sectionGrid: {width: number, height: number};
@@ -16,6 +17,7 @@ export default class GridManager {
 
   constructor(p5: P5, canvas: Size2D) {
     // init values
+    
     this.p5 = p5;
     this.gridSections = [];
     this.canvas = canvas;
@@ -42,7 +44,8 @@ export default class GridManager {
 
   additionalData: {[key: string]: string} = {};
 
-  loadImage = async (base64Image: string, size: Size2D, data: {[key: string]: string}) => {
+  loadImage = async (canvasId: number,base64Image: string, size: Size2D, data: {[key: string]: string}) => {
+    this.canvasId = canvasId;
     this.additionalData = data;
     this.p5.loadImage(base64Image, this.handleImage);
   }

@@ -3,6 +3,7 @@
 	import Create from '$lib/components/modals/create.svelte';
 	import { openedModal } from '$lib/stores/modalStore';
 	import Auth from '$lib/components/modals/auth.svelte';
+	import Settings from './modals/settings.svelte';
 
 	let dialog: HTMLDialogElement;
 
@@ -44,6 +45,8 @@
 			<Create on:close={modalClosed}></Create>
 		{:else if openedDialog == 'login'}
 			<Auth on:close={modalClosed}></Auth>
+		{:else if openedDialog == 'settings'}
+			<Settings on:close={modalClosed}></Settings>
 		{/if}
 	</Panel>
 </dialog>

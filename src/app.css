@@ -38,11 +38,6 @@
 		display: none;
 	}
 
-	/* Button */
-	.button.yellow {
-		@apply rounded py-1 bg-naples-yellow hover:bg-naples-yellow-focus;
-	}
-
 	/* Scrollbar */
 	.chat {
 		/* width */
@@ -62,5 +57,8 @@
 		::-webkit-scrollbar-thumb {
 			@apply bg-black;
 		}
+	}
+	.disable-blur {
+		image-rendering: pixelated;
 	}
 }

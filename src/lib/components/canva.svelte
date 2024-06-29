@@ -5,7 +5,6 @@
 	import { ToolType, backToTool, selectedTool, setTempTool, setTool } from '$lib/stores/toolStore';
 
 	import Palette from './color/palette.svelte';
-	import Button from './button.svelte';
 	import Networker from '$lib/utility/Networker';
 	import Modal from '$lib/components/modal.svelte';
 	import Toolbar from '$lib/components/toolbar/toolbar.svelte';
@@ -20,6 +19,13 @@
 	let width = 32;
 	let height = 16;
 
+	const getIdFromParam = () => {
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		const id = urlParams.get('id');
+		return id ? parseInt(id) : null;
+	};
+	const canva_id: number | null = getIdFromParam();
 	let container: HTMLElement;
 	let updateColorPalette: (newColors: [string]) => void;
 
@@ -49,8 +55,10 @@
 	const reloadCanva = async () => {
 		isReady = false;
 		const canvasData = await fetchData();
-		controlManager.init(canvasData.size);
-		connect(canvasData);
+		if (canvasData) {
+			controlManager.init(canvasData.size);
+			connect(canvasData);
+		}
 	};
 
 	const isTargeting = (target: EventTarget | null, id: string) => {
@@ -62,7 +70,8 @@
 
 	const fetchData = async () => {
 		// load data
-		const data = await networker.getCanva();
+		if (canva_id == null) return null;
+		const data = await networker.getCanva(canva_id);
 
 		// set width and height
 		width = data.width;
@@ -81,7 +90,7 @@
 		networker.connectToSocket(gridManager, reloadCanva);
 
 		const pixels = networker.tempPoints as { [key: string]: string };
-		gridManager.loadImage(canvasData.data.image, canvasData.size, pixels);
+		gridManager.loadImage(canvasData.id, canvasData.data.image, canvasData.size, pixels);
 		// color = data.colors[0];
 		updateColorPalette(canvasData.data.colors);
 		networker.loadCanva(canvasData.id);
@@ -90,8 +99,10 @@
 
 	const initCanvas = async () => {
 		const canvasData = await fetchData();
-		controlManager = new ControlManager(p5, canvasData.size);
-		connect(canvasData);
+		if (canvasData) {
+			controlManager = new ControlManager(p5, canvasData.size);
+			connect(canvasData);
+		}
 	};
 
 	onMount(() => {

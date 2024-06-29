@@ -4,6 +4,7 @@ import ServerRequests from "./ServerRequests";
 import { Socket, io } from 'socket.io-client';
 import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
 import { chatMessages } from "$lib/stores/chatStore";
+import { authStatus, userStore } from "$lib/stores/authStore";
 
 export default class Networker {
   static #instance: Networker
@@ -14,6 +15,7 @@ export default class Networker {
   tempPoints: {[key: string]: string} | undefined
   websocket: string
   messages: Message[] = []
+  canvasId: number | undefined
 
   static getInstance() {
     if (!this.#instance) {
@@ -53,6 +55,7 @@ export default class Networker {
     // listen to socket server message
     
     this.socket.on('canva:new-pixel-from-others', (coord, color) => {
+      console.log("NEW PIXEL FROM OTHERS");
       if(!this.gridManager) return console.error("missing grid manager");
       this.gridManager.drawPixelOnCanvas(coord, color);
     });
@@ -84,7 +87,30 @@ export default class Networker {
     console.log(response);
   }
 
+  getSession = async () => {
+    const response = await this.server.get('/session')
+    if(response.isConnected) {
+      userStore.set(response.user);
+      authStatus.set(true);
+    } else {
+      authStatus.set(false);
+    }
+  }
+
+  saveField = async (payload: SettingOption) => {
+    const response = await this.server.post('/user/update/', payload)
+    if(response?.response.user) {
+      userStore.set(response.response.user);
+      authStatus.set(true);
+    }
+  }
+
   // Canvas
+
+  getCanvas = async () => {
+    const response: any = await this.server.get("/canvas/");
+    return response;
+  }
 
   getCanva = async (id: number = 1) => {
     const response = await this.server.get("/canvas/"+id);
@@ -92,7 +118,10 @@ export default class Networker {
   }
 
   loadCanva = (canvaId: number) => {
-    this.socket?.emit('switch-room', {"canvaId": canvaId})
+    this.socket?.emit('join-room', {
+      "canvaId": canvaId,
+      "user": 'TODO'
+    })
   }
 
   placePixel = (coord: Coord, color: string | null) => {
@@ -105,7 +134,8 @@ export default class Networker {
     const index = this.gridManager.drawPixelOnCanvas(coord, color);
     if(index === false) return
     if(this.socket != undefined)
-    this.socket.emit('canva:new-pixel', index, coord, color);
+      this.socket.emit('canva:new-pixel:'+this.gridManager.canvasId, index, coord, color);
+
   }
 
   addColors = async (id: number, colors: string[]) => {
@@ -117,8 +147,8 @@ export default class Networker {
     return response;
   }
 
-  createCanva = async (id: number = 1, size: Size2D) => {
-    const response = await this.server.post("/canvas/create", size);
+  createCanva = async (payload: CreateCanvaPayload) => {
+    const response = await this.server.post("/canvas/create", payload);
     if(this.socket != undefined)
     this.socket.emit('canva:reset');
     return response;
