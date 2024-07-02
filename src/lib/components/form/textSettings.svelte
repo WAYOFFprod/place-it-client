@@ -9,7 +9,7 @@
 	export let id: string;
 	export let placeholder: string = '';
 	export let label: string;
-	export const type: string = 'text';
+	export let type: string = 'text';
 	export let value: string = '';
 	export let field: string;
 

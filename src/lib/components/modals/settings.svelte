@@ -10,8 +10,14 @@
 	let form: HTMLFormElement;
 
 	let user: User;
+
+	let nameInput: HTMLInputElement;
+	let nameValue: string = '';
+	let nameEditable: boolean = false;
+
 	userStore.subscribe((newUser) => {
 		user = newUser;
+		nameValue = user.name;
 	});
 
 	const networker: Networker = Networker.getInstance();
@@ -25,6 +31,19 @@
 				value: value
 			});
 		}
+	};
+	const makeEditable = () => {
+		nameEditable = !nameEditable;
+	};
+	const saveName = () => {
+		const formData = new FormData(form);
+		const value = formData.get('name') as string;
+		console.log(value);
+		networker.saveField({
+			field: 'name',
+			value: value
+		});
+		nameEditable = false;
 	};
 </script>
 
@@ -42,13 +61,22 @@
 			<button class="border-b-2 border-black py-4 px-5 self-stretch">Notifications</button>
 		</div>
 		<!-- Window -->
-		<div class="overflow-scroll px-20 py-6 w-full">
+		<form bind:this={form} class="overflow-scroll px-20 py-6 w-full">
 			<div class="w-40 flex flex-col items-center gap-2 mx-auto">
 				<div class="rounded-full w-36 h-36 border-2 border-black"></div>
-				<div>{user.name}</div>
-				<Button>Modifier</Button>
+				<input
+					bind:this={nameInput}
+					id="name"
+					name="name"
+					type="text"
+					placeholder="Name"
+					disabled={!nameEditable}
+					value={nameValue}
+					class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 min-w-5 disabled:border-transparent"
+				/>
+				<Button on:click={() => (nameEditable ? saveName() : makeEditable())}>Modifier</Button>
 			</div>
-			<form class="py-8" bind:this={form}>
+			<div class="py-8">
 				<div class="flex flex-col gap-4">
 					<ToggleInput
 						id="darkmode"
@@ -89,7 +117,7 @@
 						on:saveField={onSaveField}
 					></SelectSettings>
 				</div>
-			</form>
-		</div>
+			</div>
+		</form>
 	</div>
 </div>
