@@ -116,7 +116,7 @@ export default class Networker {
 
   getCanva = async (id: number) => {
     const response = await this.server.get("/canvas/"+id);
-    return response;
+    return response.data;
   }
 
   deleteCanva = async (id: number) => {

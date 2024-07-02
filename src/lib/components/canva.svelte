@@ -15,17 +15,11 @@
 	import ZoomCounter from './metric/zoomCounter.svelte';
 	import CoordViewer from './metric/coordViewer.svelte';
 
+	export let canva: undefined | CanvaRequestData;
 	let id = 'canvas-container';
 	let width = 32;
 	let height = 16;
 
-	const getIdFromParam = () => {
-		const queryString = window.location.search;
-		const urlParams = new URLSearchParams(queryString);
-		const id = urlParams.get('id');
-		return id ? parseInt(id) : null;
-	};
-	const canva_id: number | null = getIdFromParam();
 	let container: HTMLElement;
 	let updateColorPalette: (newColors: [string]) => void;
 
@@ -54,11 +48,11 @@
 
 	const reloadCanva = async () => {
 		isReady = false;
-		const canvasData = await fetchData();
-		if (canvasData) {
-			controlManager.init(canvasData.size);
-			connect(canvasData);
-		}
+		// const canvasData = await fetchData();
+		// if (canvasData) {
+		// 	controlManager.init(canvasData.size);
+		// 	connect(canvasData);
+		// }
 	};
 
 	const isTargeting = (target: EventTarget | null, id: string) => {
@@ -66,22 +60,6 @@
 		const targetId = (target as HTMLElement).id;
 		if (targetId != id) return false;
 		return true;
-	};
-
-	const fetchData = async () => {
-		// load data
-		if (canva_id == null) return null;
-		const data = await networker.getCanva(canva_id);
-
-		// set width and height
-		width = data.width;
-		height = data.height;
-		const size: Size2D = { width: width, height: height };
-		return {
-			id: data.id,
-			data: data,
-			size: size
-		};
 	};
 
 	const connect = async (canvasData: CanvaData) => {
@@ -98,10 +76,17 @@
 	};
 
 	const initCanvas = async () => {
-		const canvasData = await fetchData();
-		if (canvasData) {
-			controlManager = new ControlManager(p5, canvasData.size);
-			connect(canvasData);
+		if (canva) {
+			width = canva.width;
+			height = canva.height;
+			const size: Size2D = { width: width, height: height };
+			const data = {
+				id: canva.id,
+				data: canva,
+				size: size
+			};
+			controlManager = new ControlManager(p5, data.size);
+			connect(data);
 		}
 	};
 
