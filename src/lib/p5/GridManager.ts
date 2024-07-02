@@ -90,6 +90,7 @@ export default class GridManager {
         const absolutePosition = this.getCoordFromIndex(index, this.canvas.width)
         const gridIndex = this.getGridSectionIndex(absolutePosition);
         const relPosition = this.getRelativePixelPosition(absolutePosition);
+
         this.gridSections[gridIndex].drawPixel(relPosition, color);
       }
     }

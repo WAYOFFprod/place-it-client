@@ -84,7 +84,9 @@ export default class Networker {
   login = async (payload: LoginPayload) => {
     await this.server.get('/sanctum/csrf-cookie')
     const response = await this.server.post("/auth/login/", payload);
-    console.log(response);
+    if(response?.status == 200) {
+      authStatus.set(true);
+    }
   }
 
   getSession = async () => {
@@ -112,8 +114,13 @@ export default class Networker {
     return response;
   }
 
-  getCanva = async (id: number = 1) => {
+  getCanva = async (id: number) => {
     const response = await this.server.get("/canvas/"+id);
+    return response;
+  }
+
+  deleteCanva = async (id: number) => {
+    const response = await this.server.delete("/canvas/"+id);
     return response;
   }
 

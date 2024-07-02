@@ -32,7 +32,6 @@
 
 	const validate = async () => {
 		const formData = new FormData(form);
-		console.log([...formData.entries()]);
 		const width = formData.get('width') as string;
 		const height = formData.get('height') as string;
 		const name = formData.get('name') as string;
@@ -69,7 +68,7 @@
 		const networker = Networker.getInstance();
 		const canva = await networker.createCanva(payload);
 		dispatch('close');
-		event.set('clearCanva');
+		event.set('updateCanvas');
 	};
 </script>
 

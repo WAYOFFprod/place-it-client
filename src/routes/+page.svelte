@@ -10,6 +10,7 @@
 	import Networker from '$lib/utility/Networker';
 	import CanvaPreview from '$lib/components/canvaPreview.svelte';
 	import { authStatus } from '$lib/stores/authStore';
+	import { event } from '$lib/stores/eventStore';
 
 	const onclickNotification = () => {
 		// openedModal.set('create');
@@ -32,13 +33,24 @@
 		// trigger function to fetch data in background
 		networker.getSession();
 		// load data
+		// const data = await networker.getCanvas();
+		// return data;
+	};
+
+	const updateCanvas = async () => {
 		const data = await networker.getCanvas();
-		return data;
+		canvas = data.data;
 	};
 
 	let isConnected: undefined | boolean = undefined;
 	authStatus.subscribe((newStatus) => {
 		isConnected = newStatus;
+		if (isConnected == true) updateCanvas();
+	});
+
+	event.subscribe((newEvent) => {
+		if (newEvent == 'updateCanvas') updateCanvas();
+		event.set('');
 	});
 
 	let canvas: CanvaPreviewData[] = [];
@@ -59,11 +71,10 @@
 	] as options[];
 
 	onMount(async () => {
-		const data = await fetchData();
-
-		if (data) {
-			canvas = data.data;
-		}
+		await fetchData();
+		// if (data) {
+		// 	canvas = data.data;
+		// }
 	});
 </script>
 

@@ -25,7 +25,6 @@
 		const formData = new FormData(form);
 		const value = formData.get(event.detail.field) as string;
 		if (event.detail.value != value) {
-			console.log(value, event.detail.value);
 			networker.saveField({
 				field: event.detail.field,
 				value: value
@@ -38,7 +37,6 @@
 	const saveName = () => {
 		const formData = new FormData(form);
 		const value = formData.get('name') as string;
-		console.log(value);
 		networker.saveField({
 			field: 'name',
 			value: value

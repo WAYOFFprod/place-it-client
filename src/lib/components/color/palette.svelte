@@ -21,7 +21,6 @@
 	});
 
 	const updateSelectColor = (event: CustomEvent<selectColor>) => {
-		console.log('hello', event);
 		selectedColor.set(event.detail.color);
 	};
 </script>

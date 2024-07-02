@@ -1,12 +1,19 @@
 <script lang="ts">
+	import Networker from '$lib/utility/Networker';
 	import Button from './form/button.svelte';
 	import Panel from './layout/panel.svelte';
+	import { event } from '$lib/stores/eventStore';
 
 	export let canva: CanvaPreviewData;
 
+	const networker = Networker.getInstance();
+
 	const onView = () => {};
 	const onEdit = () => {};
-	const onDelete = () => {};
+	const onDelete = async () => {
+		await networker.deleteCanva(canva.id);
+		event.set('updateCanvas');
+	};
 </script>
 
 <div class="group">
@@ -35,7 +42,7 @@
 			<div
 				class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center px-28 gap-4"
 			>
-				{#if canva.mode == 'playable'}
+				{#if canva.mode == 'playable' || canva.owned}
 					<Button
 						type="link"
 						link="/canva?id={canva.id}"

@@ -61,6 +61,32 @@ export default class ServerRequests {
     }
   }
 
+  delete = async (path: string) => {
+    try {
+      const response = await fetch(this.host + path,
+        {
+          method: "DELETE", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: "include", // include, *same-origin, omit
+          headers: this.headers,
+          referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        }
+      );
+
+      this.xsrfCheck()
+      if(response.status == 200) {
+        const res = await response.json();
+        return res;
+      }
+      
+      return response;
+    } catch(error) {
+      console.error("Error:", error);
+      return false
+    }
+  }
+
   xsrfCheck() {
     const cookies = this.parseCookie(document.cookie)
     if('XSRF-TOKEN' in cookies) {
