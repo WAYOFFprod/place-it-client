@@ -33,7 +33,7 @@
 </script>
 
 <div role="presentation" on:focus={focus} on:mouseover={mouseEnter} on:mouseleave={mouseLeave}>
-	<Panel isSmall={isHovering}>
+	<Panel isSmall={isHovering || toggle}>
 		<input
 			name={id}
 			{id}
@@ -45,6 +45,7 @@
 		/>
 		<label
 			class=" py-2 px-2 flex justify-between gap-2 items-center group
+			{$$props.class}
       {toggle ? classActive : classInactive}
       {disabled ? 'cursor-not-allowed' : 'cursor-pointer'}"
 			for={id}

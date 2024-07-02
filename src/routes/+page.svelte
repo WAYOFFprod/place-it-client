@@ -12,6 +12,7 @@
 	import { authStatus } from '$lib/stores/authStore';
 	import { event } from '$lib/stores/eventStore';
 
+	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
 	const onclickNotification = () => {
 		// openedModal.set('create');
 	};
@@ -26,6 +27,20 @@
 		} else {
 			openedModal.set('login');
 		}
+	};
+
+	const openMyCanvas = async () => {
+		if (tab == 'my-canvas') return;
+		const data = await networker.getCanvas();
+		canvas = data.data;
+		tab = 'my-canvas';
+	};
+
+	const openCommunityCanvas = async () => {
+		if (tab == 'community-canvas') return;
+		const data = await networker.getCanvas();
+		canvas = data.data;
+		tab = 'community-canvas';
 	};
 
 	const networker = Networker.getInstance();
@@ -72,9 +87,6 @@
 
 	onMount(async () => {
 		await fetchData();
-		// if (data) {
-		// 	canvas = data.data;
-		// }
 	});
 </script>
 
@@ -93,9 +105,17 @@
 			</div>
 		</div>
 		<div class="container mx-auto flex h-16 items-stretch">
-			<div class="border-r-2 border-black flex gap-6 pr-32 uppercase items-center">
-				<a href="/">Mes canvas</a>
-				<a href="/">Communauté</a>
+			<div class="border-r-2 border-black flex gap-6 pr-32 items-center">
+				<button
+					on:click={openMyCanvas}
+					class="border-b-2 {tab == 'my-canvas' ? 'border-black' : 'border-transparent'}"
+					><span class="uppercase">Mes canvas</span></button
+				>
+				<button
+					on:click={openCommunityCanvas}
+					class="border-b-2 {tab == 'community-canvas' ? 'border-black' : 'border-transparent'}"
+					><span class="uppercase">Communauté</span></button
+				>
 			</div>
 			<div class="flex flex-row-reverse items-center grow">
 				<button on:click={onClickLogin} class="flex items-center gap-2 uppercase">
@@ -121,15 +141,17 @@
 			<ToggleButton
 				id="recent"
 				label="Récents"
-				classInactive="bg-fluorescent-cyan"
-				classActive="bg-fluorescent-cyan-focus"
+				class="hover:bg-fluorescent-cyan"
+				classInactive="bg-white"
+				classActive="!bg-fluorescent-cyan-focus"
 				><img src="/svg/alarm.svg" alt="recent icon" /></ToggleButton
 			>
 			<ToggleButton
 				id="favorit"
 				label="Favoris"
-				classInactive="bg-tea-rose"
-				classActive="bg-tea-rose-focus"
+				class="hover:bg-tea-rose"
+				classInactive="bg-white"
+				classActive="!bg-tea-rose-focus"
 				><img src="/svg/heart.svg" alt="favorit icon" /></ToggleButton
 			>
 			<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
