@@ -8,6 +8,7 @@
 	export let type: 'button' | 'reset' | 'submit' | 'link' = 'button';
 	export let stretch: boolean = true;
 	export let link: string = '';
+	export let disabled: boolean = false;
 
 	export let classColor: string = 'bg-naples-yellow hover:bg-naples-yellow-focus';
 
@@ -51,6 +52,7 @@
 			<button
 				on:click|preventDefault={click}
 				{type}
+				{disabled}
 				class="px-4 py-2 flex justify-center items-center gap-4 text-xl {classColor} {stretch
 					? 'w-full'
 					: ''}"

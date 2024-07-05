@@ -4,12 +4,13 @@
 	import { openedModal } from '$lib/stores/modalStore';
 	import Auth from '$lib/components/modals/auth.svelte';
 	import Settings from './modals/settings.svelte';
+	import JoinCanva from './modals/joinCanva.svelte';
 
 	let dialog: HTMLDialogElement;
 
 	let isOpen = false;
-	let openedDialog: string | undefined;
-	openedModal.subscribe((newModal) => {
+	let openedDialog: ModalData;
+	openedModal.subscribe((newModal: ModalData) => {
 		openedDialog = newModal;
 		if (dialog != undefined) {
 			dialog.showModal();
@@ -18,13 +19,13 @@
 	});
 
 	const modalClosed = () => {
-		openedModal.set('');
+		openedModal.set({ name: '' });
 		dialog.close();
 		isOpen = false;
 	};
 	const close = (e: Event) => {
 		if (e.target == dialog) {
-			openedModal.set('');
+			openedModal.set({ name: '' });
 			dialog.close();
 			isOpen = false;
 		}
@@ -41,12 +42,14 @@
 		: ''} justify-center items-center"
 >
 	<Panel class="w-fit">
-		{#if openedDialog == 'create'}
+		{#if openedDialog.name == 'create'}
 			<Create on:close={modalClosed}></Create>
-		{:else if openedDialog == 'login'}
+		{:else if openedDialog.name == 'login'}
 			<Auth on:close={modalClosed}></Auth>
-		{:else if openedDialog == 'settings'}
+		{:else if openedDialog.name == 'settings'}
 			<Settings on:close={modalClosed}></Settings>
+		{:else if openedDialog.name == 'joinRequest'}
+			<JoinCanva on:close={modalClosed} canvaId={openedDialog.data.id}></JoinCanva>
 		{/if}
 	</Panel>
 </dialog>

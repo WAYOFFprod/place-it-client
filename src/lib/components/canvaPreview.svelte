@@ -3,14 +3,29 @@
 	import Button from './form/button.svelte';
 	import Panel from './layout/panel.svelte';
 	import { event } from '$lib/stores/eventStore';
+	import { openedModal } from '$lib/stores/modalStore';
 	import Accordion from './layout/accordion.svelte';
+	import { authStatus } from '$lib/stores/authStore';
 
 	export let canva: CanvaPreviewData;
 
+	let conenctionStatus: undefined | boolean;
 	const networker = Networker.getInstance();
 
-	const onView = () => {};
 	const onEdit = () => {};
+	const onRequest = () => {
+		openedModal.set({
+			name: 'joinRequest',
+			data: {
+				id: canva.id
+			}
+		});
+	};
+
+	authStatus.subscribe((newStatus) => {
+		conenctionStatus = newStatus;
+	});
+
 	const onDelete = async () => {
 		await networker.deleteCanva(canva.id);
 		event.set('updateCanvas');
@@ -40,7 +55,7 @@
 				return '0';
 				break;
 			case 'request_only':
-				return '0/x';
+				return '0/' + canva.participants;
 				break;
 
 			default:
@@ -57,7 +72,11 @@
 			<div class="flex justify-between p-4">
 				<button>
 					<slot name="icon">
-						<img class="test-black" src="/svg/earth.svg" alt="community icon" />
+						{#if canva.access == 'open'}
+							<img class="test-black" src="/svg/earth.svg" alt="community icon" />
+						{:else if canva.access == 'request_only'}
+							<img class="test-black" src="/svg/users.svg" alt="community icon" />
+						{/if}
 					</slot>
 				</button>
 				<button>
@@ -78,17 +97,32 @@
 			<div
 				class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center px-28 gap-4"
 			>
-				{#if canva.access == 'open' || canva.owned}
-					<Button
-						type="link"
-						link="/canva?id={canva.id}"
-						classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Jouer</Button
-					>
+				{#if (canva.access != 'closed' || canva.owned) && conenctionStatus}
+					{#if canva.participationStatus == 'accepted'}
+						<Button
+							type="link"
+							link="/canva?id={canva.id}"
+							classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Jouer</Button
+						>
+					{:else if canva.participationStatus == 'sent'}
+						<Button
+							type="link"
+							disabled={true}
+							link="/canva?id={canva.id}"
+							classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Demande</Button
+						>
+					{:else if canva.participationStatus == null}
+						<Button
+							type="button"
+							on:click={onRequest}
+							classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Rejoindre</Button
+						>
+					{/if}
 				{/if}
 				{#if canva.access != 'closed'}
 					<Button
-						type="button"
-						on:click={onView}
+						type="link"
+						link="/canva/view?id={canva.id}"
 						classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Regarder</Button
 					>
 				{/if}

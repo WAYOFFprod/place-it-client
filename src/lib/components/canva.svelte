@@ -16,6 +16,8 @@
 	import CoordViewer from './metric/coordViewer.svelte';
 
 	export let canva: undefined | CanvaRequestData;
+	export let viewOnly: boolean = true;
+
 	let id = 'canvas-container';
 	let width = 32;
 	let height = 16;
@@ -85,7 +87,7 @@
 				data: canva,
 				size: size
 			};
-			controlManager = new ControlManager(p5, data.size);
+			controlManager = new ControlManager(p5, data.size, viewOnly);
 			connect(data);
 		}
 	};
@@ -196,7 +198,7 @@
 		</div>
 
 		<!-- other -->
-		<Toolbar class="absolute left-5 top-5 pointer-events-auto" {p5}></Toolbar>
+		<Toolbar class="absolute left-5 top-5 pointer-events-auto" {p5} {viewOnly}></Toolbar>
 	</div>
 
 	<!-- canvas -->

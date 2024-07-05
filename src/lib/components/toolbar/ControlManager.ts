@@ -27,10 +27,13 @@ export default class ControlManager {
   scaleFactor = 0;
 
 
-  constructor(p5: P5, size: Size2D) {
+  constructor(p5: P5, size: Size2D, viewOnly: boolean) {
     this.p5 = p5;
-    
-    this.toolManager = new ToolManager(ToolType.Cursor, p5);
+    if(viewOnly) {
+      this.toolManager = new ToolManager(ToolType.Hand, p5);
+    } else {
+      this.toolManager = new ToolManager(ToolType.Cursor, p5);
+    }
 
 		this.init(size)
   }

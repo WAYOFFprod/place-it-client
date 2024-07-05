@@ -44,7 +44,7 @@
 		</div>
 	</Header>
 	{#if canva}
-		<Canva {canva} viewOnly={false}></Canva>
+		<Canva {canva}></Canva>
 	{/if}
 </div>
 

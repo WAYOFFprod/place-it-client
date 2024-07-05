@@ -19,14 +19,14 @@
 	};
 
 	const onCreateCanva = () => {
-		openedModal.set('create');
+		openedModal.set({ name: 'create' });
 	};
 
 	const onClickLogin = () => {
 		if (isConnected) {
-			openedModal.set('settings');
+			openedModal.set({ name: 'settings' });
 		} else {
-			openedModal.set('login');
+			openedModal.set({ name: 'login' });
 		}
 	};
 

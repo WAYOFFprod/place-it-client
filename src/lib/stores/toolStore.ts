@@ -18,6 +18,11 @@ let toolClasses: Tools = {
   // [ToolType.Selection]: SelectionTool
 }
 
+let readOnlytoolClasses: Tools = {
+  [ToolType.Hand]: MoveTool,
+  // [ToolType.Selection]: SelectionTool
+}
+
 let activeToolType: typeof Tool = toolClasses[ToolType.Cursor]
 let activeTool: Tool | undefined
 
@@ -49,5 +54,6 @@ export {
   backToTool,
   setTool,
   ToolType,
-  toolClasses
+  toolClasses,
+  readOnlytoolClasses
 }

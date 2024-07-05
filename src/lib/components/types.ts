@@ -4,6 +4,11 @@ interface CanvaData {
   size: Size2D
 }
 
+interface ModalData {
+  name: string
+  data?: any
+}
+
 interface CanvaPreviewData {
   id: number,
   width: number,
@@ -13,5 +18,7 @@ interface CanvaPreviewData {
   visibility: 'public' | 'friends_only' | 'private',
   category: 'pixelwar' | 'artistic' | 'free',
   access: 'open' | 'invite_only' | 'request_only' | 'closed'
+  participationStatus: 'accepted' | 'rejected' | 'sent' | null
   image: string
+  participants: number
 }
