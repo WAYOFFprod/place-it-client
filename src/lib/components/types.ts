@@ -10,8 +10,8 @@ interface CanvaPreviewData {
   height: number,
   colors: any,
   owned: boolean,
-  mode: 'playable' | 'view_only',
+  visibility: 'public' | 'friends_only' | 'private',
   category: 'pixelwar' | 'artistic' | 'free',
-  access: 'public' | 'invite_only' | 'private'
+  access: 'open' | 'invite_only' | 'request_only' | 'closed'
   image: string
 }

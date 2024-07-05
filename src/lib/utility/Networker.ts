@@ -109,8 +109,8 @@ export default class Networker {
 
   // Canvas
 
-  getCanvas = async () => {
-    const response: any = await this.server.get("/canvas/");
+  getCanvas = async (scope: 'personal' | 'community') => {
+    const response: any = await this.server.get("/canvas/?scope="+scope);
     return response;
   }
 

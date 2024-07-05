@@ -3,6 +3,7 @@
 	import Button from './form/button.svelte';
 	import Panel from './layout/panel.svelte';
 	import { event } from '$lib/stores/eventStore';
+	import Accordion from './layout/accordion.svelte';
 
 	export let canva: CanvaPreviewData;
 
@@ -13,6 +14,38 @@
 	const onDelete = async () => {
 		await networker.deleteCanva(canva.id);
 		event.set('updateCanvas');
+	};
+
+	const getCategory = () => {
+		switch (canva.category) {
+			case 'pixelwar':
+				return 'Pixelwar';
+				break;
+			case 'artistic':
+				return 'Oeuvre Collaborative';
+				break;
+			case 'free':
+				return 'Libre';
+				break;
+
+			default:
+				break;
+		}
+		return;
+	};
+
+	const getUserCount = () => {
+		switch (canva.access) {
+			case 'open':
+				return '0';
+				break;
+			case 'request_only':
+				return '0/x';
+				break;
+
+			default:
+				break;
+		}
 	};
 </script>
 
@@ -32,23 +65,27 @@
 				</button>
 			</div>
 			<!-- Bottom Section -->
-			<div class="h-5 border-t-2 border-black bg-white flex justify-between">
-				<span>Catégorie</span>
-				<div>
-					1/2 <span class="w-1.5 h-1.5 rounded-full border border-black bg-fluorescent-cyan"></span>
+			{#if canva.access != 'closed'}
+				<div class="h-6 border-t-2 border-black bg-white flex justify-between text-lg px-1">
+					<span>{getCategory()}</span>
+					<div class="flex items-center gap-1">
+						<span>{getUserCount()} </span>
+						<span class="w-2.5 h-2.5 rounded-full border-2 border-black bg-fluorescent-cyan"></span>
+					</div>
 				</div>
-			</div>
+			{/if}
 			<!-- Hover -->
 			<div
 				class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center px-28 gap-4"
 			>
-				{#if canva.mode == 'playable' || canva.owned}
+				{#if canva.access == 'open' || canva.owned}
 					<Button
 						type="link"
 						link="/canva?id={canva.id}"
 						classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Jouer</Button
 					>
-				{:else if canva.mode == 'view_only'}
+				{/if}
+				{#if canva.access != 'closed'}
 					<Button
 						type="button"
 						on:click={onView}
@@ -56,11 +93,13 @@
 					>
 				{/if}
 				{#if canva.owned}
-					<Button
-						type="button"
-						on:click={onEdit}
-						classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Modifier</Button
-					>
+					{#if canva.access == 'closed'}
+						<Button
+							type="button"
+							on:click={onEdit}
+							classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Modifier</Button
+						>
+					{/if}
 					<Button
 						type="button"
 						on:click={onDelete}

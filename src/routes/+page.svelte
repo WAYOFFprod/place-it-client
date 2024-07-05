@@ -12,6 +12,7 @@
 	import { authStatus } from '$lib/stores/authStore';
 	import { event } from '$lib/stores/eventStore';
 
+	let canvasScope: 'community' | 'personal' = 'personal';
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
 	const onclickNotification = () => {
 		// openedModal.set('create');
@@ -31,14 +32,16 @@
 
 	const openMyCanvas = async () => {
 		if (tab == 'my-canvas') return;
-		const data = await networker.getCanvas();
+		canvasScope = 'personal';
+		const data = await networker.getCanvas(canvasScope);
 		canvas = data.data;
 		tab = 'my-canvas';
 	};
 
 	const openCommunityCanvas = async () => {
 		if (tab == 'community-canvas') return;
-		const data = await networker.getCanvas();
+		canvasScope = 'community';
+		const data = await networker.getCanvas(canvasScope);
 		canvas = data.data;
 		tab = 'community-canvas';
 	};
@@ -48,12 +51,12 @@
 		// trigger function to fetch data in background
 		networker.getSession();
 		// load data
-		// const data = await networker.getCanvas();
+		// const data = await networker.getCanvas(canvasScope);
 		// return data;
 	};
 
 	const updateCanvas = async () => {
-		const data = await networker.getCanvas();
+		const data = await networker.getCanvas(canvasScope);
 		canvas = data.data;
 	};
 
