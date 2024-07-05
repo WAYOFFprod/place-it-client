@@ -2,6 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import Button from '$lib/components/form/button.svelte';
 	import Networker from '$lib/utility/Networker';
+	import { event } from '$lib/stores/eventStore';
 
 	export let canvaId: number;
 	const dispatch = createEventDispatcher();
@@ -10,6 +11,7 @@
 
 	const join = async () => {
 		await networker.joinCanva(canvaId);
+		event.set('updateCanvas');
 		close();
 	};
 	const close = () => {

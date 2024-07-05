@@ -28,7 +28,7 @@
 		dispatch('click');
 	};
 
-	$: isHovering = hovered;
+	$: isHovering = disabled ? false : hovered;
 </script>
 
 <div

@@ -106,10 +106,11 @@
 						>
 					{:else if canva.participationStatus == 'sent'}
 						<Button
-							type="link"
+							type="button"
 							disabled={true}
 							link="/canva?id={canva.id}"
-							classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Demande</Button
+							classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus disabled:bg-white"
+							>Demande Envoyée</Button
 						>
 					{:else if canva.participationStatus == null}
 						<Button
