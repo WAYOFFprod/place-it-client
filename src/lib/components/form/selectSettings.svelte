@@ -22,6 +22,7 @@
 	const setEditable = async () => {};
 	const save = () => {
 		const data = { field: field, value: value } as SettingOption;
+		dispatch('saveField', data);
 	};
 	const discard = () => {
 		console.log('discard');
