@@ -121,8 +121,8 @@ export default class Networker {
     return response;
   }
 
-  getCanvas = async (scope: 'personal' | 'community') => {
-    const response: any = await this.server.get("/canvas/?scope="+scope);
+  getCanvas = async (scope: 'personal' | 'community', sort : undefined | 'asc' | 'desc' = undefined) => {
+    const response: any = await this.server.get("/canvas/?scope="+scope+(sort != undefined ? '&sort='+sort : ''));
     return response;
   }
 

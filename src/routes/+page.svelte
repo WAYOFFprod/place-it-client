@@ -14,6 +14,8 @@
 
 	let canvasScope: 'community' | 'personal' = 'personal';
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
+
+	let sort: undefined | 'asc' | 'desc';
 	const onclickNotification = () => {
 		// openedModal.set('create');
 	};
@@ -33,7 +35,7 @@
 	const openMyCanvas = async () => {
 		if (tab == 'my-canvas') return;
 		canvasScope = 'personal';
-		const data = await networker.getCanvas(canvasScope);
+		const data = await networker.getCanvas(canvasScope, sort);
 		canvas = data.data;
 		tab = 'my-canvas';
 	};
@@ -41,10 +43,18 @@
 	const openCommunityCanvas = async () => {
 		if (tab == 'community-canvas') return;
 		canvasScope = 'community';
-		const data = await networker.getCanvas(canvasScope);
+		const data = await networker.getCanvas(canvasScope, sort);
 		canvas = data.data;
 		tab = 'community-canvas';
 	};
+
+	const toggleRecent = async () => {
+		sort = sort ? undefined : 'desc';
+		const data = await networker.getCanvas(canvasScope, sort);
+		canvas = data.data;
+	};
+
+	const toggleFavorit = () => {};
 
 	const networker = Networker.getInstance();
 	const fetchData = async () => {
@@ -144,7 +154,7 @@
 				class="hover:bg-fluorescent-cyan"
 				classInactive="bg-white"
 				classActive="!bg-fluorescent-cyan-focus"
-				><img src="/svg/alarm.svg" alt="recent icon" /></ToggleButton
+				on:change={toggleRecent}><img src="/svg/alarm.svg" alt="recent icon" /></ToggleButton
 			>
 			<ToggleButton
 				id="favorit"
@@ -152,7 +162,7 @@
 				class="hover:bg-tea-rose"
 				classInactive="bg-white"
 				classActive="!bg-tea-rose-focus"
-				><img src="/svg/heart.svg" alt="favorit icon" /></ToggleButton
+				on:change={toggleFavorit}><img src="/svg/heart.svg" alt="favorit icon" /></ToggleButton
 			>
 			<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
 			></Select>

@@ -22,6 +22,7 @@ export default class ServerRequests {
       });
       
       this.xsrfCheck()
+
       if(response.status == 204 && response.type == 'cors') {
         return response;
       };
@@ -50,12 +51,14 @@ export default class ServerRequests {
       );
 
       this.xsrfCheck()
-      if(response.status == 200) {
-        const res = await response.json();
-        return res;
-      }
-      
-      return response;
+
+      if(response.status == 204) {
+        return response;
+      };
+
+      const res = await response.json();
+      return res;
+    
     } catch(error) {
       console.error("Error:", error);
       return false
