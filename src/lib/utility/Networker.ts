@@ -121,14 +121,19 @@ export default class Networker {
     return response;
   }
 
-  getCanvas = async (scope: 'personal' | 'community', sort : undefined | 'asc' | 'desc' = undefined) => {
-    const response: any = await this.server.get("/canvas/?scope="+scope+(sort != undefined ? '&sort='+sort : ''));
+  getCanvas = async (scope: 'personal' | 'community', sort : undefined | 'asc' | 'desc' = undefined, favorit: undefined | 1 = undefined) => {
+    const response: any = await this.server.get("/canvas/?scope="+scope+(sort != undefined ? '&sort='+sort : '')+(favorit != undefined ? '&favorit='+favorit : ''));
     return response;
   }
 
   getCanva = async (id: number) => {
     const response = await this.server.get("/canvas/"+id);
     return response.data;
+  }
+
+  likeCanva = async (id: number) => {
+    const response = await this.server.post("/canva/like", {"canvaId": id});
+    return response.response.added;
   }
 
   deleteCanva = async (id: number) => {

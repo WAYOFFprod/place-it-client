@@ -16,6 +16,7 @@
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
 
 	let sort: undefined | 'asc' | 'desc';
+	let favoritFilter: undefined | 1;
 	const onclickNotification = () => {
 		// openedModal.set('create');
 	};
@@ -54,7 +55,11 @@
 		canvas = data.data;
 	};
 
-	const toggleFavorit = () => {};
+	const toggleFavorit = async () => {
+		favoritFilter = favoritFilter ? undefined : 1;
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter);
+		canvas = data.data;
+	};
 
 	const networker = Networker.getInstance();
 	const fetchData = async () => {

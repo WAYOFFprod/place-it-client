@@ -2,6 +2,8 @@
 	import Networker from '$lib/utility/Networker';
 	import Button from './form/button.svelte';
 	import Panel from './layout/panel.svelte';
+	import Heart from '$lib/icons/heart.svelte';
+	import HeartFill from '$lib/icons/heart-fill.svelte';
 	import { event } from '$lib/stores/eventStore';
 	import { openedModal } from '$lib/stores/modalStore';
 	import Accordion from './layout/accordion.svelte';
@@ -29,6 +31,10 @@
 	const onDelete = async () => {
 		await networker.deleteCanva(canva.id);
 		event.set('updateCanvas');
+	};
+
+	const toggleLike = async () => {
+		canva.isLiked = await networker.likeCanva(canva.id);
 	};
 
 	const getUserCount = () => {
@@ -69,18 +75,22 @@
 		<!-- Overlay -->
 		<div class="absolute inset-0 flex flex-col justify-between h-full">
 			<!-- Top section -->
-			<div class="flex justify-between p-4">
+			<div class="flex justify-between p-4 z-20">
 				<button>
 					<slot name="icon">
 						{#if canva.access == 'open'}
-							<img class="test-black" src="/svg/earth.svg" alt="community icon" />
+							<img class="text-black" src="/svg/earth.svg" alt="community icon" />
 						{:else if canva.access == 'request_only'}
-							<img class="test-black" src="/svg/users.svg" alt="community icon" />
+							<img class="text-black" src="/svg/users.svg" alt="community icon" />
 						{/if}
 					</slot>
 				</button>
-				<button>
-					<img class="test-black" src="/svg/heart.svg" alt="favorit Icon" />
+				<button class="group/favorit relative" on:click={toggleLike}>
+					<Heart class="text-black absolute"></Heart>
+					<HeartFill
+						class="text-transparent group-hover/favorit:text-off-white z-20 data-[liked=true]:text-naples-yellow"
+						dataLiked={canva.isLiked}
+					></HeartFill>
 				</button>
 			</div>
 			<!-- Bottom Section -->

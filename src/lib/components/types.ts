@@ -21,4 +21,5 @@ interface CanvaPreviewData {
   participationStatus: 'accepted' | 'rejected' | 'sent' | null
   image: string
   participants: number
+  isLiked: boolean
 }
