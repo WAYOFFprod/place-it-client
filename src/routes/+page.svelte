@@ -60,7 +60,7 @@
 	let isConnected: undefined | boolean = undefined;
 	authStatus.subscribe((newStatus) => {
 		isConnected = newStatus;
-		if (isConnected == true) updateCanvas();
+		if (isConnected == true || isConnected == false) updateCanvas();
 	});
 
 	event.subscribe((newEvent) => {

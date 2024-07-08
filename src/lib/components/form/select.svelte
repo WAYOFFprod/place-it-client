@@ -53,6 +53,7 @@
 						class="peer hidden"
 						on:change={onChange}
 						value={option.value}
+						checked={selectedOption == option.value}
 					/>
 					<span class="relative z-10 pointer-events-none">{option.label}</span>
 					<div

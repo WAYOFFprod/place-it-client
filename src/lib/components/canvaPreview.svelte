@@ -31,7 +31,21 @@
 		event.set('updateCanvas');
 	};
 
-	const getCategory = () => {
+	const getUserCount = () => {
+		switch (canva.access) {
+			case 'open':
+				return '0';
+				break;
+			case 'request_only':
+				return '0/' + canva.participants;
+				break;
+
+			default:
+				break;
+		}
+	};
+
+	$: getCategory = () => {
 		switch (canva.category) {
 			case 'pixelwar':
 				return 'Pixelwar';
@@ -47,20 +61,6 @@
 				break;
 		}
 		return;
-	};
-
-	const getUserCount = () => {
-		switch (canva.access) {
-			case 'open':
-				return '0';
-				break;
-			case 'request_only':
-				return '0/' + canva.participants;
-				break;
-
-			default:
-				break;
-		}
 	};
 </script>
 
@@ -84,7 +84,7 @@
 				</button>
 			</div>
 			<!-- Bottom Section -->
-			{#if canva.access != 'closed'}
+			{#if canva.visibility != 'private'}
 				<div class="h-6 border-t-2 border-black bg-white flex justify-between text-lg px-1">
 					<span>{getCategory()}</span>
 					<div class="flex items-center gap-1">

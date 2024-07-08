@@ -17,6 +17,7 @@
 	let form: HTMLFormElement;
 	let errors: null | Errors;
 	let customPalette = true;
+	let isCommunity = false;
 	const gameTypeOptions = [
 		{
 			label: 'Libre',
@@ -49,7 +50,7 @@
 		const payload = {
 			name: name,
 			category: category,
-			access: joinRequest ? 'request_only' : 'closed',
+			access: joinRequest == 'on' ? 'request_only' : 'open',
 			visibility: community ? 'public' : 'private',
 			width: parseInt(width),
 			height: parseInt(height),
@@ -74,13 +75,21 @@
 		} as CreateCanvaPayload;
 		const networker = Networker.getInstance();
 		const canva = await networker.createCanva(payload);
+
+		console.log('canva', canva);
+
 		if (canva?.status == 422) {
+			console.log(canva);
 			errors = canva.response.errors as Errors;
 		}
 		if (canva?.status == 201) {
 			dispatch('close');
 			event.set('updateCanvas');
 		}
+	};
+
+	const toggleCommunity = () => {
+		isCommunity = !isCommunity;
 	};
 
 	$: getError = (value: string) => {
@@ -128,27 +137,29 @@
 					<span class="text-red-500 text-sm">{getError('width')}</span>
 				{/if}
 			</div>
-			<ToggleInput id="community" label="Community" />
-			<Accordion>
-				<div slot="heading">Options Avancée</div>
-				<div slot="content" class="flex flex-col gap-4">
-					<ToggleInput id="joinRequest" label="Joindre sur demande" toggle={false} />
-					<ToggleInput
-						id="limitedPalette"
-						label="Palette limitée"
-						toggle={customPalette}
-						on:change={() => (customPalette = !customPalette)}
-					/>
-					<Select
-						id="gameType"
-						label="Catégorie du canva"
-						placeholder="Type de canva"
-						options={gameTypeOptions}
-						selectedOption="free"
-						error={getError('category')}
-					></Select>
-				</div>
-			</Accordion>
+			<ToggleInput id="community" label="Community" on:change={toggleCommunity} />
+			{#if isCommunity}
+				<Accordion>
+					<div slot="heading">Options Avancée</div>
+					<div slot="content" class="flex flex-col gap-4">
+						<ToggleInput id="joinRequest" label="Joindre sur demande" toggle={false} />
+						<ToggleInput
+							id="limitedPalette"
+							label="Palette limitée"
+							toggle={customPalette}
+							on:change={() => (customPalette = !customPalette)}
+						/>
+						<Select
+							id="gameType"
+							label="Catégorie du canva"
+							placeholder="Type de canva"
+							options={gameTypeOptions}
+							selectedOption="free"
+							error={getError('category')}
+						></Select>
+					</div>
+				</Accordion>
+			{/if}
 			<div class="grow justify-self-stretch flex items-end">
 				<Button type="submit" class="" on:click={validate}>
 					<img src="/svg/canva-plus.svg" alt="create canvas icon" />
