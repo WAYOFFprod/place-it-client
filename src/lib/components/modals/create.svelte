@@ -50,7 +50,7 @@
 		const payload = {
 			name: name,
 			category: category,
-			access: joinRequest == 'on' ? 'request_only' : 'open',
+			access: joinRequest == 'on' ? 'request_only' : community ? 'open' : 'invite_only',
 			visibility: community ? 'public' : 'private',
 			width: parseInt(width),
 			height: parseInt(height),
@@ -76,10 +76,7 @@
 		const networker = Networker.getInstance();
 		const canva = await networker.createCanva(payload);
 
-		console.log('canva', canva);
-
 		if (canva?.status == 422) {
-			console.log(canva);
 			errors = canva.response.errors as Errors;
 		}
 		if (canva?.status == 201) {
