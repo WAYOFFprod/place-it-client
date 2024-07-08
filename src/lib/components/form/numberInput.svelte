@@ -5,6 +5,7 @@
 	export let label: string = '';
 	export let placeholder: string = '';
 	export let id: string;
+	export let error: string | null = null;
 
 	export let inputValue = 100;
 
@@ -44,4 +45,7 @@
 			>
 		</div>
 	</div>
+	{#if error}
+		<span class="text-red-500 text-sm">{error}</span>
+	{/if}
 </div>

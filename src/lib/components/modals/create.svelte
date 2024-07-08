@@ -11,9 +11,11 @@
 
 	import { createEventDispatcher } from 'svelte';
 	import { event } from '$lib/stores/eventStore';
+	import { error } from '@sveltejs/kit';
 
 	const dispatch = createEventDispatcher();
 	let form: HTMLFormElement;
+	let errors: null | Errors;
 	let customPalette = true;
 	const gameTypeOptions = [
 		{
@@ -29,6 +31,11 @@
 			value: 'artistic'
 		}
 	] as options[];
+
+	const selectedOption = {
+		label: 'Libre',
+		value: 'free'
+	};
 
 	const validate = async () => {
 		const formData = new FormData(form);
@@ -67,8 +74,20 @@
 		} as CreateCanvaPayload;
 		const networker = Networker.getInstance();
 		const canva = await networker.createCanva(payload);
-		dispatch('close');
-		event.set('updateCanvas');
+		if (canva?.status == 422) {
+			errors = canva.response.errors as Errors;
+		}
+		if (canva?.status == 201) {
+			dispatch('close');
+			event.set('updateCanvas');
+		}
+	};
+
+	$: getError = (value: string) => {
+		if (errors?.[value]) {
+			return errors[value]?.[0];
+		}
+		return null;
 	};
 </script>
 
@@ -95,13 +114,19 @@
 		</div>
 		<!-- sidebar: canvas settings -->
 		<form bind:this={form} class="w-64 p-6 flex flex-col gap-4" on:submit|preventDefault={validate}>
-			<TextInput id="name" label="Nom"><img src="/svg/edit.svg" alt="edit icon" /></TextInput>
+			<TextInput id="name" label="Nom" error={getError('name')}
+				><img src="/svg/edit.svg" alt="edit icon" /></TextInput
+			>
 			<div>
 				<label class="block mb-3" for="width">Dimensions</label>
 				<div class="flex flex-row gap-2">
 					<NumberInput id="width" label="W:" inputValue={64}></NumberInput>
 					<NumberInput id="height" label="H:" inputValue={64}></NumberInput>
 				</div>
+				{#if getError('height') || getError('width')}
+					<span class="text-red-500 text-sm">{getError('height')}</span>
+					<span class="text-red-500 text-sm">{getError('width')}</span>
+				{/if}
 			</div>
 			<ToggleInput id="community" label="Community" />
 			<Accordion>
@@ -119,6 +144,8 @@
 						label="Catégorie du canva"
 						placeholder="Type de canva"
 						options={gameTypeOptions}
+						selectedOption="free"
+						error={getError('category')}
 					></Select>
 				</div>
 			</Accordion>

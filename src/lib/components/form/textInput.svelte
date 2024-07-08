@@ -3,6 +3,7 @@
 	export let label: string = '';
 	export let id: string;
 	export let type: string = 'text';
+	export let error: string | null = null;
 </script>
 
 <div class={$$props.class}>
@@ -22,4 +23,7 @@
 			<slot />
 		</div>
 	</div>
+	{#if error}
+		<span class="text-red-500 text-sm">{error}</span>
+	{/if}
 </div>

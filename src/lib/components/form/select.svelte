@@ -8,6 +8,7 @@
 	export let isOpen: boolean = false;
 	export let disabled: boolean = false;
 	export let selectedOption: string | null = null;
+	export let error: string | null = null;
 
 	const toggle = () => {
 		isOpen = !isOpen;
@@ -61,4 +62,7 @@
 			{/each}
 		</div>
 	</div>
+	{#if error}
+		<div class="mt-12 text-red-500 text-sm">{error}</div>
+	{/if}
 </div>
