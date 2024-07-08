@@ -84,9 +84,16 @@ export default class Networker {
   login = async (payload: LoginPayload) => {
     await this.server.get('/sanctum/csrf-cookie')
     const response = await this.server.post("/auth/login/", payload);
-    console.log(response);
     if(response?.status == 200) {
+      userStore.set(response.response.data);
       authStatus.set(true);
+    }
+  }
+
+  logout = async () => {
+    const response = await this.server.post('/auth/logout', {});
+    if(response?.status == 204) {
+      authStatus.set(false);
     }
   }
 

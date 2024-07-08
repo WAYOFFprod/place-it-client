@@ -5,6 +5,9 @@
 	import SelectSettings from '../form/selectSettings.svelte';
 	import TextSettings from '../form/textSettings.svelte';
 	import ToggleInput from '../form/toggleInput.svelte';
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
 
 	let darkmode = false;
 	let form: HTMLFormElement;
@@ -42,6 +45,11 @@
 			value: value
 		});
 		nameEditable = false;
+	};
+
+	const logout = async () => {
+		await networker.logout();
+		dispatch('close');
 	};
 </script>
 
@@ -114,6 +122,14 @@
 						value={user.language}
 						on:saveField={onSaveField}
 					></SelectSettings>
+					<div class="flex justify-center">
+						<Button
+							classColor="bg-bittersweet-red hover:bittersweet-red-focus"
+							type="button"
+							stretch={false}
+							on:click={logout}>Logout</Button
+						>
+					</div>
 				</div>
 			</div>
 		</form>

@@ -50,9 +50,6 @@
 	const fetchData = async () => {
 		// trigger function to fetch data in background
 		networker.getSession();
-		// load data
-		// const data = await networker.getCanvas(canvasScope);
-		// return data;
 	};
 
 	const updateCanvas = async () => {

@@ -22,14 +22,16 @@ export default class ServerRequests {
       });
       
       this.xsrfCheck()
-      
-      const res = await response.json();
+      if(response.status == 200) {
+        const res = await response.json();
+        return {
+          response: res,
+          status: response.status
+        };
+      }
 
 
-      return {
-        response: res,
-        status: response.status
-      };
+      return response;
     } catch(error) {
       console.error("Error:", error);
     }
