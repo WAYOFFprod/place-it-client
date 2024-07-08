@@ -36,7 +36,7 @@
 	const openMyCanvas = async () => {
 		if (tab == 'my-canvas') return;
 		canvasScope = 'personal';
-		const data = await networker.getCanvas(canvasScope, sort);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter);
 		canvas = data.data;
 		tab = 'my-canvas';
 	};
@@ -44,14 +44,14 @@
 	const openCommunityCanvas = async () => {
 		if (tab == 'community-canvas') return;
 		canvasScope = 'community';
-		const data = await networker.getCanvas(canvasScope, sort);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter);
 		canvas = data.data;
 		tab = 'community-canvas';
 	};
 
 	const toggleRecent = async () => {
 		sort = sort ? undefined : 'desc';
-		const data = await networker.getCanvas(canvasScope, sort);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter);
 		canvas = data.data;
 	};
 
