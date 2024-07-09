@@ -11,3 +11,7 @@ interface SettingOption { 
   "field": string,
   "value": string
 }
+
+interface updateSearchEvent {
+  onChange: string;
+}

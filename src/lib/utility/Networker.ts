@@ -121,8 +121,14 @@ export default class Networker {
     return response;
   }
 
-  getCanvas = async (scope: 'personal' | 'community', sort : undefined | 'asc' | 'desc' = undefined, favorit: undefined | 1 = undefined) => {
-    const response: any = await this.server.get("/canvas/?scope="+scope+(sort != undefined ? '&sort='+sort : '')+(favorit != undefined ? '&favorit='+favorit : ''));
+  getCanvas = async (scope: 'personal' | 'community', sort : undefined | 'asc' | 'desc' = undefined, favorit: undefined | 1 = undefined, search: string = '') => {
+    const response: any = await this
+      .server
+      .get("/canvas/?scope="+scope
+        +(sort != undefined ? '&sort='+sort : '')
+        +(favorit != undefined ? '&favorit='+favorit : '')
+        +(search != '' ? '&search='+search : '' )
+      );
     return response;
   }
 

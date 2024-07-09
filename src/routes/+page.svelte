@@ -15,6 +15,7 @@
 	let canvasScope: 'community' | 'personal' = 'personal';
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
 
+	let searchTerm: string = '';
 	let sort: undefined | 'asc' | 'desc';
 	let favoritFilter: undefined | 1;
 	const onclickNotification = () => {
@@ -36,7 +37,7 @@
 	const openMyCanvas = async () => {
 		if (tab == 'my-canvas') return;
 		canvasScope = 'personal';
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
 		canvas = data.data;
 		tab = 'my-canvas';
 	};
@@ -44,14 +45,20 @@
 	const openCommunityCanvas = async () => {
 		if (tab == 'community-canvas') return;
 		canvasScope = 'community';
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
 		canvas = data.data;
 		tab = 'community-canvas';
 	};
 
+	const searchUpdated = async (event: CustomEvent<string>) => {
+		searchTerm = event.detail;
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
+		canvas = data.data;
+	};
+
 	const toggleRecent = async () => {
 		sort = sort ? undefined : 'desc';
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
 		canvas = data.data;
 	};
 
@@ -59,6 +66,7 @@
 		favoritFilter = favoritFilter ? undefined : 1;
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter);
 		canvas = data.data;
+		searchTerm = '';
 	};
 
 	const networker = Networker.getInstance();
@@ -145,9 +153,16 @@
 		</div>
 	</Header>
 	<div class="overflow-y-scroll absolute bottom-0 top-[166px] w-full">
-		<!-- search -->
 		<div class="container mx-auto flex gap-8 py-8">
-			<TextInput class="py-2 my-0" id="search" type="text" placeholder="Chercher">
+			<!-- search -->
+			<TextInput
+				on:onChange={searchUpdated}
+				class="py-2 my-0"
+				id="search"
+				type="text"
+				placeholder="Chercher"
+				value={searchTerm}
+			>
 				<div slot="startIcon">
 					<img src="/svg/search.svg" alt="Search icon" />
 				</div>

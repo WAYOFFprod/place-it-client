@@ -51,6 +51,17 @@
 		}
 	};
 
+	const dateOptions: Intl.DateTimeFormatOptions = {
+		year: 'numeric',
+		month: 'numeric',
+		day: 'numeric'
+	};
+
+	$: getDate = () => {
+		const date = new Date(canva.created_at);
+		return date.toLocaleDateString('fr-CH', dateOptions);
+	};
+
 	$: getCategory = () => {
 		switch (canva.category) {
 			case 'pixelwar':
@@ -160,4 +171,10 @@
 			alt="canva {canva.id}"
 		/>
 	</Panel>
+	<div class="flex flex-col gap-1 mt-4">
+		<div>{canva.name}</div>
+		<div class="text-lg">
+			Crée le {getDate()}
+		</div>
+	</div>
 </div>

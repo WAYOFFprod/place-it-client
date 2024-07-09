@@ -11,6 +11,7 @@ interface ModalData {
 
 interface CanvaPreviewData {
   id: number,
+  name: string,
   width: number,
   height: number,
   colors: any,
@@ -22,4 +23,5 @@ interface CanvaPreviewData {
   image: string
   participants: number
   isLiked: boolean
+  created_at: string
 }
