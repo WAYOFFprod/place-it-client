@@ -9,24 +9,55 @@
 	const dispatch = createEventDispatcher();
 	let form: HTMLFormElement;
 
-	const validate = () => {
-		const networker = Networker.getInstance();
+	let errors: null | Errors;
 
+	const networker = Networker.getInstance();
+	const validate = async () => {
 		const formData = new FormData(form);
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
 
-		networker.login({
+		const response = await networker.login({
 			email: email,
 			password: password
 		});
 
-		dispatch('close');
+		if (response?.status == 422) {
+			errors = response.response.errors;
+		} else if (response?.status) {
+			dispatch('close');
+		}
+	};
+
+	$: getError = (value: string) => {
+		if (errors?.[value]) {
+			return errors[value]?.[0];
+		}
+		return null;
 	};
 </script>
 
-<form bind:this={form} on:submit|preventDefault={validate} class="flex flex-col gap-4 items-center">
-	<TextInput id="email" placeholder="Email" label="Email" type="email" />
-	<TextInput id="password" placeholder="Password" label="Password" type="password" />
-	<Button type="submit" stretch={false} on:click={validate}>Login</Button>
-</form>
+<div class="p-4 flex flex-col gap-4 items-center">
+	<h2 class="text-xl uppercase">Se Connecter</h2>
+	<form
+		bind:this={form}
+		on:submit|preventDefault={validate}
+		class="flex flex-col gap-4 items-center"
+	>
+		<TextInput
+			id="email"
+			placeholder="Email"
+			label="Email"
+			type="email"
+			error={getError('email')}
+		/>
+		<TextInput
+			id="password"
+			placeholder="Password"
+			label="Password"
+			type="password"
+			error={getError('password')}
+		/>
+		<Button type="submit" stretch={false} on:click={validate}>Login</Button>
+	</form>
+</div>

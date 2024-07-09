@@ -88,6 +88,7 @@ export default class Networker {
       userStore.set(response.response.data);
       authStatus.set(true);
     }
+    return response;
   }
 
   logout = async () => {

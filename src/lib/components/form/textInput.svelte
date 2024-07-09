@@ -4,8 +4,10 @@
 
 	export let placeholder: string = '';
 	export let label: string = '';
+	export let type: string = 'text';
 	export let id: string;
 	export let error: string | null = null;
+	export let liveUpdate: boolean = false;
 	export let val = '';
 
 	const dispatch = createEventDispatcher<updateSearchEvent>();
@@ -16,7 +18,6 @@
 		onCooldown = true;
 		setTimeout(() => {
 			onCooldown = false;
-			console.log('CHANGE', onCooldown, changedSinceCooldown);
 			if (changedSinceCooldown) {
 				dispatch('onChange', val);
 				cooldown();
@@ -25,13 +26,11 @@
 		}, 1000);
 	};
 	const onChange = (event: FormEventHandler<HTMLInputElement>) => {
-		console.log('start', onCooldown, changedSinceCooldown);
 		if (event.target.value == '' || (event.target.value.length > 2 && !onCooldown)) {
 			changedSinceCooldown = true;
 			cooldown();
 		} else {
 		}
-		console.log('end', onCooldown, changedSinceCooldown);
 	};
 </script>
 
@@ -41,15 +40,25 @@
 	{/if}
 	<div class="relative w-full flex gap-2">
 		<slot name="startIcon" />
-		<input
-			{id}
-			name={id}
-			type="text"
-			{placeholder}
-			class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pr-8 pb-1 min-w-5"
-			on:input={onChange}
-			bind:value={val}
-		/>
+		{#if liveUpdate}
+			<input
+				{id}
+				name={id}
+				type="text"
+				{placeholder}
+				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pr-8 pb-1 min-w-5"
+				on:input={onChange}
+				bind:value={val}
+			/>
+		{:else}
+			<input
+				{id}
+				name={id}
+				{type}
+				{placeholder}
+				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pr-8 pb-1 min-w-5"
+			/>
+		{/if}
 		<div class="absolute w-5 right-0 bottom-2">
 			<slot />
 		</div>

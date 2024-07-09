@@ -162,6 +162,7 @@
 				type="text"
 				placeholder="Chercher"
 				value={searchTerm}
+				liveUpdate={true}
 			>
 				<div slot="startIcon">
 					<img src="/svg/search.svg" alt="Search icon" />
