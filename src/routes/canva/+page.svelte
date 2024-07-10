@@ -15,8 +15,11 @@
 	let canva: undefined | CanvaRequestData = undefined;
 
 	const fetchData = async () => {
+		await networker.getSession();
 		if (canva_id == null) return null;
+
 		canva = await networker.getCanva(canva_id);
+		console.log('GET CANVA');
 	};
 
 	const onclickExport = () => {

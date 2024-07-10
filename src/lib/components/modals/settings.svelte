@@ -19,6 +19,7 @@
 	let nameEditable: boolean = false;
 
 	userStore.subscribe((newUser) => {
+		if (newUser == undefined) return;
 		user = newUser;
 		nameValue = user.name;
 	});
@@ -49,6 +50,7 @@
 
 	const logout = async () => {
 		await networker.logout();
+		userStore.set(undefined);
 		dispatch('close');
 	};
 </script>

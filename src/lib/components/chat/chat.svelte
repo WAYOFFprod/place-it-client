@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tokenStore, userStore } from '$lib/stores/authStore';
 	import { chatMessages } from '$lib/stores/chatStore';
 	import Networker from '$lib/utility/Networker';
 
@@ -16,12 +17,29 @@
 		entries = newMessages;
 	});
 
+	let userData: undefined | User;
+	userStore.subscribe((newUserData) => {
+		userData = newUserData;
+	});
+
+	let canvaToken: string | undefined;
+	tokenStore.subscribe((newToken) => {
+		canvaToken = newToken;
+	});
+
 	const sendMessage = () => {
+		if (userData == undefined || canvaToken == undefined) {
+			console.warn('not autheticated: cant send message');
+			return;
+		}
+
 		const date = new Date();
 		let msg: Message = {
+			id: userData.id,
 			time: Date.parse(date.toUTCString()),
-			user: networker.shortClientId ?? 'anon',
-			message: message
+			user: userData.name,
+			message: message,
+			token: canvaToken
 		};
 		if (respondTo) {
 			msg.respondTo = respondTo;

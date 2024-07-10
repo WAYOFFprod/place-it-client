@@ -4,7 +4,8 @@ import ServerRequests from "./ServerRequests";
 import { Socket, io } from 'socket.io-client';
 import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
 import { chatMessages } from "$lib/stores/chatStore";
-import { authStatus, userStore } from "$lib/stores/authStore";
+import { authStatus, tokenStore, userStore } from "$lib/stores/authStore";
+import { isReady } from "$lib/stores/canvaStore";
 
 export default class Networker {
   static #instance: Networker
@@ -15,7 +16,8 @@ export default class Networker {
   tempPoints: {[key: string]: string} | undefined
   websocket: string
   messages: Message[] = []
-  canvasId: number | undefined
+  userData: User | undefined
+  canvaToken: string | undefined
 
   static getInstance() {
     if (!this.#instance) {
@@ -28,17 +30,34 @@ export default class Networker {
     this.websocket = websocket
     this.server = new ServerRequests(server);
     this.server.get('/sanctum/csrf-cookie');
+    userStore.subscribe((newUserData: User | undefined) => {
+      this.userData = newUserData;
+    })
+    tokenStore.subscribe((newToken) => {
+      this.canvaToken = newToken
+    })
   }
 
   connectToSocket = (gridManager: GridManager, getPixel: () => void) => {
     this.gridManager = gridManager;
     this.socket = io(this.websocket);
     
+    this.socket.on('error', (payload) => {
+      console.error(payload);
+    })
+
     this.socket.on("connect", () => {
-      if(this.socket != undefined)
-      this.socket.emit('init');
+      if(this.socket != undefined && this.gridManager != null)
+      this.socket.emit('get-init-state', {
+        'canvaId': this.gridManager.canvasId
+      });
       this.shortClientId = this.socket?.id?.slice(6);
     });
+
+    this.socket.on('live-canva-ready', (payload) => {
+      console.log("canva ready", payload);
+      isReady.set(true);
+    })
 
     this.socket.on('canva:init-pixels', (payload) => {
       if(this.gridManager != undefined)
@@ -60,12 +79,9 @@ export default class Networker {
       this.gridManager.drawPixelOnCanvas(coord, color);
     });
 
-    this.socket.on('canva:reset-others', () => {
-      getPixel()
-    });
-
     this.socket.on('chat:get-message', (message: Message) => {
       this.messages.push(message)
+      console.log("this.messages",this.messages);
       chatMessages.set(this.messages);
     });
 
@@ -146,6 +162,10 @@ export default class Networker {
 
   getCanva = async (id: number) => {
     const response = await this.server.get("/canvas/"+id);
+    console.log(response);
+    if(response.meta.token) {
+      tokenStore.set(response.meta.token)
+    }
     return response.data;
   }
 
@@ -159,14 +179,24 @@ export default class Networker {
     return response;
   }
 
-  loadCanva = (canvaId: number) => {
+  joinLiveCanva = (canvaId: number,) => {
+    if(this.canvaToken == undefined) {
+      console.warn("missing token to joinLiveCanva")
+      return
+    }
     this.socket?.emit('join-room', {
       "canvaId": canvaId,
-      "user": 'TODO'
+      "userId": this.userData?.id,
+      "username": this.userData?.name,
+      "token": this.canvaToken
     })
   }
 
   placePixel = (coord: Coord, color: string | null) => {
+    if(this.canvaToken == undefined) {
+      console.warn("missing token to placePixel")
+      return
+    }
     if(!color) {
       return console.error("no color selected");
     }
@@ -175,8 +205,13 @@ export default class Networker {
     }
     const index = this.gridManager.drawPixelOnCanvas(coord, color);
     if(index === false) return
-    if(this.socket != undefined)
-      this.socket.emit('canva:new-pixel:'+this.gridManager.canvasId, index, coord, color);
+    if(this.socket != undefined) {
+      const auth: any = {
+        user_id: this.userData?.id,
+        token: this.canvaToken
+      }
+      this.socket.emit('canva:new-pixel:'+this.gridManager.canvasId, auth, index, coord, color);
+    }
 
   }
 
@@ -191,8 +226,6 @@ export default class Networker {
 
   createCanva = async (payload: CreateCanvaPayload) => {
     const response = await this.server.post("/canvas/create", payload);
-    if(this.socket != undefined)
-    this.socket.emit('canva:reset');
     return response;
   }
 

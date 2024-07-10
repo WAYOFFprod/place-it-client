@@ -11,11 +11,12 @@
 	import Tool from './toolbar/ToolClass';
 	import ControlManager from './toolbar/ControlManager';
 	import { event } from '$lib/stores/eventStore';
+	import { isReady } from '$lib/stores/canvaStore';
 	import Chat from './chat/chat.svelte';
 	import ZoomCounter from './metric/zoomCounter.svelte';
 	import CoordViewer from './metric/coordViewer.svelte';
 
-	export let canva: undefined | CanvaRequestData;
+	export let canva: CanvaRequestData;
 	export let viewOnly: boolean = true;
 
 	let id = 'canvas-container';
@@ -28,6 +29,8 @@
 	let p5: P5;
 	let controlManager: ControlManager;
 	let gridManager: GridManager;
+
+	let userData: undefined;
 
 	const networker = Networker.getInstance();
 
@@ -46,10 +49,13 @@
 		if (newEvent == 'clearCanva') reloadCanva();
 	});
 
-	let isReady = false;
+	let ready = false;
+	isReady.subscribe((newState) => {
+		ready = newState;
+	});
 
 	const reloadCanva = async () => {
-		isReady = false;
+		isReady.set(false);
 		// const canvasData = await fetchData();
 		// if (canvasData) {
 		// 	controlManager.init(canvasData.size);
@@ -65,16 +71,15 @@
 	};
 
 	const connect = async (canvasData: CanvaData) => {
-		gridManager = new GridManager(p5, canvasData.size);
+		gridManager = new GridManager(p5, canvasData.size, canva.id);
 
 		networker.connectToSocket(gridManager, reloadCanva);
 
 		const pixels = networker.tempPoints as { [key: string]: string };
-		gridManager.loadImage(canvasData.id, canvasData.data.image, canvasData.size, pixels);
+		gridManager.loadImage(canvasData.data.image, canvasData.size, pixels);
 		// color = data.colors[0];
 		updateColorPalette(canvasData.data.colors);
-		networker.loadCanva(canvasData.id);
-		isReady = true;
+		networker.joinLiveCanva(canvasData.id);
 	};
 
 	const initCanvas = async () => {
@@ -103,7 +108,7 @@
 			};
 
 			p5.draw = () => {
-				if (!isReady) return;
+				if (!ready) return;
 				p5.background(150);
 
 				p5.push();
