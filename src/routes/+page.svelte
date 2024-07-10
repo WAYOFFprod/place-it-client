@@ -11,6 +11,9 @@
 	import CanvaPreview from '$lib/components/canvaPreview.svelte';
 	import { authStatus } from '$lib/stores/authStore';
 	import { event } from '$lib/stores/eventStore';
+	import { pushState } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { parse } from 'svelte/compiler';
 
 	let canvasScope: 'community' | 'personal' = 'personal';
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
@@ -18,6 +21,76 @@
 	let searchTerm: string = '';
 	let sort: undefined | 'asc' | 'desc';
 	let favoritFilter: undefined | 1;
+
+	addEventListener('popstate', (event) => {});
+	onpopstate = (event) => {
+		const params = new URLSearchParams(location.search);
+		initParamsFromUrl(params);
+		fetchCanvas();
+	};
+
+	// init params from url
+	const initParamsFromUrl = (params: URLSearchParams) => {
+		if (params.has('sort')) {
+			const newSort = params.get('sort');
+			if (newSort == 'asc' || newSort == 'desc') {
+				sort = newSort;
+			}
+		} else {
+			sort = undefined;
+		}
+		if (params.has('search')) {
+			const initSearch = params.get('search');
+			if (initSearch != null) {
+				searchTerm = initSearch;
+			}
+		}
+		if (params.has('main')) {
+			const initMain = params.get('main');
+			if (initMain == 'community' || initMain == 'personal') {
+				canvasScope = initMain;
+				tab = canvasScope == 'personal' ? 'my-canvas' : 'community-canvas';
+			}
+		}
+		if (params.has('favorit')) {
+			const initFavorit = params.get('favorit');
+			favoritFilter = initFavorit == 'true' ? 1 : undefined;
+		} else {
+			favoritFilter = undefined;
+		}
+	};
+
+	initParamsFromUrl($page.url.searchParams);
+
+	const pushWindowState = () => {
+		const data = buildQueryUrl('/');
+		pushState(data.queryUrl, data.params);
+	};
+
+	const buildQueryUrl = (path: string) => {
+		let queryUrl = path + '?main=' + canvasScope;
+		let params: any = {};
+		if (searchTerm != '') {
+			queryUrl += '&search=' + searchTerm;
+			params['search'] = searchTerm;
+		}
+
+		if (sort != undefined) {
+			queryUrl += '&sort=' + sort;
+			params['sort'] = sort;
+		}
+
+		if (favoritFilter != undefined) {
+			queryUrl += '&favorit=true';
+			params['favorit'] = true;
+		}
+
+		return {
+			queryUrl: queryUrl,
+			params: params
+		};
+	};
+
 	const onclickNotification = () => {
 		// openedModal.set('create');
 	};
@@ -37,17 +110,17 @@
 	const openMyCanvas = async () => {
 		if (tab == 'my-canvas') return;
 		canvasScope = 'personal';
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
-		canvas = data.data;
+		await fetchCanvas();
 		tab = 'my-canvas';
+		pushWindowState();
 	};
 
 	const openCommunityCanvas = async () => {
 		if (tab == 'community-canvas') return;
 		canvasScope = 'community';
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
-		canvas = data.data;
+		await fetchCanvas();
 		tab = 'community-canvas';
+		pushWindowState();
 	};
 
 	const searchUpdated = async (event: CustomEvent<string>) => {
@@ -58,15 +131,20 @@
 
 	const toggleRecent = async () => {
 		sort = sort ? undefined : 'desc';
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
-		canvas = data.data;
+		await fetchCanvas();
+		pushWindowState();
 	};
 
 	const toggleFavorit = async () => {
 		favoritFilter = favoritFilter ? undefined : 1;
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter);
-		canvas = data.data;
+		await fetchCanvas();
 		searchTerm = '';
+		pushWindowState();
+	};
+
+	const fetchCanvas = async () => {
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
+		canvas = data.data;
 	};
 
 	const networker = Networker.getInstance();
@@ -76,7 +154,7 @@
 	};
 
 	const updateCanvas = async () => {
-		const data = await networker.getCanvas(canvasScope);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
 		canvas = data.data;
 	};
 
@@ -111,6 +189,9 @@
 	onMount(async () => {
 		await fetchData();
 	});
+
+	$: favoritToggle = favoritFilter == 1 ? true : false;
+	$: recentToggle = sort == 'desc' ? true : false;
 </script>
 
 <Modal></Modal>
@@ -175,6 +256,7 @@
 					class="hover:bg-fluorescent-cyan"
 					classInactive="bg-white"
 					classActive="!bg-fluorescent-cyan-focus"
+					toggle={recentToggle}
 					on:change={toggleRecent}><img src="/svg/alarm.svg" alt="recent icon" /></ToggleButton
 				>
 				<ToggleButton
@@ -183,9 +265,12 @@
 					class="hover:bg-tea-rose"
 					classInactive="bg-white"
 					classActive="!bg-tea-rose-focus"
+					toggle={favoritToggle}
 					disabled={!isConnected}
 					on:change={toggleFavorit}><img src="/svg/heart.svg" alt="favorit icon" /></ToggleButton
 				>
+				{favoritFilter == 1 ? true : false}
+				{favoritToggle}
 			</div>
 			<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
 			></Select>
