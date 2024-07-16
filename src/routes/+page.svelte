@@ -199,16 +199,16 @@
 	<Header class="top-0">
 		<div class="border-b-2 border-black">
 			<div class="container mx-auto flex justify-between items-stretch h-24">
-				<a class="flex items-center" href="/">
+				<a class="flex items-center p-4" href="/">
 					<img class="h-10" src="/svg/logo.svg" alt="place-it logo" />
 				</a>
-				<div class="flex gap-2 border-l-2 pl-32 border-black items-center">
+				<div class="flex gap-2 border-l-2 pl-32 border-black items-center p-4">
 					<Button stretch={false} type="button" on:click={onclickNotification}>Notifications</Button
 					>
 				</div>
 			</div>
 		</div>
-		<div class="container mx-auto flex h-16 items-stretch">
+		<div class="container mx-auto flex h-16 items-stretch px-4">
 			<div class="border-r-2 border-black flex gap-6 pr-32 items-center">
 				<button
 					on:click={openMyCanvas}
@@ -269,8 +269,6 @@
 					disabled={!isConnected}
 					on:change={toggleFavorit}><img src="/svg/heart.svg" alt="favorit icon" /></ToggleButton
 				>
-				{favoritFilter == 1 ? true : false}
-				{favoritToggle}
 			</div>
 			<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
 			></Select>
