@@ -2,12 +2,12 @@
 	import { createEventDispatcher } from 'svelte';
 	import Panel from '../layout/panel.svelte';
 
+	const dispatch = createEventDispatcher();
+
 	export let toggleName: string;
 	export let disabled = false;
 	export let value: string;
 	export let selectedValue: string;
-
-	const dispatch = createEventDispatcher();
 
 	const selectValue = () => {
 		dispatch('selectValue');
