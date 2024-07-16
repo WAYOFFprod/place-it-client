@@ -2,6 +2,7 @@
 	import { storedColors, selectedColor } from '$lib/stores/colorStore';
 	import Panel from '$lib/components/layout/panel.svelte';
 	import Swatch from './swatch.svelte';
+	import { onDestroy } from 'svelte';
 
 	export let childClass: string;
 	let currentColor: string;
@@ -12,17 +13,22 @@
 		selectedColor.set(newColors[0]);
 	};
 
-	selectedColor.subscribe((newColor) => {
+	const unsubscribeSelectedColor = selectedColor.subscribe((newColor) => {
 		currentColor = newColor;
 	});
 
-	storedColors.subscribe((newColors) => {
+	const unsubscribeColor = storedColors.subscribe((newColors) => {
 		colors = newColors;
 	});
 
 	const updateSelectColor = (event: CustomEvent<selectColor>) => {
 		selectedColor.set(event.detail.color);
 	};
+
+	onDestroy(() => {
+		unsubscribeSelectedColor();
+		unsubscribeColor();
+	});
 </script>
 
 <div class="{childClass} cursor-pointer">

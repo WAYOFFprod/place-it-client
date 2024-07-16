@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import P5 from 'p5';
 	import GridManager from '$lib/p5/GridManager';
 	import { ToolType, backToTool, selectedTool, setTempTool, setTool } from '$lib/stores/toolStore';
@@ -38,19 +38,19 @@
 
 	let currentToolType: typeof Tool = Tool;
 
-	selectedTool.subscribe((newTool: Tool | undefined) => {
+	const unsubscribeTool = selectedTool.subscribe((newTool: Tool | undefined) => {
 		if (newTool == undefined) return;
 		const type = newTool.getType();
 		if (type == null) return;
 		currentToolType = type;
 	});
 
-	event.subscribe((newEvent) => {
+	const unsubscribeEvent = event.subscribe((newEvent) => {
 		if (newEvent == 'clearCanva') reloadCanva();
 	});
 
 	let ready = false;
-	isReady.subscribe((newState) => {
+	const unsubscribeReady = isReady.subscribe((newState) => {
 		ready = newState;
 	});
 
@@ -181,6 +181,12 @@
 				p5.remove();
 			};
 		}
+	});
+	onDestroy(() => {
+		controlManager.destroy();
+		unsubscribeTool();
+		unsubscribeEvent();
+		unsubscribeReady();
 	});
 </script>
 

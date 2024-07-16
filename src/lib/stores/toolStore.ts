@@ -31,6 +31,9 @@ let savedTool: Tool | undefined = activeTool
 const selectedTool = writable<Tool | undefined>();
 
 const setTool = (toolType: ToolType, p5: P5) => {
+  if(activeToolType != toolClasses[toolType]) {
+    destroyActiveTool();
+  }
   activeToolType = toolClasses[toolType];
   activeTool = new activeToolType(p5);
   selectedTool.set(activeTool);
@@ -48,6 +51,12 @@ const backToTool = () => {
   selectedTool.set(savedTool);
 }
 
+const destroyActiveTool = () => {
+  if(activeTool != undefined) {
+    activeTool.destroy();
+  }
+}
+
 export {
   selectedTool,
   setTempTool,
@@ -55,5 +64,6 @@ export {
   setTool,
   ToolType,
   toolClasses,
-  readOnlytoolClasses
+  readOnlytoolClasses,
+  destroyActiveTool
 }

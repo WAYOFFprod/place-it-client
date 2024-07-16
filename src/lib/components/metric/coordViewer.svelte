@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { mouseCoord } from '$lib/stores/canvaStore';
+	import { onDestroy } from 'svelte';
 	import Panel from '../layout/panel.svelte';
 
 	let coord: Coord | undefined;
-	mouseCoord.subscribe((newCoord) => {
+	const unsubscribeMouseCoord = mouseCoord.subscribe((newCoord) => {
 		coord = newCoord;
+	});
+
+	onDestroy(() => {
+		unsubscribeMouseCoord();
 	});
 </script>
 

@@ -3,7 +3,14 @@
 
 	import Tool from '$lib/components/toolbar/ToolClass';
 
-	import { readOnlytoolClasses, selectedTool, setTool, toolClasses } from '$lib/stores/toolStore';
+	import {
+		destroyActiveTool,
+		readOnlytoolClasses,
+		selectedTool,
+		setTool,
+		toolClasses
+	} from '$lib/stores/toolStore';
+	import { onDestroy } from 'svelte';
 	import ToolIcon from './toolIcon.svelte';
 	import type { selectTool } from './types';
 
@@ -22,7 +29,7 @@
 	let currentTool: Tool | undefined;
 	let currentToolType: typeof Tool | null;
 
-	selectedTool.subscribe((newTool: Tool | undefined) => {
+	const unsubscribeTool = selectedTool.subscribe((newTool: Tool | undefined) => {
 		if (newTool == undefined) return;
 		currentTool = newTool;
 		currentToolType = currentTool.getType();
@@ -31,6 +38,10 @@
 	const updateSelectTool = (event: CustomEvent<selectTool>) => {
 		setTool(event.detail.tool, p5);
 	};
+
+	onDestroy(() => {
+		unsubscribeTool();
+	});
 </script>
 
 <div class="{$$props.class} cursor-hand">

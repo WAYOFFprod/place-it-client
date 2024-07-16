@@ -48,7 +48,6 @@
 	};
 
 	const validate = async () => {
-		console.log('got here');
 		const formData = new FormData(form);
 		const formWidth = formData.get('width') as string;
 		const formHeight = formData.get('height') as string;
@@ -58,7 +57,7 @@
 		const joinRequest = formData.get('joinRequest') as string;
 		const community = formData.get('community') as string;
 		const category = formData.get('gameType') as string;
-		console.log('got here', width, height);
+
 		const payload = {
 			name: name,
 			category: category,

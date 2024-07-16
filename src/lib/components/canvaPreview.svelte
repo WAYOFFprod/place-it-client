@@ -8,6 +8,7 @@
 	import { openedModal } from '$lib/stores/modalStore';
 	import Accordion from './layout/accordion.svelte';
 	import { authStatus } from '$lib/stores/authStore';
+	import { onDestroy } from 'svelte';
 
 	export let canva: CanvaPreviewData;
 
@@ -24,7 +25,7 @@
 		});
 	};
 
-	authStatus.subscribe((newStatus) => {
+	const unsubscribeStatus = authStatus.subscribe((newStatus) => {
 		conenctionStatus = newStatus;
 	});
 
@@ -56,6 +57,10 @@
 		month: 'numeric',
 		day: 'numeric'
 	};
+
+	onDestroy(() => {
+		unsubscribeStatus();
+	});
 
 	$: getDate = () => {
 		const date = new Date(canva.created_at);

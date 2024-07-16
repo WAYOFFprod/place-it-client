@@ -1,18 +1,18 @@
 import P5 from 'p5'
 import Tool from '../ToolClass';
-import { ToolType, selectedTool, setTool } from '$lib/stores/toolStore';
+import { ToolType, destroyActiveTool, selectedTool, setTool } from '$lib/stores/toolStore';
 import ControlManager from '../ControlManager';
 
 export default class ToolManager {
   p5: P5
   activeTool: Tool | undefined;
   activeToolType: typeof Tool = Tool
-
+  unsubscribeTool: any
   constructor(initialTool: ToolType, p5: P5) {
     this.p5 = p5
     this.setTool(initialTool);
 
-    selectedTool.subscribe((newTool: Tool | undefined) => {
+    this.unsubscribeTool = selectedTool.subscribe((newTool: Tool | undefined) => {
       if(newTool == undefined) return;
       this.activeTool = newTool;
       const type = this.activeTool.getType()
@@ -43,5 +43,9 @@ export default class ToolManager {
     if(this.activeTool) {
       this.activeTool.mouseReleased();
     }
+  }
+  destroy() {
+    this.unsubscribeTool()
+    destroyActiveTool();
   }
 }

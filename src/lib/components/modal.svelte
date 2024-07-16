@@ -5,12 +5,13 @@
 	import Auth from '$lib/components/modals/auth.svelte';
 	import Settings from './modals/settings.svelte';
 	import JoinCanva from './modals/joinCanva.svelte';
+	import { onDestroy } from 'svelte';
 
 	let dialog: HTMLDialogElement;
 
 	let isOpen = false;
 	let openedDialog: ModalData;
-	openedModal.subscribe((newModal: ModalData) => {
+	const unsubscribeModal = openedModal.subscribe((newModal: ModalData) => {
 		openedDialog = newModal;
 		if (dialog != undefined) {
 			dialog.showModal();
@@ -30,6 +31,10 @@
 			isOpen = false;
 		}
 	};
+
+	onDestroy(() => {
+		unsubscribeModal();
+	});
 </script>
 
 <dialog

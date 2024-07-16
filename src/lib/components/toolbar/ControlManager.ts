@@ -129,4 +129,7 @@ export default class ControlManager {
     const percentScale = limitedCurrentScale/ControlManager.MAX_ZOOM * 100 as number
     zoom.set(percentScale)
   }
+  destroy() {
+    this.toolManager.destroy();
+  }
 }

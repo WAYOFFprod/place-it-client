@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { zoom } from '$lib/stores/canvaStore';
+	import { onDestroy } from 'svelte';
 	import Panel from '../layout/panel.svelte';
 
 	let zoomLevel: number | undefined;
-	zoom.subscribe((newZoom) => {
+	const unsubscribeZoom = zoom.subscribe((newZoom) => {
 		zoomLevel = newZoom;
+	});
+
+	onDestroy(() => {
+		unsubscribeZoom();
 	});
 </script>
 

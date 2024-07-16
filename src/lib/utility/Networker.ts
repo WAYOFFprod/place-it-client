@@ -111,7 +111,6 @@ export default class Networker {
     await this.server.get('/sanctum/csrf-cookie')
     const response = await this.server.post("/auth/register/", payload);
     if(response?.status == 200) {
-      console.log(response);
       userStore.set(response.response);
       authStatus.set(true);
     }
@@ -163,7 +162,6 @@ export default class Networker {
 
   getCanva = async (id: number) => {
     const response = await this.server.get("/canvas/"+id);
-    console.log(response);
     if(response.meta.token) {
       tokenStore.set(response.meta.token)
     }

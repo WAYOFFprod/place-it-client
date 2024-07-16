@@ -2,6 +2,7 @@
 	import { tokenStore, userStore } from '$lib/stores/authStore';
 	import { chatMessages } from '$lib/stores/chatStore';
 	import Networker from '$lib/utility/Networker';
+	import { onDestroy } from 'svelte';
 
 	const networker = Networker.getInstance();
 	let isOpen = false;
@@ -13,17 +14,17 @@
 
 	let input: HTMLInputElement;
 
-	chatMessages.subscribe((newMessages: Message[]) => {
+	const unsubscribeChat = chatMessages.subscribe((newMessages: Message[]) => {
 		entries = newMessages;
 	});
 
 	let userData: undefined | User;
-	userStore.subscribe((newUserData) => {
+	const unsubscribeUser = userStore.subscribe((newUserData) => {
 		userData = newUserData;
 	});
 
 	let canvaToken: string | undefined;
-	tokenStore.subscribe((newToken) => {
+	const unsubscribeToken = tokenStore.subscribe((newToken) => {
 		canvaToken = newToken;
 	});
 
@@ -69,6 +70,12 @@
 		const date = new Date(time);
 		return date.getHours() + ':' + date.getMinutes();
 	};
+
+	onDestroy(() => {
+		unsubscribeChat();
+		unsubscribeUser();
+		unsubscribeToken();
+	});
 </script>
 
 <div
