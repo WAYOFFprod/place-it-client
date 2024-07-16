@@ -15,9 +15,18 @@
 
 	const dispatch = createEventDispatcher();
 	let form: HTMLFormElement;
+	let presetForm: HTMLFormElement;
 	let errors: null | Errors;
 	let customPalette = true;
 	let isCommunity = false;
+
+	// default values
+	let selectedPreset: string = 'small';
+	let width: number = 64;
+	let height: number = 64;
+	let customSize: boolean = false;
+	let community = false;
+
 	const gameTypeOptions = [
 		{
 			label: 'Libre',
@@ -39,21 +48,24 @@
 	};
 
 	const validate = async () => {
+		console.log('got here');
 		const formData = new FormData(form);
-		const width = formData.get('width') as string;
-		const height = formData.get('height') as string;
+		const formWidth = formData.get('width') as string;
+		const formHeight = formData.get('height') as string;
+		const saveWidth = customSize ? parseInt(formWidth) : width;
+		const saveHeight = customSize ? parseInt(formHeight) : height;
 		const name = formData.get('name') as string;
 		const joinRequest = formData.get('joinRequest') as string;
 		const community = formData.get('community') as string;
 		const category = formData.get('gameType') as string;
-		if (width == null || height == null) return;
+		console.log('got here', width, height);
 		const payload = {
 			name: name,
 			category: category,
 			access: joinRequest == 'on' ? 'request_only' : community ? 'open' : 'invite_only',
 			visibility: community ? 'public' : 'private',
-			width: parseInt(width),
-			height: parseInt(height),
+			width: saveWidth,
+			height: saveHeight,
 			colors: [
 				'#ffd887',
 				'#eb9361',
@@ -85,6 +97,28 @@
 		}
 	};
 
+	const selectPreset = () => {
+		const formData = new FormData(presetForm);
+		selectedPreset = formData.get('canva-type') as string;
+		switch (selectedPreset) {
+			case 'small':
+				width = 64;
+				height = 64;
+				customSize = false;
+				break;
+			case 'big':
+				width = 512;
+				height = 512;
+				customSize = false;
+				break;
+			default:
+				width = 64;
+				height = 64;
+				customSize = true;
+				break;
+		}
+	};
+
 	const toggleCommunity = () => {
 		isCommunity = !isCommunity;
 	};
@@ -106,17 +140,47 @@
 	<div class="flex flex-row gap-[2px] bg-off-white justify-stretch">
 		<!-- canvas type -->
 		<div class="flex justify-center border-r-2 p-6 border-black">
-			<div class="grid grid-cols-2 gap-2 justify-around p-2">
-				<CanvaTypeToggle toggleName="canva-type"
-					><img src="/svg/custom-canva.png" alt="custom canvas icon" /></CanvaTypeToggle
+			<form bind:this={presetForm} class="grid grid-cols-2 gap-2 justify-around p-2">
+				<CanvaTypeToggle
+					toggleName="canva-type"
+					value="small"
+					selectedValue={selectedPreset}
+					on:selectValue={selectPreset}
 				>
-				<CanvaTypeToggle toggleName="canva-type"
-					><img src="/svg/custom-canva.png" alt="custom canvas icon" /></CanvaTypeToggle
+					<img src="/svg/small-canva.svg" alt="small canvas icon" class="mb-2" />
+					<span>Petit Canva</span>
+					<span class="text-md">64 x 64</span>
+				</CanvaTypeToggle>
+				<CanvaTypeToggle
+					toggleName="canva-type"
+					value="big"
+					selectedValue={selectedPreset}
+					on:selectValue={selectPreset}
 				>
-				<CanvaTypeToggle toggleName="canva-type"
-					><img src="/svg/custom-canva.png" alt="custom canvas icon" /></CanvaTypeToggle
+					<img src="/svg/big-canva.svg" alt="big canvas icon" class="mb-2" />
+					<span>Grand Canva</span>
+					<span class="text-md">512 x 512</span>
+				</CanvaTypeToggle>
+				<CanvaTypeToggle
+					toggleName="canva-type"
+					disabled
+					value="infinit"
+					selectedValue={selectedPreset}
+					on:selectValue={selectPreset}
 				>
-			</div>
+					<img src="/svg/infinit.svg" alt="infinit canvas icon" class="mb-2" />
+					<span>Infini</span>
+				</CanvaTypeToggle>
+				<CanvaTypeToggle
+					toggleName="canva-type"
+					value="custom"
+					selectedValue={selectedPreset}
+					on:selectValue={selectPreset}
+				>
+					<img src="/svg/custom-canva.png" alt="custom canvas icon" class="mb-2" />
+					<span>Personalisé</span>
+				</CanvaTypeToggle>
+			</form>
 		</div>
 		<!-- sidebar: canvas settings -->
 		<form bind:this={form} class="w-64 p-6 flex flex-col gap-4" on:submit|preventDefault={validate}>
@@ -126,8 +190,9 @@
 			<div>
 				<label class="block mb-3" for="width">Dimensions</label>
 				<div class="flex flex-row gap-2">
-					<NumberInput id="width" label="W:" inputValue={64}></NumberInput>
-					<NumberInput id="height" label="H:" inputValue={64}></NumberInput>
+					<NumberInput id="width" label="W" inputValue={width} disabled={!customSize}></NumberInput>
+					<NumberInput id="height" label="H" inputValue={height} disabled={!customSize}
+					></NumberInput>
 				</div>
 				{#if getError('height') || getError('width')}
 					<span class="text-red-500 text-sm">{getError('height')}</span>
@@ -151,7 +216,7 @@
 							label="Catégorie du canva"
 							placeholder="Type de canva"
 							options={gameTypeOptions}
-							selectedOption="free"
+							selectedOption={selectedOption.value}
 							error={getError('category')}
 						></Select>
 					</div>
