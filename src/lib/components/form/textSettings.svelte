@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, tick } from 'svelte';
+	import { createEventDispatcher, tick, onMount, onDestroy } from 'svelte';
 	import Button from './button.svelte';
 	import ToggleButton from './toggleButton.svelte';
 	import { settingsInputState } from '$lib/stores/settingsInputState';
@@ -30,7 +30,7 @@
 		console.log('discard');
 	};
 
-	settingsInputState.subscribe((newSetting) => {
+	const unsubscribeSettingsInput = settingsInputState.subscribe((newSetting) => {
 		if (newSetting == id) {
 			buttonLabel = 'Enregistrer';
 			setEditable();
@@ -57,6 +57,10 @@
 			buttonLabel = 'Enregistrer';
 		}
 	};
+
+	onDestroy(() => {
+		unsubscribeSettingsInput();
+	});
 </script>
 
 <div class="flex justify-between">

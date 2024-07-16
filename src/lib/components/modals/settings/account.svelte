@@ -5,7 +5,7 @@
 	import ToggleInput from '$lib/components/form/toggleInput.svelte';
 	import { userStore } from '$lib/stores/authStore';
 	import Networker from '$lib/utility/Networker';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 
 	let form: HTMLFormElement;
 
@@ -21,7 +21,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	userStore.subscribe((newUser) => {
+	const unsubscribeUser = userStore.subscribe((newUser) => {
 		if (newUser == undefined) return;
 		user = newUser;
 		nameValue = user.name;
@@ -57,6 +57,10 @@
 		userStore.set(undefined);
 		dispatch('close');
 	};
+
+	onDestroy(() => {
+		unsubscribeUser();
+	});
 </script>
 
 <form bind:this={form} class="overflow-scroll px-20 py-6 w-full">

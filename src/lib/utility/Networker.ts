@@ -137,8 +137,9 @@ export default class Networker {
 
   saveField = async (payload: SettingOption) => {
     const response = await this.server.post('/user/update/', payload)
-    if(response?.response.user) {
-      userStore.set(response.response.user);
+    if(response?.response.data) {
+      console.log("update user: ", response.response.data);
+      userStore.set(response.response.data);
       authStatus.set(true);
     }
   }
