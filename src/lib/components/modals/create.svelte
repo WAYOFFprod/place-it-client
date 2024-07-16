@@ -123,6 +123,10 @@
 		isCommunity = !isCommunity;
 	};
 
+	const close = () => {
+		dispatch('close');
+	};
+
 	$: getError = (value: string) => {
 		if (errors?.[value]) {
 			return errors[value]?.[0];
@@ -133,8 +137,13 @@
 
 <div class="">
 	<!-- header -->
-	<div class="border-b-2 border-black py-5 text-center font-sans font-bold text-3xl uppercase">
-		Créer un nouveau canva
+	<div
+		class="relative border-b-2 border-black py-5 text-center font-sans font-bold text-3xl uppercase"
+	>
+		<span>Créer un nouveau canva</span>
+		<button class="absolute right-4 top-4" on:click={close}>
+			<img src="/svg/close.svg" alt="close" />
+		</button>
 	</div>
 	<!-- container -->
 	<div class="flex flex-row gap-[2px] bg-off-white justify-stretch">
