@@ -58,6 +58,57 @@
 			@apply bg-black;
 		}
 	}
+
+	/* Color Wheel */
+	.color-wheel {
+		input {
+			--c: black; /* active color */
+			--g: 0px; /* the gap */
+			--l: 5px; /* line thickness*/
+			--s: 10px; /* thumb size*/
+			--p: 10px;
+			height: 20px; /* needed for Firefox*/
+			--_c: color-mix(in srgb, var(--c), #000 0%);
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			appearance: none;
+			background-image: url('/svg/range-background.svg');
+			background-position: 50% 50%;
+			background-repeat: no-repeat;
+			background-size: 100% 50%;
+			cursor: pointer;
+			overflow: hidden;
+		}
+		input:focus-visible,
+		input:hover {
+			/* --s: 20px; */
+		}
+		input:active,
+		input:focus-visible {
+			--s: 14px;
+			--_b: var(--s);
+		}
+		/* chromium */
+		input[type='range' i]::-webkit-slider-thumb {
+			height: var(--s);
+			aspect-ratio: 1;
+			box-shadow: 0 0 0 var(--p, --s) inset var(--_c);
+			-webkit-appearance: none;
+			appearance: none;
+		}
+		/* Firefox */
+		input[type='range']::-moz-range-thumb {
+			height: var(--s);
+			width: var(--s);
+			background: none;
+			border-radius: 50%;
+			box-shadow: 0 0 0 var(--s, var(--l)) inset var(--_c);
+			border-image: linear-gradient(90deg, var(--_c) 50%, var(--_c) 0) 0 1 /
+				calc(50% - var(--l) / 2) 100vw/0 calc(100vw + var(--g));
+			-moz-appearance: none;
+			appearance: none;
+		}
+	}
 	.disable-blur {
 		image-rendering: pixelated;
 	}
