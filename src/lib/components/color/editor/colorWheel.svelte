@@ -5,7 +5,7 @@
 	import { selectedColor } from '$lib/stores/colorStore';
 	import { hexToRgb, hsv2rgb, rectToRGB, rgbToHsl, rgbToHex, rgbToHsv } from '../utils/converter';
 
-	const dispatch = createEventDispatcher<updatePaletteEvent>();
+	const dispatch = createEventDispatcher<updateColorEvent>();
 
 	let canva: HTMLCanvasElement | undefined;
 	let context: CanvasRenderingContext2D | null;
@@ -80,10 +80,10 @@
 
 	const changeLuminosity = () => {
 		if (!rangeInput) return;
-		luminosity = rangeInput.value ?? 1;
+		luminosity = parseFloat(rangeInput.value + '') ?? 1;
 		saveColor();
 		drawPicker();
-		updatePalette();
+		updateColor();
 	};
 
 	const saveColor = () => {
@@ -126,7 +126,7 @@
 
 		saveColor();
 		drawPicker();
-		updatePalette();
+		updateColor();
 	};
 
 	const onMouseMove = (event: MouseEvent) => {
@@ -136,11 +136,11 @@
 		pickerPosition.y = event.offsetY;
 		saveColor();
 		drawPicker();
-		updatePalette();
+		updateColor();
 	};
 
-	const updatePalette = () => {
-		dispatch('updatePalette', {
+	const updateColor = () => {
+		dispatch('updateColor', {
 			color: pickedColorHex
 		});
 	};
@@ -153,41 +153,39 @@
 	};
 </script>
 
-<Panel class="w-full color-wheel" container="bg-white px-6 py-4">
-	<div class="flex justify-around">
-		<canvas
-			bind:this={canva}
-			id="picker"
-			width="200"
-			height="200"
-			class="rounded-full border-2 border-black"
-			on:mousedown={onMouseDown}
-			on:mousemove={onMouseMove}
-			on:mouseleave={onMouseLeave}
-			on:mouseup={onMouseUp}
-		></canvas>
-		<div class="relative self-stretch flex justify-center items-center w-12">
-			<!-- <Background class="absolute rotate-90 h-36 w-4"></Background> -->
-			<div class="rotate-90 w-48">
-				<input
-					class="w-48"
-					bind:this={rangeInput}
-					on:input={changeLuminosity}
-					id="range"
-					type="range"
-					min="0"
-					max="1"
-					value="1"
-					step="0.01"
-				/>
-			</div>
+<div class="color-wheel flex justify-around">
+	<canvas
+		bind:this={canva}
+		id="picker"
+		width="200"
+		height="200"
+		class="rounded-full border-2 border-black"
+		on:mousedown={onMouseDown}
+		on:mousemove={onMouseMove}
+		on:mouseleave={onMouseLeave}
+		on:mouseup={onMouseUp}
+	></canvas>
+	<div class="relative self-stretch flex justify-center items-center w-12">
+		<!-- <Background class="absolute rotate-90 h-36 w-4"></Background> -->
+		<div class="rotate-90 w-48">
+			<input
+				class="w-48"
+				bind:this={rangeInput}
+				on:input={changeLuminosity}
+				id="range"
+				type="range"
+				min="0"
+				max="1"
+				value="1"
+				step="0.01"
+			/>
 		</div>
 	</div>
-	<div class="flex justify-between">
-		<span class="text-xl">Couleurs</span>
-		<div class="flex items-center gap-2">
-			<Swatch color={pickedColorHex}></Swatch>
-			<span>{pickedColorHex}</span>
-		</div>
+</div>
+<div class="flex justify-between">
+	<span class="text-xl">Couleurs</span>
+	<div class="flex items-center gap-2">
+		<Swatch color={pickedColorHex}></Swatch>
+		<span>{pickedColorHex}</span>
 	</div>
-</Panel>
+</div>

@@ -4,6 +4,7 @@
 	import Swatch from './swatch.svelte';
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import ColorWheel from './editor/colorWheel.svelte';
+	import ColorEditor from './editor/colorEditor.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -11,6 +12,8 @@
 	let currentColor: string;
 	let colorIndex: number = -1;
 	let colors: string[] = [];
+
+	let storedColorPalette: string[];
 
 	let editMode = false;
 
@@ -29,27 +32,26 @@
 		colors = newColors;
 	});
 
-	const updateSelectColor = (event: CustomEvent<selectColor>) => {
+	const onUpdateSelectColor = (event: CustomEvent<selectColor>) => {
+		selectedColor.set(event.detail.color);
 		if (!editMode) {
 		}
-		selectedColor.set(event.detail.color);
 	};
 
-	const updatePalette = (event: CustomEvent<selectColor>) => {
-		if (colorIndex >= 0) {
-			const cs = colors;
-			cs[colorIndex] = event.detail.color;
-			storedColors.set(cs);
-		}
-	};
-
-	const openSettings = () => {
+	const onOpenSettings = () => {
 		editMode = true;
-		// selectedColor.set('');
+		storedColorPalette = [...colors];
 	};
 
-	const toggleEdit = () => {
-		editMode = !editMode;
+	const onSave = () => {
+		editMode = false;
+		storedColorPalette = [...colors];
+		selectedColor.set(storedColorPalette[colorIndex]);
+	};
+
+	const onUndo = () => {
+		editMode = false;
+		storedColors.set(storedColorPalette);
 	};
 
 	onDestroy(() => {
@@ -60,14 +62,14 @@
 
 <div class="{childClass} cursor-pointer flex flex-col gap-4">
 	{#if editMode}
-		<ColorWheel on:updatePalette={updatePalette}></ColorWheel>
+		<ColorEditor currentColorIndex={colorIndex} colorPalette={colors}></ColorEditor>
 	{/if}
 	<Panel class="w-fit" container="bg-white flex items-center pr-4">
 		<div class="grid grid-cols-8 gap-2 p-2 m-2">
 			{#each colors as color}
 				<Swatch
 					{color}
-					on:selectColor={updateSelectColor}
+					on:selectColor={onUpdateSelectColor}
 					edit={editMode}
 					selected={color == currentColor}
 				></Swatch>
@@ -75,10 +77,10 @@
 		</div>
 		<div class="flex gap-4">
 			{#if editMode}
-				<button><img src="/svg/undo.svg" alt="undo icon" /></button>
-				<button on:click={toggleEdit}><img src="/svg/save.svg" alt="save icon" /></button>
+				<button on:click={onUndo}><img src="/svg/undo.svg" alt="undo icon" /></button>
+				<button on:click={onSave}><img src="/svg/save.svg" alt="save icon" /></button>
 			{:else}
-				<button on:click={openSettings}><img src="/svg/settings.svg" alt="edit icon" /></button>
+				<button on:click={onOpenSettings}><img src="/svg/settings.svg" alt="edit icon" /></button>
 			{/if}
 		</div>
 	</Panel>
