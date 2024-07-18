@@ -11,11 +11,11 @@
 	let context: CanvasRenderingContext2D | null;
 	let rangeInput: HTMLInputElement | undefined;
 
-	const size = 200;
+	const size = 240;
 
 	let pickerPosition: Coord = {
-		x: 100,
-		y: 100
+		x: 120,
+		y: 120
 	};
 
 	let pickedColorHex: string = '#E11C1A';
@@ -89,15 +89,15 @@
 	const saveColor = () => {
 		const x = (pickerPosition.x - size / 2) / (size / 2);
 		const y = (pickerPosition.y - size / 2) / (size / 2);
+
 		// get equivalent color value
 		pickedColorRgb = rectToRGB(x, -y, luminosity);
-
 		pickedColorHex = rgbToHex(pickedColorRgb[0], pickedColorRgb[1], pickedColorRgb[2]);
+		return true;
 	};
 
 	const savePositionFromHex = () => {
 		pickedColorRgb = hexToRgb(pickedColorHex);
-		let hsl = rgbToHsl(pickedColorRgb[0], pickedColorRgb[1], pickedColorRgb[2]);
 		let hsv = rgbToHsv(pickedColorRgb[0], pickedColorRgb[1], pickedColorRgb[2]);
 		if (!hsv) return;
 		// Hue value represents the angle in the color wheel
@@ -124,9 +124,10 @@
 		pickerPosition.x = event.offsetX;
 		pickerPosition.y = event.offsetY;
 
-		saveColor();
-		drawPicker();
-		updateColor();
+		if (saveColor()) {
+			drawPicker();
+			updateColor();
+		}
 	};
 
 	const onMouseMove = (event: MouseEvent) => {
@@ -134,9 +135,23 @@
 		// save position
 		pickerPosition.x = event.offsetX;
 		pickerPosition.y = event.offsetY;
-		saveColor();
-		drawPicker();
-		updateColor();
+		const r = size / 2;
+
+		const absX = Math.abs(pickerPosition.x - r);
+		const absY = Math.abs(pickerPosition.y - r);
+		const distance: number = Math.sqrt(Math.abs(absX * absX + absY * absY));
+		// if farther than limit max out position
+		if (distance > r) {
+			const diff = distance - r;
+			const ratio = diff / r;
+			pickerPosition.x = (pickerPosition.x - r) * (1 - ratio) + r;
+			pickerPosition.y = (pickerPosition.y - r) * (1 - ratio) + r;
+		}
+
+		if (saveColor()) {
+			drawPicker();
+			updateColor();
+		}
 	};
 
 	const updateColor = () => {
@@ -146,30 +161,30 @@
 	};
 
 	const onMouseLeave = (event: MouseEvent) => {
-		isMouseDown = false;
+		// isMouseDown = false;
 	};
 	const onMouseUp = (event: MouseEvent) => {
 		isMouseDown = false;
 	};
 </script>
 
-<div class="color-wheel flex justify-around">
+<div class="color-wheel flex justify-center gap-2">
 	<canvas
 		bind:this={canva}
 		id="picker"
-		width="200"
-		height="200"
+		width={size}
+		height={size}
 		class="rounded-full border-2 border-black"
 		on:mousedown={onMouseDown}
 		on:mousemove={onMouseMove}
 		on:mouseleave={onMouseLeave}
 		on:mouseup={onMouseUp}
 	></canvas>
-	<div class="relative self-stretch flex justify-center items-center w-12">
+	<div class="relative self-stretch flex justify-center items-center w-8">
 		<!-- <Background class="absolute rotate-90 h-36 w-4"></Background> -->
-		<div class="rotate-90 w-48">
+		<div class="rotate-90 w-56">
 			<input
-				class="w-48"
+				class="w-56"
 				bind:this={rangeInput}
 				on:input={changeLuminosity}
 				id="range"
