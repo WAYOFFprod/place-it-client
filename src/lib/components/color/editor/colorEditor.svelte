@@ -31,7 +31,8 @@
 	<div class="flex justify-center gap-4">
 		<button
 			on:click={onOpenDisk}
-			class="flex flex-col items-center gap-2 border-b-2 {tab == 'disk'
+			class="flex flex-col items-center gap-2 border-b-2 disabled:text-dark-grey disabled:cursor-not-allowed {tab ==
+			'disk'
 				? 'border-black'
 				: 'border-transparent'}"
 		>
@@ -40,18 +41,22 @@
 		</button>
 		<button
 			on:click={onOpenHarmonie}
-			class="flex flex-col items-center gap-2 border-b-2 {tab == 'harmonie'
+			class="flex flex-col items-center gap-2 border-b-2 disabled:text-dark-grey disabled:cursor-not-allowed {tab ==
+			'harmonie'
 				? 'border-black'
 				: 'border-transparent'}"
+			disabled
 		>
 			<img src="/svg/harmonie.svg" alt="color wheel icon" />
 			<div>Harmonie</div>
 		</button>
 		<button
 			on:click={onOpenPalettes}
-			class="flex flex-col items-center gap-2 border-b-2 {tab == 'palettes'
+			class="flex flex-col items-center gap-2 border-b-2 disabled:text-dark-grey disabled:cursor-not-allowed {tab ==
+			'palettes'
 				? 'border-black'
 				: 'border-transparent'}"
+			disabled
 		>
 			<img src="/svg/palette.svg" alt="color wheel icon" />
 			<div>Palettes</div>
