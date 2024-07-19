@@ -16,7 +16,7 @@
 	import ZoomCounter from './metric/zoomCounter.svelte';
 	import CoordViewer from './metric/coordViewer.svelte';
 
-	export let canva: CanvaRequestData;
+	export let canva: CanvaPreviewData;
 	export let viewOnly: boolean = true;
 
 	let id = 'canvas-container';
@@ -197,6 +197,7 @@
 		<!-- bootom panel -->
 		<div class="absolute bottom-24 right-5 flex justify-center">
 			<Palette
+				canvasOwned={canva.owned}
 				canvaId={canva.id}
 				bind:setColors={updateColorPalette}
 				childClass={'pointer-events-auto'}

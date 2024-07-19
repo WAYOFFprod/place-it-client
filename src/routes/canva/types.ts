@@ -5,4 +5,7 @@ interface CanvaRequestData {
   colors: string[],
   image: string
   name: string
+  owned: boolean
+  category: string,
+  
 }

@@ -13,6 +13,7 @@
 
 	export let childClass: string;
 	export let canvaId: number | undefined;
+	export let canvasOwned: boolean | undefined;
 	let currentColor: string;
 	let colorIndex: number = -1;
 	let colors: string[] = [];
@@ -71,7 +72,7 @@
 	{#if editMode}
 		<ColorEditor currentColorIndex={colorIndex} colorPalette={colors}></ColorEditor>
 	{/if}
-	<Panel class="w-fit" container="bg-white flex items-center pr-4">
+	<Panel class="w-fit" container="bg-white flex items-center">
 		<div class="grid grid-cols-8 gap-2 p-2 m-2">
 			{#each colors as color}
 				<Swatch
@@ -82,13 +83,15 @@
 				></Swatch>
 			{/each}
 		</div>
-		<div class="flex gap-4">
-			{#if editMode}
-				<button on:click={onUndo}><img src="/svg/undo.svg" alt="undo icon" /></button>
-				<button on:click={onSave}><img src="/svg/save.svg" alt="save icon" /></button>
-			{:else}
-				<button on:click={onOpenSettings}><img src="/svg/settings.svg" alt="edit icon" /></button>
-			{/if}
-		</div>
+		{#if canvasOwned}
+			<div class="flex gap-4 pr-4">
+				{#if editMode}
+					<button on:click={onUndo}><img src="/svg/undo.svg" alt="undo icon" /></button>
+					<button on:click={onSave}><img src="/svg/save.svg" alt="save icon" /></button>
+				{:else}
+					<button on:click={onOpenSettings}><img src="/svg/settings.svg" alt="edit icon" /></button>
+				{/if}
+			</div>
+		{/if}
 	</Panel>
 </div>
