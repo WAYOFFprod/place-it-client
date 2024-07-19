@@ -214,12 +214,12 @@ export default class Networker {
 
   }
 
-  addColors = async (id: number, colors: string[]) => {
+  replaceColors = async (id: number, colors: string[]) => {
     const payload = {
       id: id,
       colors: colors
     }
-    const response = await this.server.post("/canvas/color/add/", payload);
+    const response = await this.server.post("/canvas/color/replace/", payload);
     return response;
   }
 

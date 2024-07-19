@@ -5,10 +5,14 @@
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import ColorWheel from './editor/colorWheel.svelte';
 	import ColorEditor from './editor/colorEditor.svelte';
+	import Networker from '$lib/utility/Networker';
+	import NumberInput from '../form/numberInput.svelte';
 
 	const dispatch = createEventDispatcher();
+	const networker = Networker.getInstance();
 
 	export let childClass: string;
+	export let canvaId: number | undefined;
 	let currentColor: string;
 	let colorIndex: number = -1;
 	let colors: string[] = [];
@@ -47,6 +51,9 @@
 		editMode = false;
 		storedColorPalette = [...colors];
 		selectedColor.set(storedColorPalette[colorIndex]);
+		if (canvaId) {
+			networker.replaceColors(canvaId, storedColorPalette);
+		}
 	};
 
 	const onUndo = () => {
