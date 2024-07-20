@@ -79,10 +79,10 @@
 </script>
 
 <div
-	class="chat border-2 border-black rounded bg-off-white/50 flex flex-col overflow-hidden pointer-events-auto {$$props.class}"
+	class="border-2 border-black rounded bg-off-white/50 flex flex-col overflow-hidden pointer-events-auto {$$props.class}"
 >
 	<!-- chat window -->
-	<div class="h-full px-4">
+	<div class="custom-scroll h-full px-4">
 		<button
 			type="button"
 			on:click={() => (isOpen = !isOpen)}

@@ -12,6 +12,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { event } from '$lib/stores/eventStore';
 	import { error } from '@sveltejs/kit';
+	import type { Errors } from './types';
 
 	const dispatch = createEventDispatcher();
 	let form: HTMLFormElement;

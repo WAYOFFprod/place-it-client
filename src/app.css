@@ -39,7 +39,7 @@
 	}
 
 	/* Scrollbar */
-	.chat {
+	.custom-scroll {
 		/* width */
 		::-webkit-scrollbar {
 			@apply w-3;
@@ -48,6 +48,7 @@
 		/* Track */
 		::-webkit-scrollbar-track {
 			@apply bg-black mb-2;
+			margin-top: 5px;
 			border-left: 5px solid transparent;
 			border-right: 5px solid transparent;
 			background-clip: padding-box;

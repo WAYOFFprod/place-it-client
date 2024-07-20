@@ -143,6 +143,12 @@ export default class Networker {
     }
   }
 
+  // Friends
+  getFriends = async () => {
+    const response: any = await this.server.get('/friends/');
+    return response;
+  }
+
   // Canvas
   joinCanva = async (id: number) => {
     const response: any = await this.server.get('/canva/join/'+id);

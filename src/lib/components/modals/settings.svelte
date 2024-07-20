@@ -8,6 +8,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import SettingsTab from './settingsTab.svelte';
 	import Account from './settings/account.svelte';
+	import Friends from './settings/friends.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -88,6 +89,8 @@
 		<!-- Window -->
 		{#if selectedTab == 'general'}
 			<Account on:close{close}></Account>
+		{:else if selectedTab == 'friends'}
+			<Friends on:close{close}></Friends>
 		{/if}
 	</div>
 </div>

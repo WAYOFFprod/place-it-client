@@ -5,6 +5,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { event } from '$lib/stores/eventStore';
 	import Button from '$lib/components/form/button.svelte';
+	import type { Errors } from '../modals/types';
 
 	const dispatch = createEventDispatcher();
 	let form: HTMLFormElement;
