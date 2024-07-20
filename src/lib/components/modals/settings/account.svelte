@@ -94,6 +94,7 @@
 				value={user.email}
 				field="email"
 				on:saveField={onSaveField}
+				disabled={true}
 			></TextSettings>
 			<TextSettings
 				type="password"
@@ -102,6 +103,7 @@
 				value="thisismypassword"
 				field="password"
 				on:saveField={onSaveField}
+				disabled={true}
 			></TextSettings>
 			<TextSettings
 				type="text"

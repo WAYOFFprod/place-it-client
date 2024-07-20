@@ -33,8 +33,9 @@
 </script>
 
 <div role="presentation" on:focus={focus} on:mouseover={mouseEnter} on:mouseleave={mouseLeave}>
-	<Panel isSmall={isHovering || toggle}>
+	<Panel isSmall={disabled || isHovering || toggle}>
 		<input
+			class="peer"
 			name={id}
 			{id}
 			type="checkbox"
@@ -44,7 +45,7 @@
 			{disabled}
 		/>
 		<label
-			class=" py-2 px-2 flex justify-between gap-2 items-center group
+			class=" py-2 px-2 flex justify-between gap-2 items-center peer-disabled:bg-dark-grey
 			{$$props.class}
       {toggle ? classActive : classInactive}
       {disabled ? 'cursor-not-allowed' : 'cursor-pointer'}"

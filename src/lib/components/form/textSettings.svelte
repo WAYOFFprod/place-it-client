@@ -12,6 +12,7 @@
 	export let type: string = 'text';
 	export let value: string = '';
 	export let field: string;
+	export let disabled: boolean = false;
 
 	let input: HTMLInputElement;
 
@@ -72,7 +73,7 @@
 			name={id}
 			{type}
 			{placeholder}
-			disabled={!editable}
+			disabled={!editable || disabled}
 			{value}
 			class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 min-w-5 disabled:border-transparent"
 		/>
@@ -83,6 +84,7 @@
 		label={buttonLabel}
 		id="{id}-edit"
 		toggle={editable}
+		{disabled}
 		on:change={change}
 	></ToggleButton>
 </div>
