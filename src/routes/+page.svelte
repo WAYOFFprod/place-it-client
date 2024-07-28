@@ -284,10 +284,12 @@
 			<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
 			></Select>
 			<div class="grow flex justify-center md:justify-end">
-				<Button stretch={false} on:click={onCreateCanva}>
-					<img src="/svg/plus.svg" alt="plus icon" />
-					<span class="inline lg:hidden xl:inline">Créer un nouveau canva</span>
-				</Button>
+				{#if isConnected}
+					<Button stretch={false} on:click={onCreateCanva}>
+						<img src="/svg/plus.svg" alt="plus icon" />
+						<span class="inline lg:hidden xl:inline">Créer un nouveau canva</span>
+					</Button>
+				{/if}
 			</div>
 		</div>
 		<!-- content -->
