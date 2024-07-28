@@ -53,7 +53,7 @@
 				on:click|preventDefault={click}
 				{type}
 				{disabled}
-				class="px-4 py-2 flex justify-center items-center gap-4 text-xl {classColor} {stretch
+				class="px-4 py-2 flex justify-center items-center gap-4 text-xl disabled:bg-dark-grey disabled:cursor-not-allowed {classColor} {stretch
 					? 'w-full'
 					: ''}"
 			>

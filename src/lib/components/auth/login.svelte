@@ -18,7 +18,7 @@
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
 
-		const response = await networker.login({
+		const response: any = await networker.login({
 			email: email,
 			password: password
 		});

@@ -20,7 +20,7 @@
 		const password = formData.get('password') as string;
 		const passwordConfirmation = formData.get('password_confirmation') as string;
 
-		const response = await networker.register({
+		const response: any = await networker.register({
 			name: name,
 			email: email,
 			password: password,

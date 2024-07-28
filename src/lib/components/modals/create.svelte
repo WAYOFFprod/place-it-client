@@ -86,7 +86,7 @@
 			]
 		} as CreateCanvaPayload;
 		const networker = Networker.getInstance();
-		const canva = await networker.createCanva(payload);
+		const canva: any = await networker.createCanva(payload);
 
 		if (canva?.status == 422) {
 			errors = canva.response.errors as Errors;

@@ -6,6 +6,7 @@
 	import Settings from './modals/settings.svelte';
 	import JoinCanva from './modals/joinCanva.svelte';
 	import { onDestroy } from 'svelte';
+	import UserActions from './modals/userActions.svelte';
 
 	let dialog: HTMLDialogElement;
 
@@ -55,6 +56,12 @@
 			<Settings on:close={modalClosed}></Settings>
 		{:else if openedDialog.name == 'joinRequest'}
 			<JoinCanva on:close={modalClosed} canvaId={openedDialog.data.id}></JoinCanva>
+		{:else if openedDialog.name == 'userAction'}
+			<UserActions
+				on:close={modalClosed}
+				userId={openedDialog.data.id}
+				userName={openedDialog.data.name}
+			></UserActions>
 		{/if}
 	</Panel>
 </dialog>
