@@ -29,7 +29,6 @@ export default class Networker {
   constructor(server: string, websocket: string) {
     this.websocket = websocket
     this.server = new ServerRequests(server);
-    this.server.get('/sanctum/csrf-cookie');
     userStore.subscribe((newUserData: User | undefined) => {
       this.userData = newUserData;
     })
