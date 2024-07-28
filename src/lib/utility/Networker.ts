@@ -99,7 +99,7 @@ export default class Networker {
 
   login = async (payload: LoginPayload) => {
     await this.server.get('/sanctum/csrf-cookie')
-    const response: any = await this.server.post("/auth/login/", payload);
+    const response: any = await this.server.post("/auth/login", payload);
     if(response?.status == 200) {
       userStore.set(response.response.data);
       authStatus.set(true);
@@ -109,7 +109,7 @@ export default class Networker {
 
   register = async (payload: RegisterPayload) => {
     await this.server.get('/sanctum/csrf-cookie')
-    const response: any = await this.server.post("/auth/register/", payload);
+    const response: any = await this.server.post("/auth/register", payload);
     if(response?.status == 200) {
       userStore.set(response.response);
       authStatus.set(true);
@@ -135,7 +135,7 @@ export default class Networker {
   }
 
   saveField = async (payload: SettingOption) => {
-    const response: any = await this.server.post('/user/update/', payload)
+    const response: any = await this.server.post('/user/update', payload)
     if(response?.response.data) {
       console.log("update user: ", response.response.data);
       userStore.set(response.response.data);
@@ -145,17 +145,17 @@ export default class Networker {
 
   // Friends
   getFriends = async () => {
-    const response: any = await this.server.get('/friends/');
+    const response: any = await this.server.get('/friends');
     return response;
   }
 
   requestFriend = async (id: number) => {
-    const response: any = await this.server.post('/friend/request/', {friend_id: id})
+    const response: any = await this.server.post('/friend/request', {friend_id: id})
     return response;
   }
 
   blockUser = async (id: number) => {
-    const response: any = await this.server.post('/friend/block/', {friend_id: id})
+    const response: any = await this.server.post('/friend/block', {friend_id: id})
     return response;
   }
 
