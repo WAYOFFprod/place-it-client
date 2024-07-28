@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { userStore } from '$lib/stores/authStore';
+	import { onDestroy, onMount } from 'svelte';
 	import Button from '$lib/components/form/button.svelte';
 	import Select from '$lib/components/form/select.svelte';
 	import TextInput from '$lib/components/form/textInput.svelte';
@@ -21,6 +22,7 @@
 	let searchTerm: string = '';
 	let sort: undefined | 'asc' | 'desc';
 	let favoritFilter: undefined | 1;
+	let userName: string | undefined;
 
 	addEventListener('popstate', (event) => {});
 	onpopstate = (event) => {
@@ -28,6 +30,11 @@
 		initParamsFromUrl(params);
 		fetchCanvas();
 	};
+
+	const unsubscribeUser = userStore.subscribe((newUser) => {
+		if (newUser == undefined) return;
+		userName = newUser.name;
+	});
 
 	// init params from url
 	const initParamsFromUrl = (params: URLSearchParams) => {
@@ -190,6 +197,10 @@
 		await fetchData();
 	});
 
+	onDestroy(() => {
+		unsubscribeUser();
+	});
+
 	$: favoritToggle = favoritFilter == 1 ? true : false;
 	$: recentToggle = sort == 'desc' ? true : false;
 </script>
@@ -224,7 +235,7 @@
 			<div class="flex flex-row-reverse items-center grow">
 				<button on:click={onClickLogin} class="flex items-center gap-2 uppercase">
 					{#if isConnected}
-						<div>Nom d'utilisateur</div>
+						<div>{userName}</div>
 					{:else if isConnected === false}
 						<div>Login</div>
 					{/if}
