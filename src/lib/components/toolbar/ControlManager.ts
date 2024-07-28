@@ -27,10 +27,13 @@ export default class ControlManager {
   scaleFactor = 0;
 
 
-  constructor(p5: P5, size: Size2D) {
+  constructor(p5: P5, size: Size2D, viewOnly: boolean) {
     this.p5 = p5;
-    
-    this.toolManager = new ToolManager(ToolType.Cursor, p5);
+    if(viewOnly) {
+      this.toolManager = new ToolManager(ToolType.Hand, p5);
+    } else {
+      this.toolManager = new ToolManager(ToolType.Cursor, p5);
+    }
 
 		this.init(size)
   }
@@ -125,5 +128,8 @@ export default class ControlManager {
 
     const percentScale = limitedCurrentScale/ControlManager.MAX_ZOOM * 100 as number
     zoom.set(percentScale)
+  }
+  destroy() {
+    this.toolManager.destroy();
   }
 }

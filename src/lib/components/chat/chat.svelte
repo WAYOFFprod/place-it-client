@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { tokenStore, userStore } from '$lib/stores/authStore';
 	import { chatMessages } from '$lib/stores/chatStore';
+	import { openedModal } from '$lib/stores/modalStore';
 	import Networker from '$lib/utility/Networker';
+	import { onDestroy } from 'svelte';
 
 	const networker = Networker.getInstance();
 	let isOpen = false;
@@ -11,17 +14,33 @@
 	let respondTo: string | null = null;
 
 	let input: HTMLInputElement;
-
-	chatMessages.subscribe((newMessages: Message[]) => {
+	const unsubscribeChat = chatMessages.subscribe((newMessages: Message[]) => {
 		entries = newMessages;
 	});
 
+	let userData: undefined | User;
+	const unsubscribeUser = userStore.subscribe((newUserData) => {
+		userData = newUserData;
+	});
+
+	let canvaToken: string | undefined;
+	const unsubscribeToken = tokenStore.subscribe((newToken) => {
+		canvaToken = newToken;
+	});
+
 	const sendMessage = () => {
+		if (userData == undefined || canvaToken == undefined) {
+			console.warn('not autheticated: cant send message');
+			return;
+		}
+
 		const date = new Date();
 		let msg: Message = {
+			id: userData.id,
 			time: Date.parse(date.toUTCString()),
-			user: networker.shortClientId ?? 'anon',
-			message: message
+			user: userData.name,
+			message: message,
+			token: canvaToken
 		};
 		if (respondTo) {
 			msg.respondTo = respondTo;
@@ -30,13 +49,15 @@
 		networker.sendMessage(msg);
 	};
 
-	window.addEventListener('keydown', (e: KeyboardEvent) => {
+	const sendMessageEvent = (e: KeyboardEvent) => {
 		if (e.key == 'Enter') {
 			sendMessage();
 			message = '';
 			if (!isOpen) isOpen = true;
 		}
-	});
+	};
+
+	window.addEventListener('keydown', sendMessageEvent);
 
 	const respond = (userName: string) => {
 		respondTo = userName;
@@ -51,13 +72,24 @@
 		const date = new Date(time);
 		return date.getHours() + ':' + date.getMinutes();
 	};
+
+	const openUserMenu = (id: number, name: string) => {
+		openedModal.set({ name: 'userAction', data: { id: id, name: name } });
+	};
+
+	onDestroy(() => {
+		window.removeEventListener('keydown', sendMessageEvent);
+		unsubscribeChat();
+		unsubscribeUser();
+		unsubscribeToken();
+	});
 </script>
 
 <div
-	class="chat border-2 border-black rounded bg-off-white/50 flex flex-col overflow-hidden pointer-events-auto {$$props.class}"
+	class="border-2 border-black rounded bg-off-white/50 flex flex-col overflow-hidden pointer-events-auto {$$props.class}"
 >
 	<!-- chat window -->
-	<div class="h-full px-4">
+	<div class="custom-scroll h-full px-4">
 		<button
 			type="button"
 			on:click={() => (isOpen = !isOpen)}
@@ -75,10 +107,16 @@
 			{#each [...entries].reverse() as entry}
 				<div class="flex items-start gap-2 pb-1">
 					<span class="text-md font-normal w-6 shrink-0 pt-0.5">{getDate(entry.time)}</span>
-					<span
-						class="text-lg font-bold max-w-20 overflow-hidden text-ellipsis whitespace-nowrap shrink-0"
-						>{entry.user}</span
+					<button
+						class="border-b-2 border-transparent hover:border-tea-rose disabled:border-transparent"
+						on:click={() => openUserMenu(entry.id, entry.user)}
+						disabled={!userData || entry.id == userData.id}
 					>
+						<span
+							class="text-lg font-bold max-w-20 overflow-hidden text-ellipsis whitespace-nowrap shrink-0"
+							>{entry.user}</span
+						>
+					</button>
 
 					<div class="relative text-md font-normal grow">
 						<span

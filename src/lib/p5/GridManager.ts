@@ -7,6 +7,7 @@ let PIXEL_IN_SECTION = 10;
 
 export default class GridManager {
   p5: P5
+  canvasId: number
   gridSections: GridSection[];
   canvas: {width: number, height: number};
   sectionGrid: {width: number, height: number};
@@ -14,8 +15,9 @@ export default class GridManager {
   pixelsAdded = false;
   imageLoaded = false;
 
-  constructor(p5: P5, canvas: Size2D) {
+  constructor(p5: P5, canvas: Size2D, canvasId: number) {
     // init values
+    this.canvasId = canvasId;
     this.p5 = p5;
     this.gridSections = [];
     this.canvas = canvas;
@@ -43,6 +45,7 @@ export default class GridManager {
   additionalData: {[key: string]: string} = {};
 
   loadImage = async (base64Image: string, size: Size2D, data: {[key: string]: string}) => {
+    
     this.additionalData = data;
     this.p5.loadImage(base64Image, this.handleImage);
   }
@@ -87,6 +90,7 @@ export default class GridManager {
         const absolutePosition = this.getCoordFromIndex(index, this.canvas.width)
         const gridIndex = this.getGridSectionIndex(absolutePosition);
         const relPosition = this.getRelativePixelPosition(absolutePosition);
+
         this.gridSections[gridIndex].drawPixel(relPosition, color);
       }
     }

@@ -71,4 +71,8 @@ export default class Tool {
     return null
   }
 
+  destroy() {
+
+  }
+
 }

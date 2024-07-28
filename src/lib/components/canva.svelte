@@ -1,20 +1,23 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import P5 from 'p5';
 	import GridManager from '$lib/p5/GridManager';
 	import { ToolType, backToTool, selectedTool, setTempTool, setTool } from '$lib/stores/toolStore';
 
 	import Palette from './color/palette.svelte';
-	import Button from './button.svelte';
 	import Networker from '$lib/utility/Networker';
 	import Modal from '$lib/components/modal.svelte';
 	import Toolbar from '$lib/components/toolbar/toolbar.svelte';
 	import Tool from './toolbar/ToolClass';
 	import ControlManager from './toolbar/ControlManager';
 	import { event } from '$lib/stores/eventStore';
+	import { isReady } from '$lib/stores/canvaStore';
 	import Chat from './chat/chat.svelte';
 	import ZoomCounter from './metric/zoomCounter.svelte';
 	import CoordViewer from './metric/coordViewer.svelte';
+
+	export let canva: CanvaPreviewData;
+	export let viewOnly: boolean = true;
 
 	let id = 'canvas-container';
 	let width = 32;
@@ -27,30 +30,37 @@
 	let controlManager: ControlManager;
 	let gridManager: GridManager;
 
+	let userData: undefined;
+
 	const networker = Networker.getInstance();
 
 	const zoomSensitivity = 0.1;
 
 	let currentToolType: typeof Tool = Tool;
 
-	selectedTool.subscribe((newTool: Tool | undefined) => {
+	const unsubscribeTool = selectedTool.subscribe((newTool: Tool | undefined) => {
 		if (newTool == undefined) return;
 		const type = newTool.getType();
 		if (type == null) return;
 		currentToolType = type;
 	});
 
-	event.subscribe((newEvent) => {
+	const unsubscribeEvent = event.subscribe((newEvent) => {
 		if (newEvent == 'clearCanva') reloadCanva();
 	});
 
-	let isReady = false;
+	let ready = false;
+	const unsubscribeReady = isReady.subscribe((newState) => {
+		ready = newState;
+	});
 
 	const reloadCanva = async () => {
-		isReady = false;
-		const canvasData = await fetchData();
-		controlManager.init(canvasData.size);
-		connect(canvasData);
+		isReady.set(false);
+		// const canvasData = await fetchData();
+		// if (canvasData) {
+		// 	controlManager.init(canvasData.size);
+		// 	connect(canvasData);
+		// }
 	};
 
 	const isTargeting = (target: EventTarget | null, id: string) => {
@@ -60,23 +70,8 @@
 		return true;
 	};
 
-	const fetchData = async () => {
-		// load data
-		const data = await networker.getCanva();
-
-		// set width and height
-		width = data.width;
-		height = data.height;
-		const size: Size2D = { width: width, height: height };
-		return {
-			id: data.id,
-			data: data,
-			size: size
-		};
-	};
-
 	const connect = async (canvasData: CanvaData) => {
-		gridManager = new GridManager(p5, canvasData.size);
+		gridManager = new GridManager(p5, canvasData.size, canva.id);
 
 		networker.connectToSocket(gridManager, reloadCanva);
 
@@ -84,14 +79,22 @@
 		gridManager.loadImage(canvasData.data.image, canvasData.size, pixels);
 		// color = data.colors[0];
 		updateColorPalette(canvasData.data.colors);
-		networker.loadCanva(canvasData.id);
-		isReady = true;
+		networker.joinLiveCanva(canvasData.id);
 	};
 
 	const initCanvas = async () => {
-		const canvasData = await fetchData();
-		controlManager = new ControlManager(p5, canvasData.size);
-		connect(canvasData);
+		if (canva) {
+			width = canva.width;
+			height = canva.height;
+			const size: Size2D = { width: width, height: height };
+			const data = {
+				id: canva.id,
+				data: canva,
+				size: size
+			};
+			controlManager = new ControlManager(p5, data.size, viewOnly);
+			connect(data);
+		}
 	};
 
 	onMount(() => {
@@ -105,7 +108,7 @@
 			};
 
 			p5.draw = () => {
-				if (!isReady) return;
+				if (!ready) return;
 				p5.background(150);
 
 				p5.push();
@@ -179,6 +182,12 @@
 			};
 		}
 	});
+	onDestroy(() => {
+		controlManager.destroy();
+		unsubscribeTool();
+		unsubscribeEvent();
+		unsubscribeReady();
+	});
 </script>
 
 <Modal></Modal>
@@ -187,7 +196,12 @@
 	<div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none">
 		<!-- bootom panel -->
 		<div class="absolute bottom-24 right-5 flex justify-center">
-			<Palette bind:setColors={updateColorPalette} childClass={'pointer-events-auto'}></Palette>
+			<Palette
+				canvasOwned={canva.owned}
+				canvaId={canva.id}
+				bind:setColors={updateColorPalette}
+				childClass={'pointer-events-auto'}
+			></Palette>
 		</div>
 
 		<div class="absolute bottom-24 left-5 flex justify-center">
@@ -200,7 +214,7 @@
 		</div>
 
 		<!-- other -->
-		<Toolbar class="absolute left-5 top-5 pointer-events-auto" {p5}></Toolbar>
+		<Toolbar class="absolute left-5 top-5 pointer-events-auto" {p5} {viewOnly}></Toolbar>
 	</div>
 
 	<!-- canvas -->
