@@ -29,7 +29,7 @@ export default class Networker {
   constructor(server: string, websocket: string) {
     this.websocket = websocket
     this.server = new ServerRequests(server);
-    this.server.get('/sanctum/csrf-cookie');
+    this.server.get('/sanctum/csrf-cookie/');
     userStore.subscribe((newUserData: User | undefined) => {
       this.userData = newUserData;
     })
@@ -98,8 +98,8 @@ export default class Networker {
   // Auth
 
   login = async (payload: LoginPayload) => {
-    await this.server.get('/sanctum/csrf-cookie')
-    const response: any = await this.server.post("/auth/login", payload);
+    await this.server.get('/sanctum/csrf-cookie/')
+    const response: any = await this.server.post("/auth/login/", payload);
     if(response?.status == 200) {
       userStore.set(response.response.data);
       authStatus.set(true);
@@ -108,8 +108,8 @@ export default class Networker {
   }
 
   register = async (payload: RegisterPayload) => {
-    await this.server.get('/sanctum/csrf-cookie')
-    const response: any = await this.server.post("/auth/register", payload);
+    await this.server.get('/sanctum/csrf-cookie/')
+    const response: any = await this.server.post("/auth/register/", payload);
     if(response?.status == 200) {
       userStore.set(response.response);
       authStatus.set(true);
@@ -118,14 +118,14 @@ export default class Networker {
   }
 
   logout = async () => {
-    const response = await this.server.post('/auth/logout', {});
+    const response = await this.server.post('/auth/logout/', {});
     if(response?.status == 204) {
       authStatus.set(false);
     }
   }
 
   getSession = async () => {
-    const response = await this.server.get('/session')
+    const response = await this.server.get('/session/')
     if(response.isConnected) {
       userStore.set(response.user);
       authStatus.set(true);
@@ -135,7 +135,7 @@ export default class Networker {
   }
 
   saveField = async (payload: SettingOption) => {
-    const response: any = await this.server.post('/user/update', payload)
+    const response: any = await this.server.post('/user/update/', payload)
     if(response?.response.data) {
       console.log("update user: ", response.response.data);
       userStore.set(response.response.data);
@@ -145,17 +145,17 @@ export default class Networker {
 
   // Friends
   getFriends = async () => {
-    const response: any = await this.server.get('/friends');
+    const response: any = await this.server.get('/friends/');
     return response;
   }
 
   requestFriend = async (id: number) => {
-    const response: any = await this.server.post('/friend/request', {friend_id: id})
+    const response: any = await this.server.post('/friend/request/', {friend_id: id})
     return response;
   }
 
   blockUser = async (id: number) => {
-    const response: any = await this.server.post('/friend/block', {friend_id: id})
+    const response: any = await this.server.post('/friend/block/', {friend_id: id})
     return response;
   }
 
@@ -240,7 +240,7 @@ export default class Networker {
   }
 
   createCanva = async (payload: CreateCanvaPayload) => {
-    const response = await this.server.post("/canvas/create", payload);
+    const response = await this.server.post("/canvas/create/", payload);
     return response;
   }
 
