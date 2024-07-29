@@ -71,6 +71,12 @@ export default {
 			}
 		}
 	},
-	safelist: ['cursor-hand', 'cursor-pointer', 'cursor-selection', 'text-fluorescent-cyan'],
+	safelist: [
+		'cursor-hand',
+		'cursor-pointer',
+		'cursor-selection',
+		'cursor-eraser',
+		'text-fluorescent-cyan'
+	],
 	plugins: []
 };
