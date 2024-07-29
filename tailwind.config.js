@@ -16,7 +16,7 @@ export default {
 				hand: 'url("/cursors/hand.svg"), pointer',
 				pointer: 'url("/cursors/cursor.svg") 5 0, pointer',
 				selection: 'url("/cursors/selection.svg"), pointer',
-				eraser: 'url("/cursors/erase.svg"), pointer'
+				eraser: 'url("/cursors/erase.svg") 0 20, pointer'
 			},
 			colors: {
 				'tea-rose': {
