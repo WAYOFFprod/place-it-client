@@ -6,6 +6,7 @@ import Tool, { ToolType } from '$lib/components/toolbar/ToolClass'
 import MoveTool from "$lib/components/toolbar/tools/MoveTool";
 import PointTool from "$lib/components/toolbar/tools/PointTool";
 import SelectionTool from "$lib/components/toolbar/tools/SelectionTool";
+import EraserTool from '$lib/components/toolbar/tools/EraserTool';
 
 
 interface Tools {
@@ -15,6 +16,7 @@ interface Tools {
 let toolClasses: Tools = {
   [ToolType.Hand]: MoveTool,
   [ToolType.Cursor]: PointTool,
+  [ToolType.Eraser]: EraserTool,
   // [ToolType.Selection]: SelectionTool
 }
 

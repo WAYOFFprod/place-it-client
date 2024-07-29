@@ -6,7 +6,8 @@ import ControlManager from './ControlManager';
 export enum ToolType {
   Cursor = 'cursor',
   Hand = 'hand',
-  Selection = 'selection'
+  Selection = 'selection',
+  Eraser = 'eraser'
 }
 
 export default class Tool {
