@@ -12,6 +12,8 @@ export default class ControlManager {
   isMouseDown: boolean = false
   isMouseDragging: boolean = false
 
+  marginBottom: number = 0
+
   static screenOffset: Coord
   static currentScale:number
 
@@ -27,8 +29,9 @@ export default class ControlManager {
   scaleFactor = 0;
 
 
-  constructor(p5: P5, size: Size2D, viewOnly: boolean) {
+  constructor(p5: P5, size: Size2D, viewOnly: boolean, marginBottom:number) {
     this.p5 = p5;
+    this.marginBottom = marginBottom;
     if(viewOnly) {
       this.toolManager = new ToolManager(ToolType.Hand, p5);
     } else {
@@ -41,7 +44,7 @@ export default class ControlManager {
   init(size: Size2D) {
     // initialize scale factor
 		const widthRatio = this.p5.windowWidth / size.width;
-		const heightRatio = this.p5.windowHeight / size.height;
+		const heightRatio = (this.p5.windowHeight - this.marginBottom) / size.height;
     
 		// get scale factor by getting the one from the axies with the least pixels
     ControlManager.currentScale = Math.max(widthRatio < heightRatio ? widthRatio : heightRatio, ControlManager.MIN_ZOOM);
@@ -53,7 +56,7 @@ export default class ControlManager {
     
     const screenCenter = {
       x: this.p5.windowWidth / 2,
-      y: this.p5.windowHeight / 2
+      y: (this.p5.windowHeight - this.marginBottom) / 2
     };
     
     ControlManager.screenOffset = {

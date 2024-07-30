@@ -46,7 +46,9 @@
 		</div>
 	</Header>
 	{#if canva}
-		<Canva {canva} viewOnly={false}></Canva>
+		<Canva {canva} viewOnly={false} class="" marginBottom={52}></Canva>
+	{:else}
+		<div>Loading</div>
 	{/if}
 </div>
 

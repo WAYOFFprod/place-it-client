@@ -18,6 +18,7 @@
 
 	export let canva: CanvaPreviewData;
 	export let viewOnly: boolean = true;
+	export let marginBottom: number = 0;
 
 	let id = 'canvas-container';
 	let width = 32;
@@ -92,7 +93,7 @@
 				data: canva,
 				size: size
 			};
-			controlManager = new ControlManager(p5, data.size, viewOnly);
+			controlManager = new ControlManager(p5, data.size, viewOnly, marginBottom);
 			connect(data);
 		}
 	};
@@ -103,7 +104,8 @@
 			p5.setup = () => {
 				const cnv = p5.createCanvas(width, height);
 				cnv.id('place-it-canvas');
-				p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+
+				p5.resizeCanvas(p5.windowWidth, p5.windowHeight - marginBottom);
 				p5.noSmooth();
 			};
 
@@ -191,11 +193,11 @@
 </script>
 
 <Modal></Modal>
-<div {id} class="relative cursor-{currentToolType.cursor}">
+<div {id} class="relative cursor-{currentToolType.cursor} {$$props.class}">
 	<!-- overlay -->
 	<div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none">
 		<!-- bootom panel -->
-		<div class="absolute bottom-24 right-5 flex justify-center">
+		<div class="absolute bottom-10 right-5 flex justify-center">
 			<Palette
 				canvasOwned={canva.owned}
 				canvaId={canva.id}
@@ -204,7 +206,7 @@
 			></Palette>
 		</div>
 
-		<div class="absolute bottom-24 left-5 flex justify-center">
+		<div class="absolute bottom-10 left-5 flex justify-center">
 			<Chat class="w-[500px]"></Chat>
 		</div>
 
@@ -218,5 +220,5 @@
 	</div>
 
 	<!-- canvas -->
-	<div bind:this={container} class="w-full"></div>
+	<div bind:this={container}></div>
 </div>
