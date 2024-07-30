@@ -17,8 +17,8 @@ export default class ControlManager {
   static screenOffset: Coord
   static currentScale:number
 
-  static MIN_ZOOM = 0.7
-  static MAX_ZOOM = 20
+  static MIN_ZOOM = 0.5
+  static MAX_ZOOM = 128
 
   	// original position on start of dragging
 	grabStart: Coord = {
@@ -49,7 +49,6 @@ export default class ControlManager {
 		// get scale factor by getting the one from the axies with the least pixels
     ControlManager.currentScale = Math.max(widthRatio < heightRatio ? widthRatio : heightRatio, ControlManager.MIN_ZOOM);
 		// ControlManager.currentScale = 1;
-    
 		// set initial offset to center image
 		const x = (size.width / 2) * ControlManager.currentScale;
 		const y = (size.height / 2) * ControlManager.currentScale;
@@ -104,16 +103,21 @@ export default class ControlManager {
 	};
 
   scroll(scaleFactor: number) {
-    // adjust for ZoomMovement
-    // this.scaleFactor = scaleFactor
-
-    // ControlManager.currentScale = ControlManager.currentScale * this.scaleFactor;
     const newCurrentScale = ControlManager.currentScale * scaleFactor;
-    const limitedCurrentScale = Math.min(Math.max(newCurrentScale, ControlManager.MIN_ZOOM), ControlManager.MAX_ZOOM);
-    const limitedScaleFactor = limitedCurrentScale / ControlManager.currentScale
 
-    this.scaleFactor = limitedScaleFactor
-    ControlManager.currentScale = limitedCurrentScale
+    let newScaleFactor = newCurrentScale / ControlManager.currentScale
+
+    let limitScaleFactor
+    if(scaleFactor > 1) {
+      limitScaleFactor = Math.min(newCurrentScale, ControlManager.MAX_ZOOM)
+      newScaleFactor = limitScaleFactor  / ControlManager.currentScale;
+    } else {
+      limitScaleFactor = Math.max(newCurrentScale, ControlManager.MIN_ZOOM)
+      newScaleFactor = limitScaleFactor /  ControlManager.currentScale;
+    }
+    
+    this.scaleFactor = newScaleFactor
+    ControlManager.currentScale = limitScaleFactor
     // get mouse position relative to canvas zoom
     const relMouse = {
       x: this.p5.mouseX * this.scaleFactor,
@@ -129,7 +133,7 @@ export default class ControlManager {
     ControlManager.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
     ControlManager.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
 
-    const percentScale = limitedCurrentScale/ControlManager.MAX_ZOOM * 100 as number
+    const percentScale = newScaleFactor/ControlManager.MAX_ZOOM * 100 as number
     zoom.set(percentScale)
   }
   destroy() {
