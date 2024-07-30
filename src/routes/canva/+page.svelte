@@ -20,7 +20,7 @@
 			isLoadingSlow = true;
 		}, 2 * 1000);
 		// for testing
-		await new Promise((r) => setTimeout(r, 6 * 1000));
+		// await new Promise((r) => setTimeout(r, 6 * 1000));
 
 		await networker.getSession();
 		if (canva_id == null) return null;
