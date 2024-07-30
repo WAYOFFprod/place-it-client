@@ -1,7 +1,7 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
 
-let PIXEL_IN_SECTION = 10;
+let PIXEL_IN_SECTION: number;
 
 
 
@@ -14,8 +14,16 @@ export default class GridManager {
   color: string = '#ffffff';
   pixelsAdded = false;
   imageLoaded = false;
+  needsUpdate: boolean = true;
 
   constructor(p5: P5, canvas: Size2D, canvasId: number) {
+    // pixel per tile
+    const MAX_PPT = 512
+    const MIN_PPT = 32
+    let PPT = (Math.ceil(canvas.width/32) * 32);
+    PPT = Math.max(PPT, MIN_PPT)
+    PIXEL_IN_SECTION = Math.min(PPT, MAX_PPT)
+    
     // init values
     this.canvasId = canvasId;
     this.p5 = p5;
@@ -104,6 +112,9 @@ export default class GridManager {
     const relPosition = this.getRelativePixelPosition(absolutePosition);
     const i = this.getGridSectionIndex(absolutePosition);
     this.gridSections[i].drawPixel(relPosition, color);
+
+    this.needsUpdate = true;
+
     return this.getAbsolutePixelPosition(absolutePosition);
   }
 

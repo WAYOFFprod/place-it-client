@@ -57,11 +57,6 @@
 
 	const reloadCanva = async () => {
 		isReady.set(false);
-		// const canvasData = await fetchData();
-		// if (canvasData) {
-		// 	controlManager.init(canvasData.size);
-		// 	connect(canvasData);
-		// }
 	};
 
 	const isTargeting = (target: EventTarget | null, id: string) => {
@@ -111,18 +106,23 @@
 
 			p5.draw = () => {
 				if (!ready) return;
-				p5.background(150);
-
-				p5.push();
 
 				controlManager.checkMousePosition();
 
-				p5.translate(ControlManager.screenOffset.x, ControlManager.screenOffset.y);
-				p5.scale(ControlManager.currentScale);
+				// TODO: check if it was updated by drawing pixel or other player pixel as well
+				if (gridManager.needsUpdate || controlManager.hasNewScreenOffset()) {
+					p5.push();
+					p5.background(150);
+					p5.translate(ControlManager.screenOffset.x, ControlManager.screenOffset.y);
+					p5.scale(ControlManager.currentScale);
 
-				// draw content
-				gridManager.updateCanvasPosition();
-				p5.pop();
+					// draw content
+					gridManager.updateCanvasPosition();
+					p5.pop();
+					gridManager.needsUpdate = false;
+
+					controlManager.saveScreenOffset();
+				}
 			};
 
 			p5.mousePressed = (e: MouseEvent) => {

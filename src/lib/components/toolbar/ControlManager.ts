@@ -9,6 +9,8 @@ export default class ControlManager {
   networker: Networker = Networker.getInstance();;
   toolManager: ToolManager
 
+  previousOffset: Coord | undefined = undefined;
+
   isMouseDown: boolean = false
   isMouseDragging: boolean = false
 
@@ -89,6 +91,15 @@ export default class ControlManager {
     this.isMouseDown = false;
   }
 
+  hasNewScreenOffset() {
+    if(!this.previousOffset) return true;
+    if(this.previousOffset.x == ControlManager.screenOffset.x && this.previousOffset.y == ControlManager.screenOffset.y) return false;
+    return true;
+  }
+
+  saveScreenOffset() {
+    this.previousOffset = {...ControlManager.screenOffset}
+  }
 
 	hasMovedSinceDragStart() {
 		if (this.isMouseDown ) {
