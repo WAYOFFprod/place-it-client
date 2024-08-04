@@ -88,9 +88,9 @@
 		</form>
 		<!-- Window -->
 		{#if selectedTab == 'general'}
-			<Account on:close{close}></Account>
+			<Account on:close={close}></Account>
 		{:else if selectedTab == 'friends'}
-			<Friends on:close{close}></Friends>
+			<Friends on:close={close}></Friends>
 		{/if}
 	</div>
 </div>
