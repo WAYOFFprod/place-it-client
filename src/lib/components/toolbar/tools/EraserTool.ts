@@ -19,10 +19,10 @@ export default class EraserTool extends Tool {
   pixels: Coord[] = [];
 
   protected init() {
-    console.log("init eraser")
     EraserTool.unsubscribeSelectedColor = selectedColor.subscribe((newColor) => {
       if(EraserTool.init) {
         if(newColor != '') {
+          EraserTool.savedColor = ''
           setTool(ToolType.Cursor, this.p5);
         }
       } else {
@@ -95,7 +95,9 @@ export default class EraserTool extends Tool {
     if(EraserTool.unsubscribeSelectedColor) {
       EraserTool.unsubscribeSelectedColor();
     }
-    selectedColor.set(EraserTool.savedColor);
+    if(EraserTool.savedColor != '') {
+      selectedColor.set(EraserTool.savedColor);
+    }
   }
 
 }

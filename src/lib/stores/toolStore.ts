@@ -37,7 +37,6 @@ const setTool = (toolType: ToolType, p5: P5) => {
   if(activeToolType != toolClasses[toolType]) {
     destroyActiveTool();
   }
-  tick();
   activeToolType = toolClasses[toolType];
   activeTool = new activeToolType(p5);
   selectedTool.set(activeTool);
