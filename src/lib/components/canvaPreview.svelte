@@ -41,10 +41,10 @@
 	const getUserCount = () => {
 		switch (canva.access) {
 			case 'open':
-				return '0';
+				return canva.currentPlayers;
 				break;
 			case 'request_only':
-				return '0/' + canva.participants;
+				return canva.currentPlayers + '/' + canva.participants;
 				break;
 
 			default:
