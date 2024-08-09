@@ -11,7 +11,6 @@
 
 	import { createEventDispatcher } from 'svelte';
 	import { event } from '$lib/stores/eventStore';
-	import { error } from '@sveltejs/kit';
 	import type { Errors } from './types';
 
 	const dispatch = createEventDispatcher();
@@ -26,7 +25,6 @@
 	let width: number = 64;
 	let height: number = 64;
 	let customSize: boolean = false;
-	let community = false;
 
 	const gameTypeOptions = [
 		{

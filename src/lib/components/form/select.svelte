@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { ChangeEventHandler, EventHandler } from 'svelte/elements';
-
 	export let id: string;
 	export let label: string = '';
 	export let placeholder: string;

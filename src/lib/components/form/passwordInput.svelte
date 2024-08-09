@@ -1,18 +1,8 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import type { FormEventHandler } from 'svelte/elements';
-
 	export let placeholder: string = '';
 	export let label: string = '';
 	export let id: string;
 	export let error: string | null = null;
-	export let liveUpdate: boolean = false;
-	export let val = '';
-
-	const dispatch = createEventDispatcher<updateSearchEvent>();
-
-	let onCooldown = false;
-	let changedSinceCooldown = false;
 
 	let passwordShow = false;
 </script>
@@ -21,7 +11,7 @@
 	{#if label}
 		<label class="block mb-3" for={id}>{label}</label>
 	{/if}
-	<div class="relative w-full flex gap-2 w-fit">
+	<div class="relative flex gap-2 w-fit">
 		<slot name="startIcon" />
 		<input
 			{id}

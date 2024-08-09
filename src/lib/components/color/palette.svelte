@@ -2,13 +2,10 @@
 	import { storedColors, selectedColor } from '$lib/stores/colorStore';
 	import Panel from '$lib/components/layout/panel.svelte';
 	import Swatch from './swatch.svelte';
-	import { createEventDispatcher, onDestroy } from 'svelte';
-	import ColorWheel from './editor/colorWheel.svelte';
+	import { onDestroy } from 'svelte';
 	import ColorEditor from './editor/colorEditor.svelte';
 	import Networker from '$lib/utility/Networker';
-	import NumberInput from '../form/numberInput.svelte';
 
-	const dispatch = createEventDispatcher();
 	const networker = Networker.getInstance();
 
 	export let childClass: string;

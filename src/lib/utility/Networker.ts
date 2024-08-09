@@ -37,7 +37,7 @@ export default class Networker {
     })
   }
 
-  connectToSocket = (gridManager: GridManager, getPixel: () => void) => {
+  connectToSocket = (gridManager: GridManager) => {
     this.gridManager = gridManager;
     this.socket = io(this.websocket);
     

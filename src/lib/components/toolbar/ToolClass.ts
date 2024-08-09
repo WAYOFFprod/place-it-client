@@ -1,6 +1,5 @@
 
 import P5 from 'p5';
-import ControlManager from './ControlManager';
 
 
 export enum ToolType {
@@ -58,7 +57,7 @@ export default class Tool {
   }
 
   // returns: boolean that represent if pressing down should be saved
-  mousePressed(mousePressed: Coord): boolean {
+  mousePressed(_mousePressed: Coord): boolean {
     return false
   }
 

@@ -5,9 +5,8 @@ import Tool, { ToolType } from '$lib/components/toolbar/ToolClass'
 
 import MoveTool from "$lib/components/toolbar/tools/MoveTool";
 import PointTool from "$lib/components/toolbar/tools/PointTool";
-import SelectionTool from "$lib/components/toolbar/tools/SelectionTool";
+
 import EraserTool from '$lib/components/toolbar/tools/EraserTool';
-import { tick } from 'svelte';
 
 
 interface Tools {

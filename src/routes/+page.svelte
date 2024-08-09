@@ -14,7 +14,6 @@
 	import { event } from '$lib/stores/eventStore';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { parse } from 'svelte/compiler';
 
 	let canvasScope: 'community' | 'personal' = 'personal';
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
@@ -31,8 +30,8 @@
 	let headerHeight = 166;
 	let additionHeader = 0;
 
-	addEventListener('popstate', (event) => {});
-	onpopstate = (event) => {
+	addEventListener('popstate', () => {});
+	onpopstate = () => {
 		const params = new URLSearchParams(location.search);
 		initParamsFromUrl(params);
 		fetchCanvas();
@@ -200,7 +199,7 @@
 		}
 	] as options[];
 
-	const debounce = (e: Event) => {
+	const debounce = () => {
 		clearTimeout(timer);
 		timer = setTimeout(() => {
 			setWindowSize();

@@ -1,10 +1,4 @@
 <script lang="ts">
-	import { userStore } from '$lib/stores/authStore';
-	import Networker from '$lib/utility/Networker';
-	import Button from '../form/button.svelte';
-	import SelectSettings from '../form/selectSettings.svelte';
-	import TextSettings from '../form/textSettings.svelte';
-	import ToggleInput from '../form/toggleInput.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import SettingsTab from './settingsTab.svelte';
 	import Account from './settings/account.svelte';

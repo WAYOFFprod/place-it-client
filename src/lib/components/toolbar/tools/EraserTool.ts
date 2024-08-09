@@ -41,7 +41,7 @@ export default class EraserTool extends Tool {
 
   }
 
-  mousePressed(mousePressed: Coord) {
+  mousePressed(_mousePressed: Coord) {
     this.placePixel();
     return true
   }

@@ -3,7 +3,7 @@
 	const dispatch = createEventDispatcher();
 
 	export let childClass: string;
-	const onClick = (e: Event) => {
+	const onClick = () => {
 		dispatch('resetCanva');
 	};
 </script>

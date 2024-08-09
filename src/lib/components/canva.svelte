@@ -2,7 +2,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import P5 from 'p5';
 	import GridManager from '$lib/p5/GridManager';
-	import { ToolType, backToTool, selectedTool, setTempTool, setTool } from '$lib/stores/toolStore';
+	import { ToolType, backToTool, selectedTool, setTempTool } from '$lib/stores/toolStore';
 
 	import Palette from './color/palette.svelte';
 	import Networker from '$lib/utility/Networker';
@@ -30,8 +30,6 @@
 	let p5: P5;
 	let controlManager: ControlManager;
 	let gridManager: GridManager;
-
-	let userData: undefined;
 
 	const networker = Networker.getInstance();
 
@@ -69,7 +67,7 @@
 	const connect = async (canvasData: CanvaData) => {
 		gridManager = new GridManager(p5, canvasData.size, canva.id);
 
-		networker.connectToSocket(gridManager, reloadCanva);
+		networker.connectToSocket(gridManager);
 
 		const pixels = networker.tempPoints as { [key: string]: string };
 		gridManager.loadImage(canvasData.data.image, canvasData.size, pixels);
@@ -131,8 +129,7 @@
 			};
 
 			/* Clicking on canvas */
-			p5.mouseReleased = (e: MouseEvent) => {
-				// if (!isTargeting(e.target, 'place-it-canvas')) return;
+			p5.mouseReleased = () => {
 				controlManager.mouseReleased();
 			};
 

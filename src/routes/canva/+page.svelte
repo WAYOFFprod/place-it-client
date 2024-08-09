@@ -2,7 +2,6 @@
 	import Canva from '$lib/components/canva.svelte';
 	import Button from '$lib/components/form/button.svelte';
 	import Header from '$lib/components/header.svelte';
-	import { selectedColor } from '$lib/stores/colorStore';
 	import { openedModal } from '$lib/stores/modalStore';
 	import Networker from '$lib/utility/Networker';
 
