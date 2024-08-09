@@ -38,20 +38,6 @@
 		canva.isLiked = await networker.likeCanva(canva.id);
 	};
 
-	const getUserCount = () => {
-		switch (canva.access) {
-			case 'open':
-				return canva.currentPlayers;
-				break;
-			case 'request_only':
-				return canva.currentPlayers + '/' + canva.participants;
-				break;
-
-			default:
-				break;
-		}
-	};
-
 	const dateOptions: Intl.DateTimeFormatOptions = {
 		year: 'numeric',
 		month: 'numeric',
@@ -83,6 +69,20 @@
 				break;
 		}
 		return;
+	};
+
+	$: getUserCount = () => {
+		switch (canva.access) {
+			case 'open':
+				return canva.currentPlayers;
+				break;
+			case 'request_only':
+				return canva.currentPlayers + '/' + canva.participants;
+				break;
+
+			default:
+				break;
+		}
 	};
 </script>
 
