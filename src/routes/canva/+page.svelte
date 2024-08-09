@@ -37,6 +37,10 @@
 	fetchData();
 </script>
 
+<svelte:head>
+	<title>Canva {canva?.name}</title>
+	<meta name="description" content="an editable canva" />
+</svelte:head>
 <div class="flex flex-col h-full">
 	<Header>
 		<div class="flex justify-between h-10 items-center p-6">

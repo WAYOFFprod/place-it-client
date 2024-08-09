@@ -229,6 +229,13 @@
 	$: containerTop = headerHeight + additionHeader;
 </script>
 
+<svelte:head>
+	<title>Place-it Dashboard</title>
+	<meta
+		name="description"
+		content="Place-it is a pixelart tool with sharable art. create personal canva or join other people artwork"
+	/>
+</svelte:head>
 <Modal></Modal>
 <div class="flex flex-col h-full">
 	<Header class="top-0">
