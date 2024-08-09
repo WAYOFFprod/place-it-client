@@ -30,8 +30,11 @@
 			{placeholder}
 			class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus pr-8 pb-1"
 		/>
-		<button type="button" on:click={() => (passwordShow = !passwordShow)}
-			><img src="/svg/eye.svg" alt="" /></button
+		<button
+			aria-label="Toggle {label} visibility"
+			type="button"
+			on:click={() => (passwordShow = !passwordShow)}
+			aria-pressed={passwordShow}><img src="/svg/eye.svg" alt="" /></button
 		>
 	</div>
 	{#if error}

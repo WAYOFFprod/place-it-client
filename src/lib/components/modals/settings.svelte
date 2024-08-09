@@ -36,7 +36,7 @@
 		class="relative h-14 w-full border-b-2 border-black uppercase flex justify-center items-center"
 	>
 		<span>Règlage</span>
-		<button class="absolute right-4 top-4" on:click={close}>
+		<button  " class="absolute right-4 top-4" on:click={close}>
 			<img src="/svg/close.svg" alt="" />
 		</button>
 	</div>

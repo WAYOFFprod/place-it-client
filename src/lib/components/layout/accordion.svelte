@@ -8,7 +8,12 @@
 
 <div>
 	<!-- heading -->
-	<button on:click={toggleOpen} type="button" class="flex flex-row justify-between w-full">
+	<button
+		aria-pressed={isOpen}
+		on:click={toggleOpen}
+		type="button"
+		class="flex flex-row justify-between w-full"
+	>
 		<slot name="heading"></slot>
 		<img class={isOpen ? '' : '-rotate-90'} src="/svg/chevron-down.svg" alt="" />
 	</button>

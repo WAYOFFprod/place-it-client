@@ -40,7 +40,7 @@
 <div class="flex flex-col h-full">
 	<Header>
 		<div class="flex justify-between h-10 items-center p-6">
-			<a href="/">
+			<a aria-label="homepage" href="/">
 				<img src="/svg/home.svg" alt="" />
 			</a>
 			<div class="uppercase">

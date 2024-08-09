@@ -19,14 +19,20 @@
 	<div>{friend.name}</div>
 	{#if friend.request_status == FriendStatus.Pending}
 		{#if friend.is_sender}
-			<button on:click={() => acceptRequest(friend.friend_id)}>
+			<button
+				aria-label="accept {friend.name} as friend"
+				on:click={() => acceptRequest(friend.friend_id)}
+			>
 				<img class="h-5" src="/svg/reply.svg" alt="" />
 			</button>
 		{:else}
 			<img class="h-5" src="/svg/time.svg" alt="" />
 		{/if}
 	{/if}
-	<button on:click={() => removeFriend(friend.friend_id)}>
+	<button
+		aria-label="remove {friend.name} as friend"
+		on:click={() => removeFriend(friend.friend_id)}
+	>
 		<img class="h-5" src="/svg/trash.svg" alt="" />
 	</button>
 </div>

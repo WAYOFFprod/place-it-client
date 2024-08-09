@@ -34,7 +34,9 @@
 			: 'top-0'} rounded w-full border-2 border-black overflow-hidden"
 	>
 		<button
+			aria-label="toggle {label} list"
 			on:click={toggle}
+			aria-pressed={isOpen}
 			type="button"
 			{disabled}
 			class="px-2 flex w-full items-center justify-between h-9"
