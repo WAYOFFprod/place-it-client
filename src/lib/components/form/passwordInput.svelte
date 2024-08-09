@@ -1,0 +1,40 @@
+<script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+	import type { FormEventHandler } from 'svelte/elements';
+
+	export let placeholder: string = '';
+	export let label: string = '';
+	export let id: string;
+	export let error: string | null = null;
+	export let liveUpdate: boolean = false;
+	export let val = '';
+
+	const dispatch = createEventDispatcher<updateSearchEvent>();
+
+	let onCooldown = false;
+	let changedSinceCooldown = false;
+
+	let passwordShow = false;
+</script>
+
+<div class={$$props.class}>
+	{#if label}
+		<label class="block mb-3" for={id}>{label}</label>
+	{/if}
+	<div class="relative w-full flex gap-2 w-fit">
+		<slot name="startIcon" />
+		<input
+			{id}
+			name={id}
+			type={passwordShow ? 'text' : 'password'}
+			{placeholder}
+			class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus pr-8 pb-1"
+		/>
+		<button type="button" on:click={() => (passwordShow = !passwordShow)}
+			><img src="/svg/eye.svg" alt="" /></button
+		>
+	</div>
+	{#if error}
+		<span class="text-red-500 text-sm">{error}</span>
+	{/if}
+</div>

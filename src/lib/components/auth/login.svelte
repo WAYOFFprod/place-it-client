@@ -6,6 +6,7 @@
 	import { event } from '$lib/stores/eventStore';
 	import Button from '$lib/components/form/button.svelte';
 	import type { Errors } from '../modals/types';
+	import PasswordInput from '../form/passwordInput.svelte';
 
 	const dispatch = createEventDispatcher();
 	let form: HTMLFormElement;
@@ -47,18 +48,18 @@
 	>
 		<TextInput
 			id="email"
+			class="w-full"
 			placeholder="Email"
 			label="Email"
 			type="email"
 			error={getError('email')}
 		/>
-		<TextInput
+		<PasswordInput
 			id="password"
 			placeholder="Password"
 			label="Password"
-			type="password"
 			error={getError('password')}
 		/>
-		<Button type="submit" stretch={false} on:click={validate}>Login</Button>
+		<Button class="mt-4" type="submit" stretch={false} on:click={validate}>Login</Button>
 	</form>
 </div>
