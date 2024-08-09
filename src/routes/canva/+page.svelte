@@ -13,7 +13,7 @@
 		return id ? parseInt(id) : null;
 	};
 	const canva_id: number | null = getIdFromParam();
-	let canva: undefined | CanvaRequestData = undefined;
+	let canva: undefined | CanvaPreviewData = undefined;
 	let isLoadingSlow = false;
 	const fetchData = async () => {
 		const delay = setTimeout(() => {
@@ -41,7 +41,7 @@
 	<Header>
 		<div class="flex justify-between h-10 items-center p-6">
 			<a href="/">
-				<img src="/svg/home.svg" alt="home icon" />
+				<img src="/svg/home.svg" alt="" />
 			</a>
 			<div class="uppercase">
 				{#if canva}

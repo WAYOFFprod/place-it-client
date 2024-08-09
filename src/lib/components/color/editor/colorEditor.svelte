@@ -36,7 +36,7 @@
 				? 'border-black'
 				: 'border-transparent'}"
 		>
-			<img src="/svg/color-wheel.svg" alt="color wheel icon" />
+			<img src="/svg/color-wheel.svg" alt="" />
 			<div>Disque</div>
 		</button>
 		<button
@@ -47,7 +47,7 @@
 				: 'border-transparent'}"
 			disabled
 		>
-			<img src="/svg/harmonie.svg" alt="color wheel icon" />
+			<img src="/svg/harmonie.svg" alt="" />
 			<div>Harmonie</div>
 		</button>
 		<button
@@ -58,7 +58,7 @@
 				: 'border-transparent'}"
 			disabled
 		>
-			<img src="/svg/palette.svg" alt="color wheel icon" />
+			<img src="/svg/palette.svg" alt="" />
 			<div>Palettes</div>
 		</button>
 	</div>

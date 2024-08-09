@@ -37,7 +37,7 @@
 	>
 		<span>Règlage</span>
 		<button class="absolute right-4 top-4" on:click={close}>
-			<img src="/svg/close.svg" alt="close" />
+			<img src="/svg/close.svg" alt="" />
 		</button>
 	</div>
 	<div class="flex">
@@ -50,7 +50,7 @@
 				selectedValue={selectedTab}
 				toggleName="settings-tab"
 			>
-				<img src="/svg/cursor.svg" alt="general icon" />
+				<img src="/svg/cursor.svg" alt="" />
 				<span>Général</span>
 			</SettingsTab>
 			<SettingsTab
@@ -60,7 +60,7 @@
 				selectedValue={selectedTab}
 				toggleName="settings-tab"
 			>
-				<img src="/svg/users.svg" alt="friends icon" />
+				<img src="/svg/users.svg" alt="" />
 				<span>Amis</span>
 			</SettingsTab>
 			<SettingsTab
@@ -71,7 +71,7 @@
 				toggleName="settings-tab"
 				disabled={true}
 			>
-				<img src="/svg/block.svg" alt="blocked account icon" />
+				<img src="/svg/block.svg" alt="" />
 				<span>Compte bloqués</span>
 			</SettingsTab>
 			<SettingsTab
@@ -82,7 +82,7 @@
 				toggleName="settings-tab"
 				disabled={true}
 			>
-				<img src="/svg/alarm.svg" alt="notification icon" />
+				<img src="/svg/alarm.svg" alt="" />
 				<span>Notifications</span>
 			</SettingsTab>
 		</form>

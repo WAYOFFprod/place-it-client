@@ -21,7 +21,7 @@
 
 <div class="flex flex-col gap-6 items-center p-4 max-w-xs">
 	<!-- <button on:click={close}>
-		<img src="/svg/close.svg" alt="close" />
+		<img src="/svg/close.svg" alt="" />
 	</button> -->
 	<div class="uppercase text-center">Voulez-vous demander a rejoindre le Canva ?</div>
 	<div class="flex flex-col gap-4">

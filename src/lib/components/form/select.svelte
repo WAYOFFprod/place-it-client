@@ -40,7 +40,7 @@
 			class="px-2 flex w-full items-center justify-between h-9"
 		>
 			<span>{title}</span>
-			<img class="w-4" src="/svg/chevron-down.svg" alt="chevron-down" />
+			<img class="w-4" src="/svg/chevron-down.svg" alt="" />
 		</button>
 		<div class="flex flex-col {isOpen && !disabled ? '' : 'hidden'} relative">
 			{#each options as option}

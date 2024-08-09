@@ -7,5 +7,4 @@ interface CanvaRequestData {
   name: string
   owned: boolean
   category: string,
-  
 }

@@ -142,7 +142,7 @@
 	>
 		<span>Créer un nouveau canva</span>
 		<button class="absolute right-4 top-4" on:click={close}>
-			<img src="/svg/close.svg" alt="close" />
+			<img src="/svg/close.svg" alt="" />
 		</button>
 	</div>
 	<!-- container -->
@@ -156,7 +156,7 @@
 					selectedValue={selectedPreset}
 					on:selectValue={selectPreset}
 				>
-					<img src="/svg/small-canva.svg" alt="small canvas icon" class="mb-2" />
+					<img src="/svg/small-canva.svg" alt="" class="mb-2" />
 					<span>Petit Canva</span>
 					<span class="text-md">64 x 64</span>
 				</CanvaTypeToggle>
@@ -166,7 +166,7 @@
 					selectedValue={selectedPreset}
 					on:selectValue={selectPreset}
 				>
-					<img src="/svg/big-canva.svg" alt="big canvas icon" class="mb-2" />
+					<img src="/svg/big-canva.svg" alt="" class="mb-2" />
 					<span>Grand Canva</span>
 					<span class="text-md">512 x 512</span>
 				</CanvaTypeToggle>
@@ -177,7 +177,7 @@
 					selectedValue={selectedPreset}
 					on:selectValue={selectPreset}
 				>
-					<img src="/svg/infinit.svg" alt="infinit canvas icon" class="mb-2" />
+					<img src="/svg/infinit.svg" alt="" class="mb-2" />
 					<span>Infini</span>
 				</CanvaTypeToggle>
 				<CanvaTypeToggle
@@ -186,7 +186,7 @@
 					selectedValue={selectedPreset}
 					on:selectValue={selectPreset}
 				>
-					<img src="/svg/custom-canva.png" alt="custom canvas icon" class="mb-2" />
+					<img src="/svg/custom-canva.png" alt="" class="mb-2" />
 					<span>Personalisé</span>
 				</CanvaTypeToggle>
 			</form>
@@ -194,7 +194,7 @@
 		<!-- sidebar: canvas settings -->
 		<form bind:this={form} class="w-64 p-6 flex flex-col gap-4" on:submit|preventDefault={validate}>
 			<TextInput id="name" label="Nom" error={getError('name')}
-				><img src="/svg/edit.svg" alt="edit icon" /></TextInput
+				><img src="/svg/edit.svg" alt="" /></TextInput
 			>
 			<div>
 				<label class="block mb-3" for="width">Dimensions</label>
@@ -233,7 +233,7 @@
 			{/if}
 			<div class="grow justify-self-stretch flex items-end">
 				<Button type="submit" class="" on:click={validate}>
-					<img src="/svg/canva-plus.svg" alt="create canvas icon" />
+					<img src="/svg/canva-plus.svg" alt="" />
 					<span>Créer</span>
 				</Button>
 			</div>

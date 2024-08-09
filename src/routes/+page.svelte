@@ -257,7 +257,7 @@
 				liveUpdate={true}
 			>
 				<div slot="startIcon">
-					<img src="/svg/search.svg" alt="Search icon" />
+					<img src="/svg/search.svg" alt="" />
 				</div>
 			</TextInput>
 			<div class="flex gap-8 justify-center">
@@ -268,7 +268,7 @@
 					classInactive="bg-white"
 					classActive="!bg-fluorescent-cyan-focus"
 					toggle={recentToggle}
-					on:change={toggleRecent}><img src="/svg/alarm.svg" alt="recent icon" /></ToggleButton
+					on:change={toggleRecent}><img src="/svg/alarm.svg" alt="" /></ToggleButton
 				>
 				<ToggleButton
 					id="favorit"
@@ -278,7 +278,7 @@
 					classActive="!bg-tea-rose-focus"
 					toggle={favoritToggle}
 					disabled={!isConnected}
-					on:change={toggleFavorit}><img src="/svg/heart.svg" alt="favorit icon" /></ToggleButton
+					on:change={toggleFavorit}><img src="/svg/heart.svg" alt="" /></ToggleButton
 				>
 			</div>
 			<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
@@ -286,7 +286,7 @@
 			<div class="grow flex justify-center md:justify-end">
 				{#if isConnected}
 					<Button stretch={false} on:click={onCreateCanva}>
-						<img src="/svg/plus.svg" alt="plus icon" />
+						<img src="/svg/plus.svg" alt="" />
 						<span class="inline lg:hidden xl:inline">Créer un nouveau canva</span>
 					</Button>
 				{/if}

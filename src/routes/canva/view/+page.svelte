@@ -12,11 +12,21 @@
 		return id ? parseInt(id) : null;
 	};
 	const canva_id: number | null = getIdFromParam();
-	let canva: undefined | CanvaRequestData = undefined;
+	let canva: undefined | CanvaPreviewData = undefined;
+	let isLoadingSlow = false;
 
 	const fetchData = async () => {
+		const delay = setTimeout(() => {
+			isLoadingSlow = true;
+		}, 2 * 1000);
+		// for testing
+		// await new Promise((r) => setTimeout(r, 6 * 1000));
+
+		await networker.getSession();
 		if (canva_id == null) return null;
+
 		canva = await networker.getCanva(canva_id);
+		clearTimeout(delay);
 	};
 
 	const onclickExport = () => {
@@ -31,7 +41,7 @@
 	<Header>
 		<div class="flex justify-between h-10 items-center p-6">
 			<a href="/">
-				<img src="/svg/home.svg" alt="home icon" />
+				<img src="/svg/home.svg" alt="" />
 			</a>
 			<div class="uppercase">
 				{#if canva}
@@ -44,7 +54,16 @@
 		</div>
 	</Header>
 	{#if canva}
-		<Canva {canva}></Canva>
+		<Canva {canva} viewOnly={true} class="" marginBottom={52}></Canva>
+	{:else}
+		<div class="absolute top-14 bottom-0 w-full flex flex-col justify-center items-center gap-8">
+			<p class="text-3xl">Loading</p>
+			{#if isLoadingSlow}
+				<div>
+					This app is currently running on slow servers, the first load may take up to a minute.
+				</div>
+			{/if}
+		</div>
 	{/if}
 </div>
 
