@@ -23,6 +23,13 @@
 	let sort: undefined | 'asc' | 'desc';
 	let favoritFilter: undefined | 1;
 	let userName: string | undefined;
+	let windowSize: Size2D = {
+		width: 0,
+		height: 0
+	};
+	let timer: ReturnType<typeof setTimeout>;
+	let headerHeight = 166;
+	let additionHeader = 0;
 
 	addEventListener('popstate', (event) => {});
 	onpopstate = (event) => {
@@ -193,8 +200,24 @@
 		}
 	] as options[];
 
-	onMount(async () => {
-		await fetchData();
+	const debounce = (e: Event) => {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			setWindowSize();
+		}, 300);
+	};
+
+	const setWindowSize = () => {
+		windowSize.width = window.innerWidth;
+		windowSize.height = window.innerHeight;
+	};
+
+	onMount(() => {
+		window.addEventListener('resize', debounce);
+		fetchData();
+		return () => {
+			window.removeEventListener('resize', debounce);
+		};
 	});
 
 	onDestroy(() => {
@@ -203,6 +226,7 @@
 
 	$: favoritToggle = favoritFilter == 1 ? true : false;
 	$: recentToggle = sort == 'desc' ? true : false;
+	$: containerTop = headerHeight + additionHeader;
 </script>
 
 <Modal></Modal>
@@ -244,7 +268,10 @@
 			</div>
 		</div>
 	</Header>
-	<div class="overflow-y-scroll absolute bottom-0 top-[166px] w-full">
+	<div
+		class="overflow-y-scroll w-full"
+		style="top: {containerTop}px; height: calc(100vh - {containerTop}px);"
+	>
 		<div class="container mx-auto flex flex-col md:flex-row flex-wrap gap-8 py-8 px-8">
 			<!-- search -->
 			<TextInput
