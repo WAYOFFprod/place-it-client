@@ -7,6 +7,7 @@ import MoveTool from "$lib/components/toolbar/tools/MoveTool";
 import PointTool from "$lib/components/toolbar/tools/PointTool";
 import SelectionTool from "$lib/components/toolbar/tools/SelectionTool";
 import EraserTool from '$lib/components/toolbar/tools/EraserTool';
+import { tick } from 'svelte';
 
 
 interface Tools {
@@ -36,6 +37,7 @@ const setTool = (toolType: ToolType, p5: P5) => {
   if(activeToolType != toolClasses[toolType]) {
     destroyActiveTool();
   }
+  tick();
   activeToolType = toolClasses[toolType];
   activeTool = new activeToolType(p5);
   selectedTool.set(activeTool);

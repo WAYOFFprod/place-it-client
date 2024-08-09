@@ -1,21 +1,36 @@
-import { ToolType } from "$lib/stores/toolStore";
+import { setTool, ToolType } from "$lib/stores/toolStore";
 import Tool from "../ToolClass";
 import EraseIcon from "$lib/icons/erase.svelte"
 import ControlManager from "../ControlManager";
 import Networker from "$lib/utility/Networker";
+import { selectedColor } from "$lib/stores/colorStore";
+import type { Unsubscriber } from "svelte/motion";
 
 export default class EraserTool extends Tool {
   static cursor = "eraser"
   static type = ToolType.Eraser
   static icon = EraseIcon
-
+  static unsubscribeSelectedColor: Unsubscriber | undefined;
+  static savedColor: string = '';
+  static init: boolean = false
 
   networker: Networker = Networker.getInstance();
 
   pixels: Coord[] = [];
 
-
   protected init() {
+    console.log("init eraser")
+    EraserTool.unsubscribeSelectedColor = selectedColor.subscribe((newColor) => {
+      if(EraserTool.init) {
+        if(newColor != '') {
+          setTool(ToolType.Cursor, this.p5);
+        }
+      } else {
+        EraserTool.savedColor = newColor;
+        EraserTool.init = true;
+        selectedColor.set('')
+      }
+    });
   }
 
   keyDown() {
@@ -76,7 +91,11 @@ export default class EraserTool extends Tool {
   }
 
   destroy() {
-    
+    EraserTool.init = false;
+    if(EraserTool.unsubscribeSelectedColor) {
+      EraserTool.unsubscribeSelectedColor();
+    }
+    selectedColor.set(EraserTool.savedColor);
   }
 
 }
