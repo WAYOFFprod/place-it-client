@@ -12,6 +12,11 @@ interface SettingOption { 
   "value": string
 }
 
+interface Option {
+  "key": number,
+  "value": string
+}
+
 interface updateSearchEvent {
   onChange: string;
 }

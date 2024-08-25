@@ -6,6 +6,7 @@ import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
 import { chatMessages } from "$lib/stores/chatStore";
 import { authStatus, tokenStore, userStore } from "$lib/stores/authStore";
 import { isReady } from "$lib/stores/canvaStore";
+import type { ParticipationStatus } from "$lib/components/modals/types";
 
 export default class Networker {
   static #instance: Networker
@@ -159,10 +160,10 @@ export default class Networker {
   }
 
   // Canvas
-  joinCanva = async (id: number) => {
-    const response: any = await this.server.get('/canva/join/'+id);
-    return response;
-  }
+  // joinCanva = async (id: number) => {
+  //   const response: any = await this.server.get('/canva/join/'+id);
+  //   return response;
+  // }
 
   getCanvas = async (scope: 'personal' | 'community', sort : undefined | 'asc' | 'desc' = undefined, favorit: undefined | 1 = undefined, search: string = '') => {
     const response: any = await this
@@ -182,6 +183,51 @@ export default class Networker {
     }
     return response.data;
   }
+
+  inviteToCanva = async (friend_id: number, canva_id: number) => {
+    const response: any = await this.server.post("/canva/invite/", {
+      "user_id": friend_id,
+      'canva_id': canva_id
+    });
+    console.log(response);
+  }
+
+  requestAccess = async (canva_id: number) => {
+    const response: any = await this.server.post("/canva/request_access/", {
+      'canva_id': canva_id
+    });
+    console.log(response);
+  }
+
+  getParticipants = async (id: number) => {
+    const response: any = await this.server.get("/canva/"+id+"/participants/");
+    return response;
+  }
+
+  acceptParticipationRequest = async (friend_id: number, canva_id: number) => {
+    const response: any = await this.server.post("/canva/accept_request/", {
+      "user_id": friend_id,
+      'canva_id': canva_id
+    });
+    return response.response
+  }
+
+  rejectParticipationRequest = async (friend_id: number, canva_id: number) => {
+    const response: any = await this.server.post("/canva/reject_request/", {
+      "user_id": friend_id,
+      'canva_id': canva_id
+    });
+    return response.response
+  }
+
+  // updateParticipation = async (userId: number, canvaId: number, status: ParticipationStatus ) => {
+  //   const response: any = await this.server.patch("/participant/",{
+  //     'user_id': userId,
+  //     'canva_id': canvaId,
+  //     'status': status
+  //   });
+  //   return response.response;
+  // }
 
   likeCanva = async (id: number) => {
     const response: any = await this.server.post("/canva/like", {"canvaId": id});

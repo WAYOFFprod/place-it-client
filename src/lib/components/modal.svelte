@@ -3,10 +3,11 @@
 	import Create from '$lib/components/modals/create.svelte';
 	import { openedModal } from '$lib/stores/modalStore';
 	import Auth from '$lib/components/modals/auth.svelte';
-	import Settings from './modals/settings.svelte';
-	import JoinCanva from './modals/joinCanva.svelte';
+	import Settings from '$lib/components/modals/settings.svelte';
+	import JoinCanva from '$lib/components/modals/joinCanva.svelte';
 	import { onDestroy } from 'svelte';
-	import UserActions from './modals/userActions.svelte';
+	import UserActions from '$lib/components/modals/userActions.svelte';
+	import Modify from '$lib/components/modals/modify.svelte';
 
 	let dialog: HTMLDialogElement;
 
@@ -56,6 +57,8 @@
 			<Settings on:close={modalClosed}></Settings>
 		{:else if openedDialog.name == 'joinRequest'}
 			<JoinCanva on:close={modalClosed} canvaId={openedDialog.data.id}></JoinCanva>
+		{:else if openedDialog.name == 'modifyCanva'}
+			<Modify on:close={modalClosed} canvaId={openedDialog.data.id}></Modify>
 		{:else if openedDialog.name == 'userAction'}
 			<UserActions
 				on:close={modalClosed}

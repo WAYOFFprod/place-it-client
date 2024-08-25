@@ -9,6 +9,14 @@ interface Friend {
   request_status: FriendStatus
 }
 
+interface Participant {
+  name: string
+  id: number
+  status: ParticipationStatus
+}
+
+type ParticipationStatus = 'accepted' | 'rejected' | 'requested' | 'invited'
+
 enum FriendStatus {
   Accepted = 'accepted',
   Rejected = 'rejected',
@@ -21,4 +29,14 @@ interface removeFriendEvent {
   acceptRequest: number;
 }
 
-export {FriendStatus, type Friend,type Errors, type removeFriendEvent };
+interface removeParticipantEvent {
+  removeParticipant: number;
+  acceptRequest: number;
+}
+
+interface FriendOption {
+  name: string,
+  requestId: number
+}
+
+export {FriendStatus, type Friend,type Errors, type removeFriendEvent, type removeParticipantEvent, type ParticipationStatus, type Participant, type FriendOption};

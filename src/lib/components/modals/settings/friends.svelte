@@ -1,21 +1,15 @@
 <script lang="ts">
 	import Networker from '$lib/utility/Networker';
-	import { createEventDispatcher, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import FriendLine from './friendLine.svelte';
 	import type { Friend } from '../types';
-	const dispatch = createEventDispatcher();
 
 	const networker = Networker.getInstance();
 
 	let friends: Friend[] = [];
 	const getData = async () => {
 		const response = await networker.getFriends();
-		console.log(response.data);
 		friends = response.data;
-	};
-
-	const close = () => {
-		dispatch('close');
 	};
 
 	const removeFriend = (event: CustomEvent<number>) => {

@@ -84,7 +84,7 @@
 		{#if selectedTab == 'general'}
 			<Account on:close={close}></Account>
 		{:else if selectedTab == 'friends'}
-			<Friends on:close={close}></Friends>
+			<Friends></Friends>
 		{/if}
 	</div>
 </div>

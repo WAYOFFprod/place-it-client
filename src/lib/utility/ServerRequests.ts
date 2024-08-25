@@ -65,6 +65,34 @@ export default class ServerRequests {
     }
   }
 
+  patch = async (path: string, payload: Object) => {
+    try {
+      const response = await fetch(this.host + path,{
+        method: "PATCH", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "include", // include, *same-origin, omit
+        headers: this.headers,
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(payload), // body data type must match "Content-Type" header
+      });
+      
+      this.xsrfCheck()
+
+      if(response.status == 204 && response.type == 'cors') {
+        return response;
+      };
+      const res = await response.json();
+
+      return {
+        response: res,
+        status: response.status
+      };
+    } catch(error) {
+      console.error("Error:", error);
+    }
+  }
+
   delete = async (path: string) => {
     try {
       const response = await fetch(this.host + path,

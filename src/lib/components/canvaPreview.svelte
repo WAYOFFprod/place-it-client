@@ -6,7 +6,6 @@
 	import HeartFill from '$lib/icons/heart-fill.svelte';
 	import { event } from '$lib/stores/eventStore';
 	import { openedModal } from '$lib/stores/modalStore';
-	import Accordion from './layout/accordion.svelte';
 	import { authStatus } from '$lib/stores/authStore';
 	import { onDestroy } from 'svelte';
 
@@ -15,7 +14,14 @@
 	let conenctionStatus: undefined | boolean;
 	const networker = Networker.getInstance();
 
-	const onEdit = () => {};
+	const onEdit = () => {
+		openedModal.set({
+			name: 'modifyCanva',
+			data: {
+				id: canva.id
+			}
+		});
+	};
 	const onRequest = () => {
 		openedModal.set({
 			name: 'joinRequest',
@@ -57,13 +63,10 @@
 		switch (canva.category) {
 			case 'pixelwar':
 				return 'Pixelwar';
-				break;
 			case 'artistic':
 				return 'Oeuvre Collaborative';
-				break;
 			case 'free':
 				return 'Libre';
-				break;
 
 			default:
 				break;
@@ -75,11 +78,8 @@
 		switch (canva.access) {
 			case 'open':
 				return canva.currentPlayers;
-				break;
 			case 'request_only':
 				return canva.currentPlayers + '/' + canva.participants;
-				break;
-
 			default:
 				break;
 		}
@@ -154,13 +154,11 @@
 					>
 				{/if}
 				{#if canva.owned}
-					{#if canva.access == 'closed'}
-						<Button
-							type="button"
-							on:click={onEdit}
-							classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Modifier</Button
-						>
-					{/if}
+					<Button
+						type="button"
+						on:click={onEdit}
+						classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Modifier</Button
+					>
 					<Button
 						type="button"
 						on:click={onDelete}

@@ -10,7 +10,7 @@
 	const networker = Networker.getInstance();
 
 	const join = async () => {
-		await networker.joinCanva(canvaId);
+		await networker.requestAccess(canvaId);
 		event.set('updateCanvas');
 		close();
 	};
