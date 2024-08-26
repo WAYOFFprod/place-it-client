@@ -12,6 +12,12 @@ interface SettingOption { 
   "value": string
 }
 
+interface CanvaFieldUpdate { 
+  "id": number
+  "field": string,
+  "value": string
+}
+
 interface Option {
   "key": number,
   "value": string

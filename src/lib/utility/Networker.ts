@@ -6,7 +6,6 @@ import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
 import { chatMessages } from "$lib/stores/chatStore";
 import { authStatus, tokenStore, userStore } from "$lib/stores/authStore";
 import { isReady } from "$lib/stores/canvaStore";
-import type { ParticipationStatus } from "$lib/components/modals/types";
 
 export default class Networker {
   static #instance: Networker
@@ -134,7 +133,7 @@ export default class Networker {
     }
   }
 
-  saveField = async (payload: SettingOption) => {
+  saveUserField = async (payload: SettingOption) => {
     const response: any = await this.server.post('/user/update', payload)
     if(response?.response.data) {
       console.log("update user: ", response.response.data);
@@ -182,6 +181,15 @@ export default class Networker {
       tokenStore.set(response.meta.token)
     }
     return response.data;
+  }
+
+  saveCanvaField = async (payload: CanvaFieldUpdate) => {
+    const response: any = await this.server.post('/canva/update', payload)
+    if(response?.response.data) {
+      console.log("update canva: ", response.response.data);
+      userStore.set(response.response.data);
+      authStatus.set(true);
+    }
   }
 
   inviteToCanva = async (friend_id: number, canva_id: number) => {

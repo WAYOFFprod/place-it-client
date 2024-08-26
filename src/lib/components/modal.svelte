@@ -58,7 +58,11 @@
 		{:else if openedDialog.name == 'joinRequest'}
 			<JoinCanva on:close={modalClosed} canvaId={openedDialog.data.id}></JoinCanva>
 		{:else if openedDialog.name == 'modifyCanva'}
-			<Modify on:close={modalClosed} canvaId={openedDialog.data.id}></Modify>
+			<Modify
+				on:close={modalClosed}
+				canvaId={openedDialog.data.id}
+				canvaName={openedDialog.data.name}
+			></Modify>
 		{:else if openedDialog.name == 'userAction'}
 			<UserActions
 				on:close={modalClosed}

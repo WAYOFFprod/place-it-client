@@ -13,7 +13,6 @@
 	const acceptRequest = (id: number) => {
 		dispatch('acceptRequest', id);
 	};
-	console.log(participant);
 </script>
 
 <div class="flex justify-between items-center">

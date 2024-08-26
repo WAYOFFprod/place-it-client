@@ -11,25 +11,21 @@
 	let participants: Participant[] = [];
 	const getData = async () => {
 		const response = await networker.getParticipants(canvaId);
-		console.log(response.data);
 		participants = response.data;
 	};
 
 	const removeParticipant = async (event: CustomEvent<number>) => {
 		const response: any = await networker.rejectParticipationRequest(event.detail, canvaId);
-		console.log(response, response.data);
 		updateParticipantList(response.data.id, response.data);
 	};
 
 	const acceptRequest = async (event: CustomEvent<number>) => {
 		const response: any = await networker.acceptParticipationRequest(event.detail, canvaId);
-		console.log(response);
 		updateParticipantList(response.data.id, response.data);
 	};
 
 	const updateParticipantList = (user_id: number, data: any) => {
 		const index = participants.findIndex((obj) => obj.id == user_id);
-		console.log(index, participants[index]);
 		if (index >= 0) {
 			participants[index] = data;
 		}
@@ -41,7 +37,7 @@
 
 <div class="overflow-scroll min-w-64">
 	<div class="w-full flex flex-col items-center gap-2 mx-auto custom-scroll pr-4">
-		<div class="min-h-60 max-h-96 overflow-y-scroll flex flex-col w-full px-4 py-8">
+		<div class="max-h-72 overflow-y-auto flex flex-col w-full px-4 py-8">
 			{#each participants as participant}
 				<ParticipantLine
 					{participant}

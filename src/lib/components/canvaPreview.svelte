@@ -18,7 +18,8 @@
 		openedModal.set({
 			name: 'modifyCanva',
 			data: {
-				id: canva.id
+				id: canva.id,
+				name: canva.name
 			}
 		});
 	};

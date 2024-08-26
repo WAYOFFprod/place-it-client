@@ -14,7 +14,7 @@
 	let isFocus = false;
 	let onCooldown = false;
 	let changedSinceCooldown = false;
-	let selectedOption: string | undefined;
+	let selectedOption: number | undefined;
 	let filteredOptions: Option[] = [];
 	const cooldown = () => {
 		onCooldown = true;
@@ -38,7 +38,10 @@
 	const selectOption = (option: any) => {
 		selectedOption = option;
 		if (selectedOption != undefined) {
-			val = selectedOption;
+			const newValue = options.find((x) => x.key == option);
+			if (newValue != undefined) {
+				val = newValue.value;
+			}
 		}
 		isFocus = false;
 		dispatch('selectOption', option);
