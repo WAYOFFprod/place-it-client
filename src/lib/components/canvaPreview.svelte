@@ -121,52 +121,52 @@
 				</div>
 			{/if}
 			<!-- Hover -->
-			<div
-				class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center px-28 gap-4"
-			>
-				{#if (canva.access != 'closed' || canva.owned) && conenctionStatus}
-					{#if canva.participationStatus == 'accepted'}
+			<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 px-28">
+				<div class="relative flex flex-col justify-center items-center gap-4 h-full z-30">
+					{#if (canva.access != 'closed' || canva.owned) && conenctionStatus}
+						{#if canva.participationStatus == 'accepted'}
+							<Button
+								type="link"
+								link="/canva?id={canva.id}"
+								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Jouer</Button
+							>
+						{:else if canva.participationStatus == 'sent'}
+							<Button
+								type="button"
+								disabled={true}
+								link="/canva?id={canva.id}"
+								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus disabled:bg-white"
+								>Demande Envoyée</Button
+							>
+						{:else if canva.participationStatus == null}
+							<Button
+								type="button"
+								on:click={onRequest}
+								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Rejoindre</Button
+							>
+						{/if}
+					{/if}
+					{#if canva.access != 'closed'}
 						<Button
 							type="link"
-							link="/canva?id={canva.id}"
-							classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Jouer</Button
-						>
-					{:else if canva.participationStatus == 'sent'}
-						<Button
-							type="button"
-							disabled={true}
-							link="/canva?id={canva.id}"
-							classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus disabled:bg-white"
-							>Demande Envoyée</Button
-						>
-					{:else if canva.participationStatus == null}
-						<Button
-							type="button"
-							on:click={onRequest}
-							classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Rejoindre</Button
+							link="/canva/view?id={canva.id}"
+							classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Regarder</Button
 						>
 					{/if}
-				{/if}
-				{#if canva.access != 'closed'}
-					<Button
-						type="link"
-						link="/canva/view?id={canva.id}"
-						classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Regarder</Button
-					>
-				{/if}
-				{#if canva.owned}
-					<Button
-						id="modify"
-						type="button"
-						on:click={onEdit}
-						classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Modifier</Button
-					>
-					<Button
-						type="button"
-						on:click={onDelete}
-						classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus">Supprimer</Button
-					>
-				{/if}
+					{#if canva.owned}
+						<Button
+							id="modify"
+							type="button"
+							on:click={onEdit}
+							classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Modifier</Button
+						>
+						<Button
+							type="button"
+							on:click={onDelete}
+							classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus">Supprimer</Button
+						>
+					{/if}
+				</div>
 			</div>
 		</div>
 		<!-- Image -->
