@@ -87,7 +87,7 @@
 	};
 </script>
 
-<div class="group">
+<div class="group" id="canva-preview-{canva.id}">
 	<Panel class="w-full">
 		<!-- Overlay -->
 		<div class="absolute inset-0 flex flex-col justify-between h-full">
@@ -156,6 +156,7 @@
 				{/if}
 				{#if canva.owned}
 					<Button
+						id="modify"
 						type="button"
 						on:click={onEdit}
 						classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Modifier</Button

@@ -76,7 +76,9 @@
 			value={nameValue}
 			class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 min-w-5 disabled:border-transparent"
 		/>
-		<Button on:click={() => (nameEditable ? saveName() : makeEditable())}>Modifier</Button>
+		<Button id="edit-username" on:click={() => (nameEditable ? saveName() : makeEditable())}
+			>Modifier</Button
+		>
 	</div>
 	<div class="py-8">
 		<div class="flex flex-col gap-4">

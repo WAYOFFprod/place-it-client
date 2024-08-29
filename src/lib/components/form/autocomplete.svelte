@@ -102,6 +102,7 @@
 			<div id="listbox" class="flex flex-col">
 				{#each filteredOptions as option}
 					<button
+						id={'option-' + option.key}
 						type="button"
 						class="m-2"
 						on:click={() => selectOption(option.key)}

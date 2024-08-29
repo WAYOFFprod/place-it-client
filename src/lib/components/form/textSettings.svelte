@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, tick, onMount, onDestroy } from 'svelte';
-	import Button from './button.svelte';
+	import { createEventDispatcher, tick, onDestroy } from 'svelte';
 	import ToggleButton from './toggleButton.svelte';
 	import { settingsInputState } from '$lib/stores/settingsInputState';
 

@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import Background from '../svg/toggle/background.svelte';
-	import Knob from '../svg/toggle/knob.svelte';
 	import Panel from '../layout/panel.svelte';
 
 	const dispatch = createEventDispatcher();

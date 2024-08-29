@@ -263,7 +263,11 @@
 				>
 			</div>
 			<div class="flex flex-row-reverse items-center grow">
-				<button on:click={onClickLogin} class="flex items-center gap-2 uppercase">
+				<button
+					id="button-profile"
+					on:click={onClickLogin}
+					class="flex items-center gap-2 uppercase"
+				>
 					{#if isConnected}
 						<div>{userName}</div>
 					{:else if isConnected === false}

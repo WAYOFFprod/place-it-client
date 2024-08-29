@@ -5,6 +5,7 @@
 
 	const dispatch = createEventDispatcher();
 
+	export let id: string | undefined = undefined;
 	export let type: 'button' | 'reset' | 'submit' | 'link' = 'button';
 	export let stretch: boolean = true;
 	export let link: string = '';
@@ -50,6 +51,7 @@
 			</a>
 		{:else}
 			<button
+				id={id ? 'button-' + id : undefined}
 				on:click|preventDefault={click}
 				{type}
 				{disabled}

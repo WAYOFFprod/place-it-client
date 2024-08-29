@@ -66,7 +66,7 @@
 		class="relative border-b-2 border-black py-5 text-center font-sans font-bold text-3xl uppercase"
 	>
 		<span>modifier le canva</span>
-		<button aria-label="close" class="absolute right-4 top-4" on:click={close}>
+		<button id="close-modal" aria-label="close" class="absolute right-4 top-4" on:click={close}>
 			<img src="/svg/close.svg" alt="" />
 		</button>
 	</div>
@@ -94,14 +94,18 @@
 						options={friendoptions}
 						class="max-h-64 mb-6"
 					></Autocomplete>
-					<Button type="button" on:click={() => (isAddingUser = !isAddingUser)}>Voir liste</Button>
+					<Button
+						id="see-participant-list"
+						type="button"
+						on:click={() => (isAddingUser = !isAddingUser)}>Voir liste</Button
+					>
 				{:else}
 					<div class="flex">
 						<img src="" alt="" />
 						<h3>Participants</h3>
 					</div>
 					<Participants {canvaId}></Participants>
-					<Button type="button" on:click={() => (isAddingUser = !isAddingUser)}
+					<Button id="add-participant" type="button" on:click={() => (isAddingUser = !isAddingUser)}
 						><img src="/svg/plus.svg" alt="" />Ajouter un participant</Button
 					>
 				{/if}
