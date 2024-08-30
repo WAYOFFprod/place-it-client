@@ -254,11 +254,13 @@
 		<div class="container mx-auto flex h-16 items-stretch px-4">
 			<div class="border-r-2 border-black flex gap-6 pr-32 items-center">
 				<button
+					id="button-my-canvas"
 					on:click={openMyCanvas}
 					class="border-b-2 {tab == 'my-canvas' ? 'border-black' : 'border-transparent'}"
 					><span class="uppercase">Mes canvas</span></button
 				>
 				<button
+					id="button-community-canvas"
 					on:click={openCommunityCanvas}
 					class="border-b-2 {tab == 'community-canvas' ? 'border-black' : 'border-transparent'}"
 					><span class="uppercase">Communauté</span></button
