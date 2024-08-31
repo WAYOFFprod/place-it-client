@@ -181,10 +181,6 @@ export default class Networker {
   }
 
   // Canvas
-  // joinCanva = async (id: number) => {
-  //   const response: any = await this.server.get('/canva/join/'+id);
-  //   return response;
-  // }
 
   getCanvas = async (scope: 'personal' | 'community', sort : undefined | 'asc' | 'desc' = undefined, favorit: undefined | 1 = undefined, search: string = '') => {
     const response: any = await this
@@ -331,6 +327,18 @@ export default class Networker {
   disconnect = () => {
     if(this.socket != undefined)
     this.socket.disconnect();
+  }
+
+  // Notification settings
+
+  getNotificationSettings = async () => {
+    const response: any = await this.server.get('/settings/notifications');
+    return response;
+  }
+
+  saveNotificationSetting = async (payload: BoolSettingOption) => {
+    const response: any = await this.server.patch('/settings/update', payload)
+    return response.response;
   }
 
 }

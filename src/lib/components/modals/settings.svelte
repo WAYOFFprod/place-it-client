@@ -4,6 +4,7 @@
 	import Account from './settings/account.svelte';
 	import Friends from './settings/friends.svelte';
 	import Blocked from './settings/blocked.svelte';
+	import Notifications from './settings/notifications.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -74,7 +75,6 @@
 				on:selectValue={selectTab}
 				selectedValue={selectedTab}
 				toggleName="settings-tab"
-				disabled={true}
 			>
 				<img src="/svg/alarm.svg" alt="" />
 				<span>Notifications</span>
@@ -87,6 +87,8 @@
 			<Friends></Friends>
 		{:else if selectedTab == 'blocked'}
 			<Blocked></Blocked>
+		{:else if selectedTab == 'notification'}
+			<Notifications></Notifications>
 		{/if}
 	</div>
 </div>
