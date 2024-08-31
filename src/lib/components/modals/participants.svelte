@@ -16,16 +16,16 @@
 
 	const removeParticipant = async (event: CustomEvent<number>) => {
 		const response: any = await networker.rejectParticipationRequest(event.detail, canvaId);
-		updateParticipantList(response.data.id, response.data);
+		updateParticipantList(response.data);
 	};
 
 	const acceptRequest = async (event: CustomEvent<number>) => {
 		const response: any = await networker.acceptParticipationRequest(event.detail, canvaId);
-		updateParticipantList(response.data.id, response.data);
+		updateParticipantList(response.data);
 	};
 
-	const updateParticipantList = (user_id: number, data: any) => {
-		const index = participants.findIndex((obj) => obj.id == user_id);
+	const updateParticipantList = (data: any) => {
+		const index = participants.findIndex((obj) => obj.id == data.id);
 		if (index >= 0) {
 			participants[index] = data;
 		}

@@ -158,7 +158,6 @@
 	const fetchCanvas = async () => {
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
 		canvas = data.data;
-		console.log(canvas);
 	};
 
 	const networker = Networker.getInstance();
@@ -170,7 +169,6 @@
 	const updateCanvas = async () => {
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
 		canvas = data.data;
-		console.log(canvas);
 	};
 
 	let isConnected: undefined | boolean = undefined;

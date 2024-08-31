@@ -3,6 +3,7 @@
 	import SettingsTab from './settingsTab.svelte';
 	import Account from './settings/account.svelte';
 	import Friends from './settings/friends.svelte';
+	import Blocked from './settings/blocked.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -63,7 +64,6 @@
 				on:selectValue={selectTab}
 				selectedValue={selectedTab}
 				toggleName="settings-tab"
-				disabled={true}
 			>
 				<img src="/svg/block.svg" alt="" />
 				<span>Compte bloqués</span>
@@ -85,6 +85,8 @@
 			<Account on:close={close}></Account>
 		{:else if selectedTab == 'friends'}
 			<Friends></Friends>
+		{:else if selectedTab == 'blocked'}
+			<Blocked></Blocked>
 		{/if}
 	</div>
 </div>

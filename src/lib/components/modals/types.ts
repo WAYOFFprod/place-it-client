@@ -7,6 +7,7 @@ interface Friend {
   name: string
   is_sender: boolean
   request_status: FriendStatus
+  noDisplay: boolean
 }
 
 interface Participant {
@@ -29,6 +30,10 @@ interface removeFriendEvent {
   acceptRequest: number;
 }
 
+interface unblockAccountEvent {
+  unblockAccount: number;
+}
+
 interface removeParticipantEvent {
   removeParticipant: number;
   acceptRequest: number;
@@ -39,4 +44,4 @@ interface FriendOption {
   requestId: number
 }
 
-export {FriendStatus, type Friend,type Errors, type removeFriendEvent, type removeParticipantEvent, type ParticipationStatus, type Participant, type FriendOption};
+export {FriendStatus, type Friend,type Errors, type removeFriendEvent, type removeParticipantEvent, type ParticipationStatus, type Participant, type FriendOption, type unblockAccountEvent};

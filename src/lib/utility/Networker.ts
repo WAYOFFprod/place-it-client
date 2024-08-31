@@ -153,8 +153,30 @@ export default class Networker {
     return response;
   }
 
+  acceptFriendRequest = async (id: number) => {
+    const response: any = await this.server.post('/friend/accept', {
+      'friend_id': id
+    })
+    return response.response;
+  }
+
+  removeFriend = async (id: number) => {
+    const response: any = await this.server.delete('/friend/'+id+'/remove')
+    return response;
+  }
+
   blockUser = async (id: number) => {
     const response: any = await this.server.post('/friend/block', {friend_id: id})
+    return response;
+  }
+
+  blockedUser = async () => {
+    const response: any = await this.server.get('/friends/blocked')
+    return response;
+  }
+
+  unblockAccount = async (id: number) => {
+    const response: any = await this.server.delete('/friend/'+id+'/unblock')
     return response;
   }
 
@@ -186,7 +208,6 @@ export default class Networker {
   saveCanvaField = async (payload: CanvaFieldUpdate) => {
     const response: any = await this.server.post('/canva/update', payload)
     if(response?.response.data) {
-      console.log("update canva: ", response.response.data);
       userStore.set(response.response.data);
       authStatus.set(true);
     }
