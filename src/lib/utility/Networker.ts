@@ -204,7 +204,6 @@ export default class Networker {
   saveCanvaField = async (payload: CanvaFieldUpdate) => {
     const response: any = await this.server.post('/canva/update', payload)
     if(response?.response.data) {
-      userStore.set(response.response.data);
       authStatus.set(true);
     }
   }

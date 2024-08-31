@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 	import Button from '../form/button.svelte';
-	import TextInput from '../form/textInput.svelte';
 	import Participants from './participants.svelte';
 	import Autocomplete from '../form/autocomplete.svelte';
 	import Networker from '$lib/utility/Networker';
@@ -41,7 +40,6 @@
 	};
 
 	const onSaveName = (event: CustomEvent<SettingOption>) => {
-		console.log(event);
 		const formData = new FormData(form);
 		const value = formData.get(event.detail.field) as string;
 		networker.saveCanvaField({
