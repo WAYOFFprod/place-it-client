@@ -43,14 +43,14 @@
 			{disabled}
 		/>
 		<label
-			class=" py-2 px-2 flex justify-between gap-2 items-center peer-disabled:bg-dark-grey
+			class="py-2 px-2 flex justify-between gap-2 items-center peer-disabled:bg-dark-grey
 			{$$props.class}
       {toggle ? classActive : classInactive}
       {disabled ? 'cursor-not-allowed' : 'cursor-pointer'}"
 			for={id}
 		>
 			<slot></slot>
-			<span>{label}</span>
+			<span class="hidden md:inline">{label}</span>
 		</label>
 	</Panel>
 </div>

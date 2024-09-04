@@ -239,18 +239,29 @@
 <div class="flex flex-col h-full">
 	<Header class="top-0">
 		<div class="border-b-2 border-black">
-			<div class="container mx-auto flex justify-between items-stretch h-24">
-				<a class="flex items-center p-4" href="/">
-					<img class="h-10" src="/svg/logo.svg" alt="place-it logo" />
+			<div class="relative container mx-auto flex justify-between items-stretch h-20 md:h-24">
+				<a class="flex grow justify-center md:justify-start items-end md:items-center p-4" href="/">
+					<img class="h-7 md:h-10" src="/svg/logo.svg" alt="place-it logo" />
 				</a>
-				<div class="flex gap-2 border-l-2 pl-32 border-black items-center p-4">
-					<Button stretch={false} type="button" on:click={onclickNotification}>Notifications</Button
+				<div
+					class="absolute right-0 bottom-0 md:relative flex gap-2 md:border-l-2 md:pl-32 border-black items-center p-4"
+				>
+					<Button
+						classColor="bg-tea-rose hover:bg-tea-rose-focus"
+						stretch={false}
+						type="button"
+						on:click={onclickNotification}
 					>
+						<img class="icon" src="/svg/alarm.svg" alt="" />
+						<span class="hidden md:inline">Notifications</span>
+					</Button>
 				</div>
 			</div>
 		</div>
 		<div class="container mx-auto flex h-16 items-stretch px-4">
-			<div class="border-r-2 border-black flex gap-6 pr-32 items-center">
+			<div
+				class="border-r-2 border-black flex gap-4 md:gap-6 pr-4 md:pr-32 items-center grow md:grow-0"
+			>
 				<button
 					id="button-my-canvas"
 					on:click={openMyCanvas}
@@ -264,14 +275,14 @@
 					><span class="uppercase">Communauté</span></button
 				>
 			</div>
-			<div class="flex flex-row-reverse items-center grow">
+			<div class="flex flex-row-reverse items-center grow-0 md:grow pl-4">
 				<button
 					id="button-profile"
 					on:click={onClickLogin}
 					class="flex items-center gap-2 uppercase"
 				>
 					{#if isConnected}
-						<div>{userName}</div>
+						<div class="hidden md:block">{userName}</div>
 					{:else if isConnected === false}
 						<div>Login</div>
 					{/if}
@@ -284,11 +295,11 @@
 		class="overflow-y-scroll w-full"
 		style="top: {containerTop}px; height: calc(100vh - {containerTop}px);"
 	>
-		<div class="container mx-auto flex flex-col md:flex-row flex-wrap gap-8 py-8 px-8">
+		<div class="container mx-auto flex flex-row flex-wrap gap-4 md:gap-8 py-8 px-8">
 			<!-- search -->
 			<TextInput
 				on:onChange={searchUpdated}
-				class="py-2 my-0"
+				class="py-2 my-0 flex-shrink grow md:grow-0 min-w-5"
 				id="search"
 				type="text"
 				placeholder="Chercher"
@@ -299,7 +310,7 @@
 					<img src="/svg/search.svg" alt="" />
 				</div>
 			</TextInput>
-			<div class="flex gap-8 justify-center">
+			<div class="flex gap-4 md:gap-8 justify-start md:grow">
 				<ToggleButton
 					id="recent"
 					label="Récents"
@@ -307,7 +318,7 @@
 					classInactive="bg-white"
 					classActive="!bg-fluorescent-cyan-focus"
 					toggle={recentToggle}
-					on:change={toggleRecent}><img src="/svg/alarm.svg" alt="" /></ToggleButton
+					on:change={toggleRecent}><img class="icon" src="/svg/alarm.svg" alt="" /></ToggleButton
 				>
 				<ToggleButton
 					id="favorit"
@@ -317,18 +328,26 @@
 					classActive="!bg-tea-rose-focus"
 					toggle={favoritToggle}
 					disabled={!isConnected}
-					on:change={toggleFavorit}><img src="/svg/heart.svg" alt="" /></ToggleButton
+					on:change={toggleFavorit}><img class="icon" src="/svg/heart.svg" alt="" /></ToggleButton
 				>
+				<Select
+					class="min-w-52 hidden md:block"
+					id="canvaType"
+					placeholder="Tous"
+					options={canvaTypeOptions}
+				></Select>
+				<div class="flex grow justify-end">
+					{#if isConnected}
+						<Button stretch={false} on:click={onCreateCanva}>
+							<img class="icon" src="/svg/plus.svg" alt="" />
+							<span class="hidden xl:inline">Créer un nouveau canva</span>
+						</Button>
+					{/if}
+				</div>
 			</div>
-			<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
-			></Select>
-			<div class="grow flex justify-center md:justify-end">
-				{#if isConnected}
-					<Button stretch={false} on:click={onCreateCanva}>
-						<img src="/svg/plus.svg" alt="" />
-						<span class="inline lg:hidden xl:inline">Créer un nouveau canva</span>
-					</Button>
-				{/if}
+			<div class="grow md:grow-0 md:hidden">
+				<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
+				></Select>
 			</div>
 		</div>
 		<!-- content -->

@@ -42,7 +42,7 @@
 	<Panel isSmall={isHovering} class={stretch ? 'w-full' : ''}>
 		{#if type == 'link'}
 			<a
-				class="px-4 py-2 flex justify-center items-center gap-4 text-xl {classColor} {stretch
+				class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl {classColor} {stretch
 					? 'w-full'
 					: ''}"
 				href={link}
@@ -55,7 +55,7 @@
 				on:click|preventDefault={click}
 				{type}
 				{disabled}
-				class="px-4 py-2 flex justify-center items-center gap-4 text-xl disabled:bg-dark-grey disabled:cursor-not-allowed {classColor} {stretch
+				class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl disabled:bg-dark-grey disabled:cursor-not-allowed {classColor} {stretch
 					? 'w-full'
 					: ''}"
 			>
