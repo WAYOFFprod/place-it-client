@@ -5,11 +5,21 @@
 	import Auth from '$lib/components/modals/auth.svelte';
 	import Settings from '$lib/components/modals/settings.svelte';
 	import JoinCanva from '$lib/components/modals/joinCanva.svelte';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import UserActions from '$lib/components/modals/userActions.svelte';
 	import Modify from '$lib/components/modals/modify.svelte';
+	import { mdBreak } from '$lib/stores/tailwindStore';
 
 	let dialog: HTMLDialogElement;
+
+	let isWindowSmall: boolean | undefined = false;
+	let md: number | undefined;
+
+	mdBreak.subscribe((val) => {
+		md = val;
+		// initial size
+		isWindowSmall = window.innerWidth >= md ? false : true;
+	});
 
 	let isOpen = false;
 	let openedDialog: ModalData;
@@ -34,6 +44,17 @@
 		}
 	};
 
+	const onResize = () => {
+		if (md) isWindowSmall = window.innerWidth >= md ? false : true;
+	};
+
+	onMount(() => {
+		window.addEventListener('resize', onResize);
+		return () => {
+			window.removeEventListener('resize', onResize);
+		};
+	});
+
 	onDestroy(() => {
 		unsubscribeModal();
 	});
@@ -44,11 +65,11 @@
 	on:click={close}
 	role="none"
 	bind:this={dialog}
-	class="bg-transparent z-10 backdrop-blur-sm m-0 w-full h-full max-w-full max-h-full {isOpen
+	class="bg-transparent z-10 backdrop-blur-sm m-0 w-full h-screen overflow-scroll max-w-full max-h-full {isOpen
 		? 'flex'
 		: ''} justify-center items-center"
 >
-	<Panel class="w-fit">
+	<Panel class="w-fit {isWindowSmall ? 'h-full' : ''}" noShadow={isWindowSmall}>
 		{#if openedDialog.name == 'create'}
 			<Create on:close={modalClosed}></Create>
 		{:else if openedDialog.name == 'login'}

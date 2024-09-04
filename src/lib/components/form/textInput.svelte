@@ -11,12 +11,13 @@
 	export let liveUpdate: boolean = false;
 	export let val = '';
 
-	let inputSize: number | undefined = 20;
+	let inputSize: number | undefined = 10;
 	let md: number | undefined;
 
 	mdBreak.subscribe((val) => {
 		md = val;
-		console.log('SIZE', val);
+		// initial size
+		inputSize = window.innerWidth >= md ? 20 : 10;
 	});
 
 	const dispatch = createEventDispatcher<updateSearchEvent>();

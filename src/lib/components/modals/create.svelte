@@ -133,7 +133,7 @@
 	};
 </script>
 
-<div class="">
+<div class="h-fit">
 	<!-- header -->
 	<div
 		class="relative border-b-2 border-black py-5 text-center font-sans font-bold text-3xl uppercase"
@@ -144,9 +144,13 @@
 		</button>
 	</div>
 	<!-- container -->
-	<div class="flex flex-row gap-[2px] bg-off-white justify-stretch">
+	<div
+		class="flex flex-col md:flex-row gap-[2px] bg-off-white items-center md:items-start justify-stretch"
+	>
 		<!-- canvas type -->
-		<div class="flex justify-center border-r-2 p-6 xl:px-10 border-black">
+		<div
+			class="flex justify-center md:border-r-2 p-6 xl:px-10 border-black border-b-2 md:border-b-0"
+		>
 			<form bind:this={presetForm} class="grid grid-cols-2 gap-8 justify-around p-2">
 				<CanvaTypeToggle
 					toggleName="canva-type"
@@ -184,7 +188,7 @@
 					selectedValue={selectedPreset}
 					on:selectValue={selectPreset}
 				>
-					<img src="/svg/custom-canva.png" alt="" class="mb-2" />
+					<img src="/svg/custom-canva.png" alt="" class="mb-2 w-16 h-16" />
 					<span>Personalisé</span>
 				</CanvaTypeToggle>
 			</form>
