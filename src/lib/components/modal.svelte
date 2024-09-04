@@ -65,11 +65,11 @@
 	on:click={close}
 	role="none"
 	bind:this={dialog}
-	class="bg-transparent z-10 backdrop-blur-sm m-0 w-full h-screen overflow-scroll max-w-full max-h-full {isOpen
+	class="bg-transparent z-10 backdrop-blur-sm m-0 w-full h-screen overflow-scroll min-w-full min-h-full {isOpen
 		? 'flex'
 		: ''} justify-center items-center"
 >
-	<Panel class="w-fit {isWindowSmall ? 'h-full' : ''}" noShadow={isWindowSmall}>
+	<Panel class="w-fit {isWindowSmall ? 'h-full min-h-full w-full' : ''}" noShadow={isWindowSmall}>
 		{#if openedDialog.name == 'create'}
 			<Create on:close={modalClosed}></Create>
 		{:else if openedDialog.name == 'login'}

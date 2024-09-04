@@ -149,9 +149,9 @@
 	>
 		<!-- canvas type -->
 		<div
-			class="flex justify-center md:border-r-2 p-6 xl:px-10 border-black border-b-2 md:border-b-0"
+			class="flex justify-center md:border-r-2 p-6 xl:px-10 border-black border-b-2 md:border-b-0 w-full md:w-auto"
 		>
-			<form bind:this={presetForm} class="grid grid-cols-2 gap-8 justify-around p-2">
+			<form bind:this={presetForm} class="grid grid-cols-2 w-full gap-8 justify-around p-2">
 				<CanvaTypeToggle
 					toggleName="canva-type"
 					value="small"
