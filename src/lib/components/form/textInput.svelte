@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { mdBreak } from '$lib/stores/tailwindStore';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import type { FormEventHandler } from 'svelte/elements';
 
 	export let placeholder: string = '';
@@ -9,6 +10,14 @@
 	export let error: string | null = null;
 	export let liveUpdate: boolean = false;
 	export let val = '';
+
+	let inputSize: number | undefined = 20;
+	let md: number | undefined;
+
+	mdBreak.subscribe((val) => {
+		md = val;
+		console.log('SIZE', val);
+	});
 
 	const dispatch = createEventDispatcher<updateSearchEvent>();
 
@@ -32,6 +41,17 @@
 		} else {
 		}
 	};
+
+	const onResize = () => {
+		if (md) inputSize = window.innerWidth >= md ? 20 : 10;
+	};
+
+	onMount(() => {
+		window.addEventListener('resize', onResize);
+		return () => {
+			window.removeEventListener('resize', onResize);
+		};
+	});
 </script>
 
 <div class={$$props.class}>
@@ -43,20 +63,26 @@
 		{#if liveUpdate}
 			<input
 				{id}
+				size={inputSize}
 				name={id}
 				type="text"
 				{placeholder}
-				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pr-8 pb-1 min-w-5"
+				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 {$$slots.default
+					? 'pr-8'
+					: ''}"
 				on:input={onChange}
 				bind:value={val}
 			/>
 		{:else}
 			<input
 				{id}
+				size={inputSize}
 				name={id}
 				{type}
 				{placeholder}
-				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pr-8 pb-1 min-w-5"
+				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 {$$slots.default
+					? 'pr-8'
+					: ''}"
 			/>
 		{/if}
 		<div class="absolute w-5 right-0 bottom-2">
