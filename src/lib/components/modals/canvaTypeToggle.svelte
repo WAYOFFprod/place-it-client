@@ -27,7 +27,7 @@
 				on:change={selectValue}
 			/>
 			<div
-				class="w-28 h-48 md:w-64 md:h-64 flex flex-col gap-2 justify-center items-center peer-hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan hover:cursor-pointer peer-disabled:bg-dark-grey"
+				class="w-32 h-40 md:w-64 md:h-64 flex flex-col gap-2 justify-center items-center peer-hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan hover:cursor-pointer peer-disabled:bg-dark-grey"
 			>
 				<slot></slot>
 			</div>
