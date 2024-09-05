@@ -4,7 +4,7 @@
 
 	const dispatch = createEventDispatcher();
 	export let placeholder: string = '';
-	export let label: string = '';
+	export let label: string | undefined;
 	export let id: string;
 	export let toggle = false;
 	export let disabled = false;
@@ -49,8 +49,12 @@
       {disabled ? 'cursor-not-allowed' : 'cursor-pointer'}"
 			for={id}
 		>
-			<slot></slot>
-			<span class="hidden md:inline">{label}</span>
+			{#if $$slots.default}
+				<slot></slot>
+			{/if}
+			{#if label}
+				<span class="hidden md:inline">{label}</span>
+			{/if}
 		</label>
 	</Panel>
 </div>
