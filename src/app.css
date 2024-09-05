@@ -23,6 +23,7 @@
 		@apply w-4 h-4 md:w-6 md:h-6;
 	}
 
+	label,
 	span,
 	div {
 		@apply text-lg md:text-xl;

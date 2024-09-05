@@ -25,9 +25,12 @@
 		{disabled}
 	/>
 	<div
-		class="peer-hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan peer-disabled:text-gray-400 peer-disabled:cursor-not-allowed flex items-center gap-4 {$$props.class} grow"
+		class="bg-white peer-hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan peer-disabled:text-gray-400 peer-disabled:cursor-not-allowed flex items-center justify-start gap-4 {$$props.class} grow"
 	>
 		<slot></slot>
+		<div class="grow flex justify-end md:hidden">
+			<img src="/svg/chevron-right.svg" alt="" class="w-4 h-4" />
+		</div>
 	</div>
 	<Tooltip show={disabled} class="hidden peer-hover:flex">Comming soon</Tooltip>
 </label>

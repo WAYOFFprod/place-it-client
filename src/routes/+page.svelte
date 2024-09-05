@@ -27,7 +27,7 @@
 		height: 0
 	};
 	let timer: ReturnType<typeof setTimeout>;
-	let headerHeight = 166;
+	let headerHeight = 150;
 	let additionHeader = 0;
 
 	addEventListener('popstate', () => {});
@@ -318,7 +318,7 @@
 					classInactive="bg-white"
 					classActive="!bg-fluorescent-cyan-focus"
 					toggle={recentToggle}
-					on:change={toggleRecent}><img class="icon" src="/svg/alarm.svg" alt="" /></ToggleButton
+					on:change={toggleRecent}><img class="icon" src="/svg/time.svg" alt="" /></ToggleButton
 				>
 				<ToggleButton
 					id="favorit"

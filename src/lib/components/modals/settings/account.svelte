@@ -63,7 +63,7 @@
 	});
 </script>
 
-<form bind:this={form} class="overflow-scroll px-20 py-6 w-full">
+<form bind:this={form} class="px-8 md:px-20 py-6 w-full">
 	<div class="w-40 flex flex-col items-center gap-2 mx-auto">
 		<div class="rounded-full w-36 h-36 border-2 border-black"></div>
 		<input
@@ -80,7 +80,7 @@
 			>Modifier</Button
 		>
 	</div>
-	<div class="py-8">
+	<div class="py-8 w-full">
 		<div class="flex flex-col gap-4">
 			<ToggleInput
 				id="darkmode"

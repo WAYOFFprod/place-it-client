@@ -80,10 +80,9 @@
 	<ToggleButton
 		classInactive="bg-white"
 		classActive="bg-fluorescent-cyan-focus"
-		label={buttonLabel}
 		id="{id}-edit"
 		toggle={editable}
 		{disabled}
-		on:change={change}
-	></ToggleButton>
+		on:change={change}><span>{buttonLabel}</span></ToggleButton
+	>
 </div>
