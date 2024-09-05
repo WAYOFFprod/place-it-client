@@ -65,7 +65,7 @@
 	>
 		<span>modifier le canva</span>
 		<button id="close-modal" aria-label="close" class="absolute right-4 top-4" on:click={close}>
-			<img src="/svg/close.svg" alt="" />
+			<img class="icon" src="/svg/close.svg" alt="" />
 		</button>
 	</div>
 	<!-- content -->
@@ -104,7 +104,7 @@
 					</div>
 					<Participants {canvaId}></Participants>
 					<Button id="add-participant" type="button" on:click={() => (isAddingUser = !isAddingUser)}
-						><img src="/svg/plus.svg" alt="" />Ajouter un participant</Button
+						><img class="icon" src="/svg/plus.svg" alt="" />Ajouter un participant</Button
 					>
 				{/if}
 			</div>
