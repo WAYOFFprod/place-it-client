@@ -224,7 +224,7 @@ export default class Networker {
   }
 
   getParticipants = async (id: number) => {
-    const response: any = await this.server.get("/canva/"+id+"/participants/");
+    const response: any = await this.server.get("/canva/"+id+"/participants");
     return response;
   }
 
