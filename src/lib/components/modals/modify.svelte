@@ -58,19 +58,10 @@
 	getData();
 </script>
 
-<form bind:this={form} class="">
-	<!-- header -->
-	<div
-		class="relative border-b-2 border-black py-5 text-center font-sans font-bold text-3xl uppercase"
-	>
-		<span>modifier le canva</span>
-		<button id="close-modal" aria-label="close" class="absolute right-4 top-4" on:click={close}>
-			<img class="icon" src="/svg/close.svg" alt="" />
-		</button>
-	</div>
+<form bind:this={form} class="relative">
 	<!-- content -->
-	<div class="m-8 flex flex-col items-center gap-8">
-		<div class="flex gap-8">
+	<div class="p-8 flex flex-col items-center justify-between gap-8 h-full">
+		<div class="flex flex-col md:flex-row gap-8">
 			<div>
 				<TextSettings
 					type="text"
@@ -109,13 +100,13 @@
 				{/if}
 			</div>
 		</div>
-		<!-- <div class="flex flex-col gap-4 w-64">
+		<div class="flex flex-col gap-4 w-64">
 			<Button type="button" classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
 				><img src="/svg/save.svg" alt="" />Sauvegarder</Button
 			>
 			<Button type="button" classColor="bg-tea-rose hover:bg-tea-rose-focus"
 				><img src="/svg/close.svg" alt="" />Annuler</Button
 			>
-		</div> -->
+		</div>
 	</div>
 </form>

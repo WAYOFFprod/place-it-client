@@ -59,26 +59,14 @@
 </script>
 
 <div class="md:w-[800px]">
-	<!-- Header -->
-	<div
-		class="relative h-14 w-full border-b-2 border-black uppercase flex justify-center items-center"
-	>
-		<span>Règlage</span>
-		<button aria-label="close" class="absolute right-4 top-4" on:click={close}>
-			<img src="/svg/close.svg" alt="" />
-		</button>
-	</div>
-	<div
-		class="overflow-scroll flex flex-col md:flex-row"
-		style={isWindowSmall ? 'height: calc(100vh - 56px);' : ''}
-	>
-		<!-- Sidebar -->
-		{#if isWindowSmall && isOnNav}
-			<div class="w-40 flex flex-col items-center gap-2 mx-auto mt-8 mb-4">
-				<div class="rounded-full w-36 h-36 border-2 border-black"></div>
-			</div>
-			<div class="self-center mb-8 text-xl">{userName}</div>
-		{/if}
+	<!-- Sidebar -->
+	{#if isWindowSmall && isOnNav}
+		<div class="w-40 flex flex-col items-center gap-2 mx-auto mt-8 mb-4">
+			<div class="rounded-full w-36 h-36 border-2 border-black"></div>
+		</div>
+		<div class="self-center mb-8 text-xl">{userName}</div>
+	{/if}
+	<div class="flex flex-col md:flex-row">
 		{#if !isWindowSmall || isOnNav}
 			<form
 				bind:this={tabForm}
@@ -128,7 +116,7 @@
 		{/if}
 		<!-- Window -->
 		{#if !isWindowSmall || !isOnNav}
-			<div class="flex flex-col w-full min-h-screen md:min-h-0 h-full md:h-auto">
+			<div class="flex flex-col w-full md:min-h-0 h-full md:h-auto">
 				{#if isWindowSmall && !isOnNav}
 					<button
 						class="border-black border-b-2 flex justify-between items-center px-4"

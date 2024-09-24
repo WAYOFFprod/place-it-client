@@ -58,6 +58,28 @@
 	onDestroy(() => {
 		unsubscribeModal();
 	});
+
+	$: label = () => {
+		let val: undefined | string;
+		switch (openedDialog.name) {
+			case 'create':
+				val = 'Créer un nouveau canva';
+				break;
+			case 'modifyCanva':
+				val = 'MODIFIER LE CANVA';
+				break;
+			case 'settings':
+				val = 'Règlages';
+				break;
+			case 'login':
+				val = 'Connexion';
+				break;
+			default:
+				val = undefined;
+				break;
+		}
+		return val;
+	};
 </script>
 
 <dialog
@@ -74,26 +96,40 @@
 		noShadow={isWindowSmall}
 		container="bg-off-white h-full md:h-auto"
 	>
-		{#if openedDialog.name == 'create'}
-			<Create on:close={modalClosed}></Create>
-		{:else if openedDialog.name == 'login'}
-			<Auth on:close={modalClosed}></Auth>
-		{:else if openedDialog.name == 'settings'}
-			<Settings on:close={modalClosed}></Settings>
-		{:else if openedDialog.name == 'joinRequest'}
-			<JoinCanva on:close={modalClosed} canvaId={openedDialog.data.id}></JoinCanva>
-		{:else if openedDialog.name == 'modifyCanva'}
-			<Modify
-				on:close={modalClosed}
-				canvaId={openedDialog.data.id}
-				canvaName={openedDialog.data.name}
-			></Modify>
-		{:else if openedDialog.name == 'userAction'}
-			<UserActions
-				on:close={modalClosed}
-				userId={openedDialog.data.id}
-				userName={openedDialog.data.name}
-			></UserActions>
+		<!-- Header -->
+		{#if label() != undefined}
+			<div
+				class="relative h-14 mr-32 w-full border-b-2 border-black uppercase flex justify-center items-center"
+			>
+				<span>{label()}</span>
+				<button aria-label="close" class="absolute right-4 top-4" on:click={modalClosed}>
+					<img src="/svg/close.svg" alt="" />
+				</button>
+			</div>
 		{/if}
+		<!-- Body -->
+		<div class="overflow-scroll" style={isWindowSmall ? 'height: calc(100vh - 56px);' : ''}>
+			{#if openedDialog.name == 'create'}
+				<Create on:close={modalClosed}></Create>
+			{:else if openedDialog.name == 'login'}
+				<Auth on:close={modalClosed}></Auth>
+			{:else if openedDialog.name == 'settings'}
+				<Settings on:close={modalClosed}></Settings>
+			{:else if openedDialog.name == 'joinRequest'}
+				<JoinCanva on:close={modalClosed} canvaId={openedDialog.data.id}></JoinCanva>
+			{:else if openedDialog.name == 'modifyCanva'}
+				<Modify
+					on:close={modalClosed}
+					canvaId={openedDialog.data.id}
+					canvaName={openedDialog.data.name}
+				></Modify>
+			{:else if openedDialog.name == 'userAction'}
+				<UserActions
+					on:close={modalClosed}
+					userId={openedDialog.data.id}
+					userName={openedDialog.data.name}
+				></UserActions>
+			{/if}
+		</div>
 	</Panel>
 </dialog>

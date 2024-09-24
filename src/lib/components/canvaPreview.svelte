@@ -115,13 +115,15 @@
 				<div class="h-6 border-t-2 border-black bg-white flex justify-between text-lg px-1">
 					<span>{getCategory()}</span>
 					<div class="flex items-center gap-1">
-						<span>{getUserCount()} </span>
+						<span>{getUserCount()}</span>
 						<span class="w-2.5 h-2.5 rounded-full border-2 border-black bg-fluorescent-cyan"></span>
 					</div>
 				</div>
 			{/if}
 			<!-- Hover -->
-			<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 px-28">
+			<div
+				class="absolute invisible inset-0 bg-black/50 opacity-0 group-hover:opacity-100 px-16 md:px-28 group-hover:visible"
+			>
 				<div class="relative flex flex-col justify-center items-center gap-4 h-full z-30">
 					{#if (canva.access != 'closed' || canva.owned) && conenctionStatus}
 						{#if canva.participationStatus == 'accepted'}

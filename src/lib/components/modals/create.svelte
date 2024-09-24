@@ -134,15 +134,6 @@
 </script>
 
 <div class="h-fit">
-	<!-- header -->
-	<div
-		class="relative border-b-2 border-black py-5 text-center font-sans font-bold text-3xl uppercase"
-	>
-		<span>Créer un nouveau canva</span>
-		<button aria-label="close" class="absolute right-4 top-4" on:click={close}>
-			<img src="/svg/close.svg" alt="" />
-		</button>
-	</div>
 	<!-- container -->
 	<div
 		class="flex flex-col md:flex-row gap-[2px] bg-off-white items-center md:items-start justify-stretch"
