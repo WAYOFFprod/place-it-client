@@ -170,11 +170,7 @@
 			</div>
 		</div>
 		<!-- Image -->
-		<img
-			class="w-full h-64 disable-blur object-cover aspect-7/5"
-			src={canva.image}
-			alt="canva {canva.id}"
-		/>
+		<img class="w-96 h-64 disable-blur object-cover" src={canva.image} alt="canva {canva.id}" />
 	</Panel>
 	<div class="flex flex-col gap-1 mt-4">
 		<div>{canva.name}</div>
