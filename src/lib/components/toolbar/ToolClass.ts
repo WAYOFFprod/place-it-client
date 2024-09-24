@@ -6,7 +6,8 @@ export enum ToolType {
   Cursor = 'cursor',
   Hand = 'hand',
   Selection = 'selection',
-  Eraser = 'eraser'
+  Eraser = 'eraser',
+  Place = 'place'
 }
 
 export default class Tool {

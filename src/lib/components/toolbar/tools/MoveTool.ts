@@ -23,6 +23,7 @@ export default class MoveTool extends Tool {
   }
 
   mousePressed(screenOffset: Coord): boolean {
+    
     ControlManager.screenOffset = screenOffset
     this.dragOffset.x = this.p5.mouseX - ControlManager.screenOffset.x;
     this.dragOffset.y = this.p5.mouseY - ControlManager.screenOffset.y;

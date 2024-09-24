@@ -128,6 +128,16 @@
 				controlManager.mousePressed();
 			};
 
+			p5.touchStarted = (e: TouchEvent) => {
+				if (!isTargeting(e.target, 'place-it-canvas')) return;
+				controlManager.mousePressed();
+			};
+
+			p5.touchEnded = (e: TouchEvent) => {
+				if (!isTargeting(e.target, 'place-it-canvas')) return;
+				controlManager.mouseReleased();
+			};
+
 			/* Clicking on canvas */
 			p5.mouseReleased = () => {
 				controlManager.mouseReleased();
