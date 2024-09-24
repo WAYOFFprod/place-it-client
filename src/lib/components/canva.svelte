@@ -194,7 +194,7 @@
 	<!-- overlay -->
 	<div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none">
 		<!-- bootom panel -->
-		<div class="absolute bottom-10 right-5 flex justify-center">
+		<div class="absolute bottom-5 md:bottom-10 right-5 flex justify-center">
 			<Palette
 				canvasOwned={canva.owned}
 				canvaId={canva.id}
@@ -203,17 +203,18 @@
 			></Palette>
 		</div>
 
-		<div class="absolute bottom-10 left-5 flex justify-center">
+		<div class="absolute bottom-10 left-5 justify-center hidden md:flex">
 			<Chat class="w-[500px]"></Chat>
 		</div>
 
-		<div class="absolute top-5 right-5 flex flex-col items-end gap-4">
+		<div class="absolute top-3 md:top-5 right-3 md:right-5 flex flex-col items-end gap-4">
 			<ZoomCounter></ZoomCounter>
 			<CoordViewer></CoordViewer>
 		</div>
 
 		<!-- other -->
-		<Toolbar class="absolute left-5 top-5 pointer-events-auto" {p5} {viewOnly}></Toolbar>
+		<Toolbar class="absolute left-3 md:left-5 top-3 md:top-5 pointer-events-auto" {p5} {viewOnly}
+		></Toolbar>
 	</div>
 
 	<!-- canvas -->
