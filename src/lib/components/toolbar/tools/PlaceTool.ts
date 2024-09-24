@@ -6,6 +6,7 @@ import Networker from "$lib/utility/Networker";
 import ControlManager from "../ControlManager";
 import { selectedColor } from "$lib/stores/colorStore";
 import { get } from "svelte/store";
+import { windowSize } from "$lib/stores/tailwindStore";
 
 export default class PlaceTool extends Tool {
   static cursor = "pointer"

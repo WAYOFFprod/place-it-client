@@ -3,7 +3,7 @@
 
 	import Tool from '$lib/components/toolbar/ToolClass';
 
-	import { readOnlytoolClasses, selectedTool, setTool, toolClasses } from '$lib/stores/toolStore';
+	import { initTools, selectedTool, setTool, toolClasses } from '$lib/stores/toolStore';
 	import { onDestroy, onMount } from 'svelte';
 	import ToolIcon from './toolIcon.svelte';
 	import type { selectTool } from './types';
@@ -25,11 +25,12 @@
 	});
 
 	let tools: (typeof Tool)[];
-	if (viewOnly) {
-		tools = Object.values(readOnlytoolClasses);
-	} else {
-		tools = Object.values(toolClasses);
-	}
+
+	initTools(viewOnly);
+
+	toolClasses.subscribe((newClasses) => {
+		tools = Object.values(newClasses);
+	});
 
 	let currentTool: Tool | undefined;
 	let currentToolType: typeof Tool | null;
@@ -41,7 +42,7 @@
 	});
 
 	const updateSelectTool = (event: CustomEvent<selectTool>) => {
-		setTool(event.detail.tool, p5);
+		setTool(event.detail.tool);
 		if (isWindowSmall) expandedToolbar = false;
 	};
 

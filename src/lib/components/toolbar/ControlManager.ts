@@ -4,6 +4,7 @@ import { ToolType, selectedTool} from '$lib/stores/toolStore';
 import Networker from '$lib/utility/Networker';
 import ToolManager from './tools/ToolManager';
 import { mouseCoord, zoom } from '$lib/stores/canvaStore';
+import { windowSize } from '$lib/stores/tailwindStore';
 export default class ControlManager {
   p5: P5
   networker: Networker = Networker.getInstance();;
@@ -34,6 +35,9 @@ export default class ControlManager {
   constructor(p5: P5, size: Size2D, viewOnly: boolean, marginBottom:number) {
     this.p5 = p5;
     this.marginBottom = marginBottom;
+    // init tailwind store
+    windowSize(window)
+    
     if(viewOnly) {
       this.toolManager = new ToolManager(ToolType.Hand, p5);
     } else {
