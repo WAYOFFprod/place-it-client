@@ -129,14 +129,12 @@
 			};
 
 			p5.touchStarted = (e: TouchEvent) => {
-				e.preventDefault();
 				console.log('touch started', e.touches);
 				if (!isTargeting(e.target, 'place-it-canvas')) return;
 				controlManager.mousePressed();
 			};
 
 			p5.touchEnded = (e: TouchEvent) => {
-				e.preventDefault();
 				if (!isTargeting(e.target, 'place-it-canvas')) return;
 				controlManager.mouseReleased();
 			};
