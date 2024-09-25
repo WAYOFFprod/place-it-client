@@ -16,7 +16,8 @@ export default {
 				hand: 'url("/cursors/hand.svg"), pointer',
 				pointer: 'url("/cursors/cursor.svg") 5 0, pointer',
 				selection: 'url("/cursors/selection.svg"), pointer',
-				eraser: 'url("/cursors/erase.svg") 0 20, pointer'
+				eraser: 'url("/cursors/erase.svg") 0 20, pointer',
+				place: 'url("/cursors/plus.svg") 0 0, pointer'
 			},
 			colors: {
 				'tea-rose': {
@@ -76,6 +77,7 @@ export default {
 		'cursor-pointer',
 		'cursor-selection',
 		'cursor-eraser',
+		'cursor-place',
 		'text-fluorescent-cyan'
 	],
 	plugins: []

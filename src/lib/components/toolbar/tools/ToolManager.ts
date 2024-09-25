@@ -1,6 +1,6 @@
 import P5 from 'p5'
 import Tool from '../ToolClass';
-import { ToolType, destroyActiveTool, selectedTool, setToolset } from '$lib/stores/toolStore';
+import { destroyActiveTool, selectedTool, setToolset } from '$lib/stores/toolStore';
 import ControlManager from '../ControlManager';
 import { isWindowSmall } from '$lib/stores/tailwindStore';
 
@@ -9,15 +9,21 @@ export default class ToolManager {
   activeTool: Tool | undefined;
   activeToolType: typeof Tool = Tool
   unsubscribeTool: any
-  constructor(initialTool: ToolType, p5: P5) {
+  constructor(p5: P5, viewOnly: boolean) {
+    
     this.p5 = p5
     isWindowSmall.subscribe((isSmall) => {
-      if(isSmall) {
+      if(viewOnly) {
+        setToolset('view-only', p5)
+      } else if(isSmall === true) {
         setToolset('mobile', p5)
-      } else {
+      } else if(isSmall === false) {
         setToolset('desktop', p5)
+      } else {
+        console.warn("No toolset found")
       }
     })
+    
 
     this.unsubscribeTool = selectedTool.subscribe((newTool: Tool | undefined) => {
       if(newTool == undefined) return;

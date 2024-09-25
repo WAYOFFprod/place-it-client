@@ -1,6 +1,4 @@
 import P5 from 'p5'
-import Tool from "$lib/components/toolbar/ToolClass";
-import { ToolType, selectedTool} from '$lib/stores/toolStore';
 import Networker from '$lib/utility/Networker';
 import ToolManager from './tools/ToolManager';
 import { mouseCoord, zoom } from '$lib/stores/canvaStore';
@@ -38,11 +36,7 @@ export default class ControlManager {
     // init tailwind store
     windowSize(window)
     
-    if(viewOnly) {
-      this.toolManager = new ToolManager(ToolType.Hand, p5);
-    } else {
-      this.toolManager = new ToolManager(ToolType.Cursor, p5);
-    }
+    this.toolManager = new ToolManager(p5, viewOnly);
 
 		this.init(size)
   }

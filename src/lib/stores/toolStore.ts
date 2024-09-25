@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 import P5 from 'p5';
 
 import Tool, { ToolType } from '$lib/components/toolbar/ToolClass'
@@ -19,8 +19,9 @@ let desktopToolClasses: Tools = {
   [ToolType.Eraser]: EraserTool,
 }
 
-let toolClasses = writable<Tools>(desktopToolClasses); 
-let tools: Tools = desktopToolClasses;
+let toolClasses: Writable<Tools | undefined> = writable<Tools>(undefined); 
+let tools: Tools | undefined
+
 let mobileToolClasses: Tools = {
   [ToolType.Hand]: MoveTool,
   // [ToolType.Eraser]: EraserTool,
@@ -32,25 +33,13 @@ let readOnlytoolClasses: Tools = {
   // [ToolType.Selection]: SelectionTool
 }
 
-let activeToolType: typeof Tool = tools[ToolType.Cursor]
+let activeToolType: typeof Tool | undefined
 let activeTool: Tool | undefined
 
 let savedTool: Tool | undefined = activeTool
 let p5: P5 | undefined
 
 const selectedTool = writable<Tool | undefined>();
-
-
-const initTools = (viewOnly: boolean) => {
-  if(viewOnly) {
-    toolClasses.set(readOnlytoolClasses);
-    tools = readOnlytoolClasses;
-  } else {
-    toolClasses.set(desktopToolClasses);
-    tools = desktopToolClasses;
-  }
-  setTool(ToolType.Cursor);
-}
 
 const destroyActiveTool = () => {
   if(activeTool != undefined) {
@@ -59,6 +48,7 @@ const destroyActiveTool = () => {
 }
 
 const setTool = (toolType: ToolType) => {
+  if(tools == undefined) return;
   if(activeToolType != tools[toolType]) {
     destroyActiveTool();
   }
@@ -68,24 +58,26 @@ const setTool = (toolType: ToolType) => {
   selectedTool.set(activeTool);
 }
 
-const setToolset = (type: 'mobile' | 'desktop', p5js: P5) => {
+const setToolset = (type: 'mobile' | 'desktop' | 'view-only', p5js: P5) => {
+  if(toolClasses == undefined) return;
   p5 = p5js
   if(type == 'mobile') {
     toolClasses.set(mobileToolClasses);
     tools = mobileToolClasses;
     setTool(ToolType.Place);
-  } else {
+  } else if(type == 'desktop') {
     toolClasses.set(desktopToolClasses);
     tools = desktopToolClasses;
     setTool(ToolType.Cursor);
+  } else if(type == 'view-only') {
+    toolClasses.set(readOnlytoolClasses);
+    tools = readOnlytoolClasses;
+    setTool(ToolType.Hand);
   }
 }
 
-toolClasses.subscribe((newClasses) => {
-  tools = newClasses;
-})
-
 const setTempTool = (toolType: ToolType, p5: P5) => {
+  if(tools == undefined) return;
   savedTool = activeTool;
   activeToolType = tools[toolType];
   activeTool = new activeToolType(p5);
@@ -99,7 +91,6 @@ const backToTool = () => {
 
 
 export {
-  initTools,
   selectedTool,
   setTempTool,
   backToTool,

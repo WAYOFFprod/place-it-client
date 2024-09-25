@@ -1,6 +1,6 @@
 // import resolveConfig from 'tailwindcss/resolveConfig'
 // import tailwindConfig from '../../../tailwind.config.js'
-import { readable, writable } from 'svelte/store'
+import { readable, writable, type Writable } from 'svelte/store'
 
 // const fullConfig = resolveConfig(tailwindConfig)
 
@@ -10,7 +10,7 @@ const lgBreak = readable(1024);
 const xlBreak = readable(1280);
 const xl2Break = readable(1536);
 
-const isWindowSmall = writable(false);
+const isWindowSmall: Writable<boolean | undefined> = writable(undefined);
 
 let storedWindow: Window | undefined;
 const onResize = () => {
@@ -22,6 +22,7 @@ const onResize = () => {
 const windowSize = (window: Window) => {
   if(storedWindow) return;
   storedWindow = window;
+  isWindowSmall.set(window.innerWidth >= 640 ? false : true);
   window.addEventListener('resize', onResize);
 		return () => {
 			window.removeEventListener('resize', onResize);

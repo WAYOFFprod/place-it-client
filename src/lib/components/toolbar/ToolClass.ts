@@ -44,17 +44,10 @@ export default class Tool {
   }
 
   mouseMove(isMouseDown: boolean): Coord {
-    if(isMouseDown) {
-      return {
-        x: this.p5.mouseX,
-        y: this.p5.mouseX
-      };
-    } else {
-      return {
-        x: this.p5.mouseX,
-        y: this.p5.mouseX
-      }
-    }
+    return {
+      x: this.p5.mouseX,
+      y: this.p5.mouseX
+    };
   }
 
   // returns: boolean that represent if pressing down should be saved

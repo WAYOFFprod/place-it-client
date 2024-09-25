@@ -23,7 +23,7 @@ export default class EraserTool extends Tool {
       if(EraserTool.init) {
         if(newColor != '') {
           EraserTool.savedColor = ''
-          setTool(ToolType.Cursor, this.p5);
+          setTool(ToolType.Cursor);
         }
       } else {
         EraserTool.savedColor = newColor;

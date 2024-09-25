@@ -1,17 +1,16 @@
 import { ToolType } from "$lib/stores/toolStore";
 import Tool from "../ToolClass";
-import CursorIcon from "$lib/icons/cursor.svelte"
+import PlusIcon from "$lib/icons/plus.svelte"
 import Networker from "$lib/utility/Networker";
 
 import ControlManager from "../ControlManager";
 import { selectedColor } from "$lib/stores/colorStore";
 import { get } from "svelte/store";
-import { windowSize } from "$lib/stores/tailwindStore";
 
 export default class PlaceTool extends Tool {
-  static cursor = "pointer"
+  static cursor = "place"
   static type = ToolType.Place
-  static icon = CursorIcon
+  static icon = PlusIcon
   static unsubscribeColors: any | undefined = undefined;
   static color: string | undefined;
 

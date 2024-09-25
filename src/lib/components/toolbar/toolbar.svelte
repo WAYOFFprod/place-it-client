@@ -3,32 +3,24 @@
 
 	import Tool from '$lib/components/toolbar/ToolClass';
 
-	import { initTools, selectedTool, setTool, toolClasses } from '$lib/stores/toolStore';
-	import { onDestroy, onMount } from 'svelte';
+	import { selectedTool, setTool, toolClasses } from '$lib/stores/toolStore';
+	import { onDestroy } from 'svelte';
 	import ToolIcon from './toolIcon.svelte';
 	import type { selectTool } from './types';
 
-	import P5 from 'p5';
-	import { mdBreak } from '$lib/stores/tailwindStore';
+	import { isWindowSmall } from '$lib/stores/tailwindStore';
 
-	export let p5: P5;
-	export let viewOnly: boolean;
-
-	let isWindowSmall: boolean | undefined = false;
-	let md: number | undefined;
+	let windowSmall: boolean | undefined = false;
 	let expandedToolbar: boolean = false;
 
-	mdBreak.subscribe((val) => {
-		md = val;
-		// initial size
-		isWindowSmall = window.innerWidth >= md ? false : true;
+	isWindowSmall.subscribe((val) => {
+		windowSmall = val;
 	});
 
 	let tools: (typeof Tool)[];
 
-	initTools(viewOnly);
-
 	toolClasses.subscribe((newClasses) => {
+		if (newClasses == undefined) return;
 		tools = Object.values(newClasses);
 	});
 
@@ -50,43 +42,34 @@
 		unsubscribeTool();
 	});
 
-	const onResize = () => {
-		if (md) isWindowSmall = window.innerWidth >= md ? false : true;
-	};
-
 	const toggleToolbarLength = () => {
 		expandedToolbar = !expandedToolbar;
 	};
-
-	onMount(() => {
-		window.addEventListener('resize', onResize);
-		return () => {
-			window.removeEventListener('resize', onResize);
-		};
-	});
 </script>
 
 <div class="{$$props.class} cursor-hand">
 	<Panel class="w-fit">
 		<div class="grid grid-cols-1 gap-2 p-1 m-1 md:m-2">
-			{#if !isWindowSmall || expandedToolbar}
-				{#each tools as t}
+			{#if tools != undefined}
+				{#if !windowSmall || expandedToolbar}
+					{#each tools as t}
+						<ToolIcon
+							on:selectTool={updateSelectTool}
+							toolType={t.type}
+							selected={currentToolType == t}
+						>
+							<svelte:component this={t.icon} />
+						</ToolIcon>
+					{/each}
+				{:else if windowSmall && currentToolType != null}
 					<ToolIcon
-						on:selectTool={updateSelectTool}
-						toolType={t.type}
-						selected={currentToolType == t}
+						toolType={currentToolType.type}
+						selected={true}
+						on:selectTool={toggleToolbarLength}
 					>
-						<svelte:component this={t.icon} />
+						<svelte:component this={currentToolType.icon} />
 					</ToolIcon>
-				{/each}
-			{:else if isWindowSmall && currentToolType != null}
-				<ToolIcon
-					toolType={currentToolType.type}
-					selected={true}
-					on:selectTool={toggleToolbarLength}
-				>
-					<svelte:component this={currentToolType.icon} />
-				</ToolIcon>
+				{/if}
 			{/if}
 		</div>
 	</Panel>
