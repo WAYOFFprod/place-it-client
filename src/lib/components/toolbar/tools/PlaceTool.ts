@@ -77,7 +77,7 @@ export default class PlaceTool extends Tool {
     // calculate on which pixel the mouse is over
     const coords: Coord = {
       x: Math.floor(((window.innerWidth / 2) -ControlManager.screenOffset.x) / ControlManager.currentScale),
-      y: Math.floor(((window.innerHeight / 2) -ControlManager.screenOffset.y) / ControlManager.currentScale)
+      y: Math.floor((((window.innerHeight - 56) / 2 ) -ControlManager.screenOffset.y) / ControlManager.currentScale)
     };
     this.pixels.push(coords);
     this.networker.placePixel(coords, PlaceTool.color);

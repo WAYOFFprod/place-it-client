@@ -202,7 +202,12 @@
 <Modal></Modal>
 <div {id} class="relative cursor-{currentToolType.cursor} {$$props.class}">
 	<!-- overlay -->
-	<div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none">
+	<div class="absolute inset-0 pointer-events-none">
+		{#if currentToolType.type == ToolType.Place}
+			<div class="h-full w-full pointer-events-none flex justify-center items-center">
+				<img class="w-6 h-6" src="/svg/plus.svg" alt="" />
+			</div>
+		{/if}
 		<!-- bootom panel -->
 		<div class="absolute bottom-5 md:bottom-10 right-5 flex justify-center">
 			<Palette
