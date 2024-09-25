@@ -129,12 +129,14 @@
 			};
 
 			p5.touchStarted = (e: TouchEvent) => {
+				e.preventDefault();
 				console.log('touch started', e.touches);
 				if (!isTargeting(e.target, 'place-it-canvas')) return;
 				controlManager.mousePressed();
 			};
 
 			p5.touchEnded = (e: TouchEvent) => {
+				e.preventDefault();
 				if (!isTargeting(e.target, 'place-it-canvas')) return;
 				controlManager.mouseReleased();
 			};
@@ -145,14 +147,19 @@
 			};
 
 			/* Scrolling */
-			window.addEventListener('wheel', function (e: WheelEvent) {
-				if (!isTargeting(e.target, 'place-it-canvas')) return;
-				if (e.deltaY > 0) {
-					controlManager.scroll(1 + zoomSensitivity);
-				} else {
-					controlManager.scroll(1 - zoomSensitivity);
-				}
-			});
+			window.addEventListener(
+				'wheel',
+				function (e: WheelEvent) {
+					e.preventDefault();
+					if (!isTargeting(e.target, 'place-it-canvas')) return;
+					if (e.deltaY > 0) {
+						controlManager.scroll(1 - zoomSensitivity);
+					} else {
+						controlManager.scroll(1 + zoomSensitivity);
+					}
+				},
+				{ passive: false }
+			);
 
 			p5.keyPressed = () => {
 				switch (p5.keyCode) {
@@ -178,24 +185,6 @@
 						break;
 				}
 			};
-
-			document.addEventListener('gesturestart', function (e) {
-				e.preventDefault();
-				// special hack to prevent zoom-to-tabs gesture in safari
-				document.body.style.zoom = '0.99';
-			});
-
-			document.addEventListener('gesturechange', function (e) {
-				e.preventDefault();
-				// special hack to prevent zoom-to-tabs gesture in safari
-				document.body.style.zoom = '0.99';
-			});
-
-			document.addEventListener('gestureend', function (e) {
-				e.preventDefault();
-				// special hack to prevent zoom-to-tabs gesture in safari
-				document.body.style.zoom = '0.99';
-			});
 		};
 
 		/* Instantiate canva */
