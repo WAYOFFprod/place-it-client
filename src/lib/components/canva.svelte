@@ -28,7 +28,7 @@
 	let updateColorPalette: (newColors: [string]) => void;
 
 	let p5: P5;
-	let controlManager: ControlManager;
+	let controlManager: ControlManager | undefined;
 	let gridManager: GridManager;
 
 	const networker = Networker.getInstance();
@@ -77,6 +77,7 @@
 	};
 
 	const initCanvas = async () => {
+		console.log('initCanvas');
 		if (canva) {
 			width = canva.width;
 			height = canva.height;
@@ -86,7 +87,7 @@
 				data: canva,
 				size: size
 			};
-			controlManager = new ControlManager(p5, data.size, viewOnly, marginBottom);
+			controlManager = ControlManager.getInstance(p5, data.size, viewOnly, marginBottom);
 			connect(data);
 		}
 	};
@@ -103,16 +104,15 @@
 			};
 
 			p5.draw = () => {
-				if (!ready) return;
-
+				if (!ready || !controlManager) return;
 				controlManager.checkMousePosition();
 
 				// TODO: check if it was updated by drawing pixel or other player pixel as well
 				if (gridManager.needsUpdate || controlManager.hasNewScreenOffset()) {
 					p5.push();
 					p5.background(150);
-					p5.translate(ControlManager.screenOffset.x, ControlManager.screenOffset.y);
-					p5.scale(ControlManager.currentScale);
+					p5.translate(controlManager.screenOffset.x, controlManager.screenOffset.y);
+					p5.scale(controlManager.currentScale);
 
 					// draw content
 					gridManager.updateCanvasPosition();
@@ -124,23 +124,24 @@
 			};
 
 			p5.mousePressed = (e: MouseEvent) => {
-				if (!isTargeting(e.target, 'place-it-canvas')) return;
+				if (!isTargeting(e.target, 'place-it-canvas') || !controlManager) return;
 				controlManager.mousePressed();
 			};
 
 			p5.touchStarted = (e: TouchEvent) => {
+				if (!isTargeting(e.target, 'place-it-canvas') || !controlManager) return;
 				console.log('touch started', e.touches);
-				if (!isTargeting(e.target, 'place-it-canvas')) return;
 				controlManager.mousePressed();
 			};
 
 			p5.touchEnded = (e: TouchEvent) => {
-				if (!isTargeting(e.target, 'place-it-canvas')) return;
+				if (!isTargeting(e.target, 'place-it-canvas') || !controlManager) return;
 				controlManager.mouseReleased();
 			};
 
 			/* Clicking on canvas */
 			p5.mouseReleased = () => {
+				if (!controlManager) return;
 				controlManager.mouseReleased();
 			};
 
@@ -149,7 +150,7 @@
 				'wheel',
 				function (e: WheelEvent) {
 					e.preventDefault();
-					if (!isTargeting(e.target, 'place-it-canvas')) return;
+					if (!isTargeting(e.target, 'place-it-canvas') || !controlManager) return;
 					if (e.deltaY > 0) {
 						controlManager.scroll(1 - zoomSensitivity);
 					} else {
@@ -169,6 +170,7 @@
 				}
 			};
 			p5.keyReleased = () => {
+				if (!controlManager) return;
 				switch (p5.keyCode) {
 					case p5.UP_ARROW:
 						controlManager.scroll(1 + zoomSensitivity);
@@ -198,7 +200,9 @@
 		}
 	});
 	onDestroy(() => {
-		controlManager.destroy();
+		if (controlManager) {
+			controlManager.destroy();
+		}
 		unsubscribeTool();
 		unsubscribeEvent();
 		unsubscribeReady();

@@ -1,5 +1,6 @@
 
 import P5 from 'p5';
+import ControlManager from './ControlManager';
 
 
 export enum ToolType {
@@ -22,10 +23,12 @@ export default class Tool {
 
   isMouseDown = false;
   p5: P5
+  controlManager: ControlManager;
 
   constructor(p5: P5) {
     this.p5 = p5
     this.init()
+    this.controlManager =  ControlManager.getInstance();
   }
 
 

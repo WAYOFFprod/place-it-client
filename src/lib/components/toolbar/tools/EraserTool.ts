@@ -52,14 +52,14 @@ export default class EraserTool extends Tool {
 
   mouseMove(isMouseDown: boolean) {
     if(!isMouseDown) return {
-      x: ControlManager.screenOffset.x,
-      y: ControlManager.screenOffset.y
+      x: this.controlManager.screenOffset.x,
+      y: this.controlManager.screenOffset.y
     };
 
     // check if mouse position in on new pixel
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / ControlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / ControlManager.currentScale)
+      x: Math.floor((this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale),
+      y: Math.floor((this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale)
     };
 
     // if these coords are new in this stroke add it to array and place pixel
@@ -70,16 +70,16 @@ export default class EraserTool extends Tool {
 
     // return save offset in order to not move screen
     return {
-      x: ControlManager.screenOffset.x,
-      y: ControlManager.screenOffset.y
+      x: this.controlManager.screenOffset.x,
+      y: this.controlManager.screenOffset.y
     };
   }
 
   protected placePixel() {
     // calculate on which pixel the mouse is over
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / ControlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / ControlManager.currentScale)
+      x: Math.floor((this.p5.mouseX - this.screenOffset.x) / this.currentScale),
+      y: Math.floor((this.p5.mouseY - this.screenOffset.y) / this.currentScale)
     };
     this.pixels.push(coords);
     this.networker.placePixel(coords, '#ffffff');

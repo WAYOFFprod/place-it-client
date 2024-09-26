@@ -15,11 +15,16 @@ export default class ControlManager {
 
   marginBottom: number = 0
 
-  static screenOffset: Coord
-  static currentScale:number
+  screenOffset: Coord = {
+    x: 0,
+    y: 0
+  }
+  currentScale: number = 1
 
-  static MIN_ZOOM = 0.5
-  static MAX_ZOOM = 128
+  MIN_ZOOM = 0.5
+  MAX_ZOOM = 128
+
+  static instance: ControlManager
 
   	// original position on start of dragging
 	grabStart: Coord = {
@@ -29,15 +34,24 @@ export default class ControlManager {
 
   scaleFactor = 0;
 
+  static getInstance(p5?: P5, size?: Size2D, viewOnly?: boolean , marginBottom?:number) {
+    if(ControlManager.instance != undefined) return ControlManager.instance;
+    if(!p5 || !size || viewOnly == null || !marginBottom) throw new Error("Can't initialize ControlManager, you need to provide p5, size, viewOnly and marginBottom");
+    new ControlManager(p5, size, viewOnly, marginBottom);
+    return ControlManager.instance
+  }
 
   constructor(p5: P5, size: Size2D, viewOnly: boolean, marginBottom:number) {
+    ControlManager.instance = this;
+
     this.p5 = p5;
     this.marginBottom = marginBottom;
+
     // init tailwind store
     windowSize(window)
     
     this.toolManager = new ToolManager(p5, viewOnly);
-
+    
 		this.init(size)
   }
 
@@ -47,18 +61,18 @@ export default class ControlManager {
 		const heightRatio = (this.p5.windowHeight - this.marginBottom) / size.height;
     
 		// get scale factor by getting the one from the axies with the least pixels
-    ControlManager.currentScale = Math.max(widthRatio < heightRatio ? widthRatio : heightRatio, ControlManager.MIN_ZOOM);
-		// ControlManager.currentScale = 1;
+    this.currentScale = Math.max(widthRatio < heightRatio ? widthRatio : heightRatio, this.MIN_ZOOM);
+		// this.currentScale = 1;
 		// set initial offset to center image
-		const x = (size.width / 2) * ControlManager.currentScale;
-		const y = (size.height / 2) * ControlManager.currentScale;
+		const x = (size.width / 2) * this.currentScale;
+		const y = (size.height / 2) * this.currentScale;
     
     const screenCenter = {
       x: this.p5.windowWidth / 2,
       y: (this.p5.windowHeight - this.marginBottom) / 2
     };
     
-    ControlManager.screenOffset = {
+    this.screenOffset = {
       x: screenCenter.x - x,
       y: screenCenter.y - y
     };
@@ -69,8 +83,8 @@ export default class ControlManager {
       this.toolManager.updateOffset()
     }
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - ControlManager.screenOffset.x) / ControlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - ControlManager.screenOffset.y) / ControlManager.currentScale)
+      x: Math.floor((this.p5.mouseX - this.screenOffset.x) / this.currentScale),
+      y: Math.floor((this.p5.mouseY - this.screenOffset.y) / this.currentScale)
     };
     mouseCoord.set(coords)
   }
@@ -91,12 +105,12 @@ export default class ControlManager {
 
   hasNewScreenOffset() {
     if(!this.previousOffset) return true;
-    if(this.previousOffset.x == ControlManager.screenOffset.x && this.previousOffset.y == ControlManager.screenOffset.y) return false;
+    if(this.previousOffset.x == this.screenOffset.x && this.previousOffset.y == this.screenOffset.y) return false;
     return true;
   }
 
   saveScreenOffset() {
-    this.previousOffset = {...ControlManager.screenOffset}
+    this.previousOffset = {...this.screenOffset}
   }
 
 	hasMovedSinceDragStart() {
@@ -112,21 +126,21 @@ export default class ControlManager {
 	};
 
   scroll(scaleFactor: number) {
-    const newCurrentScale = ControlManager.currentScale * scaleFactor;
+    const newCurrentScale = this.currentScale * scaleFactor;
 
-    let newScaleFactor = newCurrentScale / ControlManager.currentScale
+    let newScaleFactor = newCurrentScale / this.currentScale
 
     let limitScaleFactor
     if(scaleFactor > 1) {
-      limitScaleFactor = Math.min(newCurrentScale, ControlManager.MAX_ZOOM)
-      newScaleFactor = limitScaleFactor  / ControlManager.currentScale;
+      limitScaleFactor = Math.min(newCurrentScale, this.MAX_ZOOM)
+      newScaleFactor = limitScaleFactor  / this.currentScale;
     } else {
-      limitScaleFactor = Math.max(newCurrentScale, ControlManager.MIN_ZOOM)
-      newScaleFactor = limitScaleFactor /  ControlManager.currentScale;
+      limitScaleFactor = Math.max(newCurrentScale, this.MIN_ZOOM)
+      newScaleFactor = limitScaleFactor /  this.currentScale;
     }
     
     this.scaleFactor = newScaleFactor
-    ControlManager.currentScale = limitScaleFactor
+    this.currentScale = limitScaleFactor
     // get mouse position relative to canvas zoom
     const relMouse = {
       x: this.p5.mouseX * this.scaleFactor,
@@ -135,12 +149,12 @@ export default class ControlManager {
 
     // get the current screen offset relative to the canvas
     const relOffset = {
-      x: ControlManager.screenOffset.x * this.scaleFactor,
-      y: ControlManager.screenOffset.y * this.scaleFactor
+      x: this.screenOffset.x * this.scaleFactor,
+      y: this.screenOffset.y * this.scaleFactor
     };
 
-    ControlManager.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
-    ControlManager.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
+    this.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
+    this.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
 
     const percentScale = newScaleFactor/ControlManager.MAX_ZOOM * 100 as number
     zoom.set(percentScale)

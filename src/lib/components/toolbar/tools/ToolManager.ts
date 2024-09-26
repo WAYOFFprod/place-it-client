@@ -9,8 +9,9 @@ export default class ToolManager {
   activeTool: Tool | undefined;
   activeToolType: typeof Tool = Tool
   unsubscribeTool: any
+  controlManager: ControlManager
   constructor(p5: P5, viewOnly: boolean) {
-    
+    this.controlManager = ControlManager.getInstance();
     this.p5 = p5
     isWindowSmall.subscribe((isSmall) => {
       if(viewOnly) {
@@ -36,14 +37,14 @@ export default class ToolManager {
 
   updateOffset() {
     if (this.activeTool) {
-      ControlManager.screenOffset = this.activeTool.mouseMove(true);
+      this.controlManager.screenOffset = this.activeTool.mouseMove(true);
     }
   }
 
   // returns boolean representing if tool should toggle mousedown variable
   mousePressed() {
     if(this.activeTool) {
-      return this.activeTool.mousePressed(ControlManager.screenOffset);
+      return this.activeTool.mousePressed(this.controlManager.screenOffset);
     }
     return true
   }
