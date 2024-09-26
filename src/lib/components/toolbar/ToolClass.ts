@@ -19,7 +19,6 @@ export default class Tool {
   
 
   scaleFactor = 0;
-  currentScale = 1
 
   isMouseDown = false;
   p5: P5

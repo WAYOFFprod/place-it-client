@@ -3,7 +3,6 @@ import Tool from "../ToolClass";
 import CursorIcon from "$lib/icons/cursor.svelte"
 import Networker from "$lib/utility/Networker";
 
-import ControlManager from "../ControlManager";
 import { selectedColor } from "$lib/stores/colorStore";
 import { get } from "svelte/store";
 
@@ -46,14 +45,14 @@ export default class PointTool extends Tool {
 
   mouseMove(isMouseDown: boolean) {
     if(!PointTool.color || !isMouseDown) return {
-      x: this.screenOffset.x,
-      y: this.screenOffset.y
+      x: this.controlManager.screenOffset.x,
+      y: this.controlManager.screenOffset.y
     };
 
     // check if mouse position in on new pixel
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.screenOffset.x) / this.currentScale),
-      y: Math.floor((this.p5.mouseY - this.screenOffset.y) / this.currentScale)
+      x: Math.floor((this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale),
+      y: Math.floor((this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale)
     };
 
     // if these coords are new in this stroke add it to array and place pixel
@@ -64,17 +63,19 @@ export default class PointTool extends Tool {
 
     // return save offset in order to not move screen
     return {
-      x: this.screenOffset.x,
-      y: this.screenOffset.y
+      x: this.controlManager.screenOffset.x,
+      y: this.controlManager.screenOffset.y
     };
   }
 
   protected placePixel() {
     if(!PointTool.color) return;
     // calculate on which pixel the mouse is over
+    console.log("this.controlManager.screenOffset", this.controlManager.screenOffset)
+    console.log("this.controlManager.currentScale", this.controlManager.currentScale)
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.screenOffset.x) / this.currentScale),
-      y: Math.floor((this.p5.mouseY - this.screenOffset.y) / this.currentScale)
+      x: Math.floor((this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale),
+      y: Math.floor((this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale)
     };
     this.pixels.push(coords);
     this.networker.placePixel(coords, PointTool.color);

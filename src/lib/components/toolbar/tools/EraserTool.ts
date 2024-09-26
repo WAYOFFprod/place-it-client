@@ -1,7 +1,6 @@
 import { setTool, ToolType } from "$lib/stores/toolStore";
 import Tool from "../ToolClass";
 import EraseIcon from "$lib/icons/erase.svelte"
-import ControlManager from "../ControlManager";
 import Networker from "$lib/utility/Networker";
 import { selectedColor } from "$lib/stores/colorStore";
 import type { Unsubscriber } from "svelte/motion";
@@ -78,8 +77,8 @@ export default class EraserTool extends Tool {
   protected placePixel() {
     // calculate on which pixel the mouse is over
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.screenOffset.x) / this.currentScale),
-      y: Math.floor((this.p5.mouseY - this.screenOffset.y) / this.currentScale)
+      x: Math.floor((this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale),
+      y: Math.floor((this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale)
     };
     this.pixels.push(coords);
     this.networker.placePixel(coords, '#ffffff');

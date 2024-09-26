@@ -15,11 +15,8 @@ export default class ControlManager {
 
   marginBottom: number = 0
 
-  screenOffset: Coord = {
-    x: 0,
-    y: 0
-  }
-  currentScale: number = 1
+  screenOffset: Coord
+  currentScale: number
 
   MIN_ZOOM = 0.5
   MAX_ZOOM = 128
@@ -46,22 +43,20 @@ export default class ControlManager {
 
     this.p5 = p5;
     this.marginBottom = marginBottom;
-
     // init tailwind store
     windowSize(window)
     
-    this.toolManager = new ToolManager(p5, viewOnly);
+		// this.init(size)
     
-		this.init(size)
-  }
+    this.toolManager = new ToolManager(p5, viewOnly);
 
-  init(size: Size2D) {
     // initialize scale factor
 		const widthRatio = this.p5.windowWidth / size.width;
 		const heightRatio = (this.p5.windowHeight - this.marginBottom) / size.height;
     
 		// get scale factor by getting the one from the axies with the least pixels
     this.currentScale = Math.max(widthRatio < heightRatio ? widthRatio : heightRatio, this.MIN_ZOOM);
+    console.log("this.currentScale", this.currentScale)
 		// this.currentScale = 1;
 		// set initial offset to center image
 		const x = (size.width / 2) * this.currentScale;
@@ -156,7 +151,7 @@ export default class ControlManager {
     this.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
     this.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
 
-    const percentScale = newScaleFactor/ControlManager.MAX_ZOOM * 100 as number
+    const percentScale = newScaleFactor/this.MAX_ZOOM * 100 as number
     zoom.set(percentScale)
   }
   destroy() {
