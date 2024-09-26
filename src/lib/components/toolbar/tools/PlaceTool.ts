@@ -77,10 +77,9 @@ export default class PlaceTool extends Tool {
 
   mouseMove(isMouseDown: boolean) {
     if(this.dragOffset.x == 0 && this.dragOffset.y == 0) return this.controlManager.screenOffset;
-    let distance;
     if(this.p5.touches.length >= 2) {
       // zoom
-      distance = this.p5.dist(this.p5.touches[0].x, this.p5.touches[0].y, this.p5.touches[1].x, this.p5.touches[1].y);
+      const distance = this.p5.dist(this.p5.touches[0].x, this.p5.touches[0].y, this.p5.touches[1].x, this.p5.touches[1].y);
       const scaleFactor = distance / this.pinchDistance;
       console.log("scaleFactor", scaleFactor);
       const newCurrentScale = this.controlManager.currentScale * scaleFactor;
