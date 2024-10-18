@@ -15,6 +15,7 @@ export default class GridManager {
   pixelsAdded = false;
   imageLoaded = false;
   needsUpdate: boolean = true;
+  overlay: P5.Graphics | null = null;
 
   constructor(p5: P5, canvas: Size2D, canvasId: number) {
     // pixel per tile
@@ -89,6 +90,20 @@ export default class GridManager {
         this.drawPixelsFromIndex(additionalData)
       }
     }
+  }
+
+  drawRectangleOverlay = (start: Coord, end: Coord, color: string) => {
+    if(this.overlay == null) return;
+    const x = Math.min(start.x, end.x);
+    const y = Math.min(start.y, end.y);
+    const w = Math.abs(start.x - end.x);
+    const h = Math.abs(start.y - end.y);
+    this.overlay.noFill();
+    this.overlay.stroke(0);
+    this.overlay.strokeWeight(1);
+    this.overlay.rect(x, y, w, h);
+    this.p5.image(this.overlay, this., 0);
+    console.log("DRAW");
   }
 
   drawPixelsFromIndex = (data: {[key: string]: string}) => {

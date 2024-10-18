@@ -62,10 +62,7 @@ export default class PointTool extends Tool {
     }
 
     // return save offset in order to not move screen
-    return {
-      x: this.controlManager.screenOffset.x,
-      y: this.controlManager.screenOffset.y
-    };
+    return this.controlManager.screenOffset
   }
 
   protected placePixel() {

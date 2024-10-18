@@ -7,6 +7,7 @@ import MoveTool from "$lib/components/toolbar/tools/MoveTool";
 import PointTool from "$lib/components/toolbar/tools/PointTool";
 import EraserTool from '$lib/components/toolbar/tools/EraserTool';
 import PlaceTool from '$lib/components/toolbar/tools/PlaceTool';
+import SelectionTool from '$lib/components/toolbar/tools/SelectionTool';
 
 
 interface Tools {
@@ -17,6 +18,7 @@ let desktopToolClasses: Tools = {
   [ToolType.Hand]: MoveTool,
   [ToolType.Cursor]: PointTool,
   [ToolType.Eraser]: EraserTool,
+  [ToolType.Selection]: SelectionTool,
 }
 
 let toolClasses: Writable<Tools | undefined> = writable<Tools>(undefined); 

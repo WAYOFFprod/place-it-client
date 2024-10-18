@@ -3,6 +3,7 @@ import Tool from '../ToolClass';
 import { destroyActiveTool, selectedTool, setToolset } from '$lib/stores/toolStore';
 import ControlManager from '../ControlManager';
 import { isWindowSmall } from '$lib/stores/tailwindStore';
+import type GridManager from '$lib/p5/GridManager';
 
 export default class ToolManager {
   p5: P5

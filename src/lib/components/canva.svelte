@@ -65,8 +65,6 @@
 	};
 
 	const connect = async (canvasData: CanvaData) => {
-		gridManager = new GridManager(p5, canvasData.size, canva.id);
-
 		networker.connectToSocket(gridManager);
 
 		const pixels = networker.tempPoints as { [key: string]: string };
@@ -77,7 +75,6 @@
 	};
 
 	const initCanvas = async () => {
-		console.log('initCanvas');
 		if (canva) {
 			width = canva.width;
 			height = canva.height;
@@ -87,7 +84,14 @@
 				data: canva,
 				size: size
 			};
-			controlManager = ControlManager.getInstance(p5, data.size, viewOnly, marginBottom);
+			gridManager = new GridManager(p5, data.size, canva.id);
+			controlManager = ControlManager.getInstance(
+				p5,
+				data.size,
+				viewOnly,
+				marginBottom,
+				gridManager
+			);
 			connect(data);
 		}
 	};

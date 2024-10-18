@@ -3,10 +3,13 @@ import Networker from '$lib/utility/Networker';
 import ToolManager from './tools/ToolManager';
 import { mouseCoord, zoom } from '$lib/stores/canvaStore';
 import { windowSize } from '$lib/stores/tailwindStore';
+import type GridManager from '$lib/p5/GridManager';
 export default class ControlManager {
   p5: P5
   networker: Networker = Networker.getInstance();;
   toolManager: ToolManager
+
+  gridManager: GridManager
 
   previousOffset: Coord | undefined = undefined;
 
@@ -31,16 +34,18 @@ export default class ControlManager {
 
   scaleFactor = 0;
 
-  static getInstance(p5?: P5, size?: Size2D, viewOnly?: boolean , marginBottom?:number) {
+  static getInstance(p5?: P5, size?: Size2D, viewOnly?: boolean , marginBottom?:number, gridManager?: GridManager) {
     if(ControlManager.instance != undefined) return ControlManager.instance;
     if(!p5 || !size || viewOnly == null || !marginBottom) throw new Error("Can't initialize ControlManager, you need to provide p5, size, viewOnly and marginBottom");
-    new ControlManager(p5, size, viewOnly, marginBottom);
+    if(!gridManager) throw new Error("you need to provide gridManager");
+    new ControlManager(p5, size, viewOnly, marginBottom, gridManager);
     return ControlManager.instance
   }
 
-  constructor(p5: P5, size: Size2D, viewOnly: boolean, marginBottom:number) {
+  constructor(p5: P5, size: Size2D, viewOnly: boolean, marginBottom:number, gridManager: GridManager) {
     ControlManager.instance = this;
 
+    this.gridManager = gridManager
     this.p5 = p5;
     this.marginBottom = marginBottom;
     // init tailwind store
