@@ -147,7 +147,8 @@ export default class GridManager {
     }
 
     this.overlay.clear();
-    
+    this.overlay.drawingContext.setLineDash([10, 10]);
+    this.overlay.strokeCap(this.p5.SQUARE);
     this.overlay.noFill();
     this.overlay.stroke('black');
     this.overlay.strokeWeight(4);
