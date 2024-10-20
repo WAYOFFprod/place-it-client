@@ -75,7 +75,7 @@ export default class Networker {
     this.socket.on('canva:new-pixel-from-others', (coord, color) => {
       console.log("NEW PIXEL FROM OTHERS");
       if(!this.gridManager) return console.error("missing grid manager");
-      this.gridManager.drawPixelOnCanvas(coord, color);
+      this.gridManager.addPixelOnCanvas(coord, color);
     });
 
     this.socket.on('chat:get-message', (message: Message) => {
@@ -287,7 +287,7 @@ export default class Networker {
     if(!this.gridManager) {
       return console.error("missing grid manager");
     }
-    const index = this.gridManager.drawPixelOnCanvas(coord, color);
+    const index = this.gridManager.addPixelOnCanvas(coord, color);
     if(index === false) return
     if(this.socket != undefined) {
       const auth: any = {

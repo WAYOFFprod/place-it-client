@@ -23,9 +23,9 @@ export default class MoveTool extends Tool {
 
   mousePressed(screenOffset: Coord): boolean {
     
-    this.controlManager.screenOffset = screenOffset
-    this.dragOffset.x = this.p5.mouseX - this.controlManager.screenOffset.x;
-    this.dragOffset.y = this.p5.mouseY - this.controlManager.screenOffset.y;
+    this.controlManager.gridManager.screenOffset = screenOffset
+    this.dragOffset.x = this.p5.mouseX - this.controlManager.gridManager.screenOffset.x;
+    this.dragOffset.y = this.p5.mouseY - this.controlManager.gridManager.screenOffset.y;
     return true;
   }
 
@@ -34,10 +34,10 @@ export default class MoveTool extends Tool {
   }
 
   mouseMove(isMouseDown: boolean) {
-    if(this.dragOffset.x == 0 && this.dragOffset.y == 0) return this.controlManager.screenOffset;
-    this.controlManager.screenOffset.x = this.p5.mouseX - this.dragOffset.x;
-    this.controlManager.screenOffset.y = this.p5.mouseY - this.dragOffset.y;
-    return this.controlManager.screenOffset;
+    if(this.dragOffset.x == 0 && this.dragOffset.y == 0) return this.controlManager.gridManager.screenOffset;
+    this.controlManager.gridManager.screenOffset.x = this.p5.mouseX - this.dragOffset.x;
+    this.controlManager.gridManager.screenOffset.y = this.p5.mouseY - this.dragOffset.y;
+    return this.controlManager.gridManager.screenOffset;
   }
 
   getType: () => null | typeof Tool = () => {

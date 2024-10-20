@@ -45,14 +45,14 @@ export default class PointTool extends Tool {
 
   mouseMove(isMouseDown: boolean) {
     if(!PointTool.color || !isMouseDown) return {
-      x: this.controlManager.screenOffset.x,
-      y: this.controlManager.screenOffset.y
+      x: this.controlManager.gridManager.screenOffset.x,
+      y: this.controlManager.gridManager.screenOffset.y
     };
 
     // check if mouse position in on new pixel
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale)
+      x: Math.floor((this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) / this.controlManager.gridManager.currentScale),
+      y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.gridManager.currentScale)
     };
 
     // if these coords are new in this stroke add it to array and place pixel
@@ -62,17 +62,15 @@ export default class PointTool extends Tool {
     }
 
     // return save offset in order to not move screen
-    return this.controlManager.screenOffset
+    return this.controlManager.gridManager.screenOffset
   }
 
   protected placePixel() {
     if(!PointTool.color) return;
     // calculate on which pixel the mouse is over
-    console.log("this.controlManager.screenOffset", this.controlManager.screenOffset)
-    console.log("this.controlManager.currentScale", this.controlManager.currentScale)
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale)
+      x: Math.floor((this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) / this.controlManager.gridManager.currentScale),
+      y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.gridManager.currentScale)
     };
     this.pixels.push(coords);
     this.networker.placePixel(coords, PointTool.color);

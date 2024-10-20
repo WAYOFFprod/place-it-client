@@ -38,14 +38,14 @@ export default class ToolManager {
 
   updateOffset() {
     if (this.activeTool) {
-      this.controlManager.screenOffset = this.activeTool.mouseMove(true);
+      this.controlManager.gridManager.screenOffset = this.activeTool.mouseMove(true);
     }
   }
 
   // returns boolean representing if tool should toggle mousedown variable
   mousePressed() {
     if(this.activeTool) {
-      return this.activeTool.mousePressed(this.controlManager.screenOffset);
+      return this.activeTool.mousePressed(this.controlManager.gridManager.screenOffset);
     }
     return true
   }

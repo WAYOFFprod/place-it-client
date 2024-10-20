@@ -84,14 +84,8 @@
 				data: canva,
 				size: size
 			};
-			gridManager = new GridManager(p5, data.size, canva.id);
-			controlManager = ControlManager.getInstance(
-				p5,
-				data.size,
-				viewOnly,
-				marginBottom,
-				gridManager
-			);
+			gridManager = new GridManager(p5, data.size, canva.id, marginBottom);
+			controlManager = ControlManager.getInstance(p5, viewOnly, gridManager);
 			connect(data);
 		}
 	};
@@ -115,8 +109,8 @@
 				if (gridManager.needsUpdate || controlManager.hasNewScreenOffset()) {
 					p5.push();
 					p5.background(150);
-					p5.translate(controlManager.screenOffset.x, controlManager.screenOffset.y);
-					p5.scale(controlManager.currentScale);
+					p5.translate(gridManager.screenOffset.x, gridManager.screenOffset.y);
+					p5.scale(gridManager.currentScale);
 
 					// draw content
 					gridManager.updateCanvasPosition();

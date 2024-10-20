@@ -16,11 +16,6 @@ export default class ControlManager {
   isMouseDown: boolean = false
   isMouseDragging: boolean = false
 
-  marginBottom: number = 0
-
-  screenOffset: Coord
-  currentScale: number
-
   MIN_ZOOM = 0.5
   MAX_ZOOM = 128
 
@@ -34,20 +29,19 @@ export default class ControlManager {
 
   scaleFactor = 0;
 
-  static getInstance(p5?: P5, size?: Size2D, viewOnly?: boolean , marginBottom?:number, gridManager?: GridManager) {
+  static getInstance(p5?: P5, viewOnly?: boolean , gridManager?: GridManager) {
     if(ControlManager.instance != undefined) return ControlManager.instance;
-    if(!p5 || !size || viewOnly == null || !marginBottom) throw new Error("Can't initialize ControlManager, you need to provide p5, size, viewOnly and marginBottom");
+    if(!p5 || viewOnly == null) throw new Error("Can't initialize ControlManager, you need to provide p5, size, viewOnly and marginBottom");
     if(!gridManager) throw new Error("you need to provide gridManager");
-    new ControlManager(p5, size, viewOnly, marginBottom, gridManager);
+    new ControlManager(p5, viewOnly, gridManager);
     return ControlManager.instance
   }
 
-  constructor(p5: P5, size: Size2D, viewOnly: boolean, marginBottom:number, gridManager: GridManager) {
+  constructor(p5: P5, viewOnly: boolean, gridManager: GridManager) {
     ControlManager.instance = this;
 
     this.gridManager = gridManager
     this.p5 = p5;
-    this.marginBottom = marginBottom;
     // init tailwind store
     windowSize(window)
     
@@ -56,26 +50,13 @@ export default class ControlManager {
     this.toolManager = new ToolManager(p5, viewOnly);
 
     // initialize scale factor
-		const widthRatio = this.p5.windowWidth / size.width;
-		const heightRatio = (this.p5.windowHeight - this.marginBottom) / size.height;
+		
     
 		// get scale factor by getting the one from the axies with the least pixels
-    this.currentScale = Math.max(widthRatio < heightRatio ? widthRatio : heightRatio, this.MIN_ZOOM);
-    console.log("this.currentScale", this.currentScale)
+    
+    console.log("this.currentScale", this.gridManager.currentScale)
 		// this.currentScale = 1;
-		// set initial offset to center image
-		const x = (size.width / 2) * this.currentScale;
-		const y = (size.height / 2) * this.currentScale;
-    
-    const screenCenter = {
-      x: this.p5.windowWidth / 2,
-      y: (this.p5.windowHeight - this.marginBottom) / 2
-    };
-    
-    this.screenOffset = {
-      x: screenCenter.x - x,
-      y: screenCenter.y - y
-    };
+		
   }
 
   checkMousePosition() {
@@ -83,8 +64,8 @@ export default class ControlManager {
       this.toolManager.updateOffset()
     }
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.screenOffset.x) / this.currentScale),
-      y: Math.floor((this.p5.mouseY - this.screenOffset.y) / this.currentScale)
+      x: Math.floor((this.p5.mouseX - this.gridManager.screenOffset.x) / this.gridManager.currentScale),
+      y: Math.floor((this.p5.mouseY - this.gridManager.screenOffset.y) / this.gridManager.currentScale)
     };
     mouseCoord.set(coords)
   }
@@ -105,12 +86,12 @@ export default class ControlManager {
 
   hasNewScreenOffset() {
     if(!this.previousOffset) return true;
-    if(this.previousOffset.x == this.screenOffset.x && this.previousOffset.y == this.screenOffset.y) return false;
+    if(this.previousOffset.x == this.gridManager.screenOffset.x && this.previousOffset.y == this.gridManager.screenOffset.y) return false;
     return true;
   }
 
   saveScreenOffset() {
-    this.previousOffset = {...this.screenOffset}
+    this.previousOffset = {...this.gridManager.screenOffset}
   }
 
 	hasMovedSinceDragStart() {
@@ -126,21 +107,21 @@ export default class ControlManager {
 	};
 
   scroll(scaleFactor: number) {
-    const newCurrentScale = this.currentScale * scaleFactor;
+    const newCurrentScale = this.gridManager.currentScale * scaleFactor;
 
-    let newScaleFactor = newCurrentScale / this.currentScale
+    let newScaleFactor = newCurrentScale / this.gridManager.currentScale
 
     let limitScaleFactor
     if(scaleFactor > 1) {
       limitScaleFactor = Math.min(newCurrentScale, this.MAX_ZOOM)
-      newScaleFactor = limitScaleFactor  / this.currentScale;
+      newScaleFactor = limitScaleFactor  / this.gridManager.currentScale;
     } else {
       limitScaleFactor = Math.max(newCurrentScale, this.MIN_ZOOM)
-      newScaleFactor = limitScaleFactor /  this.currentScale;
+      newScaleFactor = limitScaleFactor /  this.gridManager.currentScale;
     }
     
     this.scaleFactor = newScaleFactor
-    this.currentScale = limitScaleFactor
+    this.gridManager.currentScale = limitScaleFactor
     // get mouse position relative to canvas zoom
     const relMouse = {
       x: this.p5.mouseX * this.scaleFactor,
@@ -149,12 +130,12 @@ export default class ControlManager {
 
     // get the current screen offset relative to the canvas
     const relOffset = {
-      x: this.screenOffset.x * this.scaleFactor,
-      y: this.screenOffset.y * this.scaleFactor
+      x: this.gridManager.screenOffset.x * this.scaleFactor,
+      y: this.gridManager.screenOffset.y * this.scaleFactor
     };
 
-    this.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
-    this.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
+    this.gridManager.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
+    this.gridManager.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
 
     const percentScale = newScaleFactor/this.MAX_ZOOM * 100 as number
     zoom.set(percentScale)

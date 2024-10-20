@@ -37,23 +37,25 @@ export default class SelectionTool extends Tool {
   }
 
   mousePressed(screenOffset: Coord): boolean {
-    this.controlManager.screenOffset = screenOffset
-    this.dragCurrent.x = this.dragStart.x = this.p5.mouseX - this.controlManager.screenOffset.x;
-    this.dragCurrent.y = this.dragStart.y = this.p5.mouseY - this.controlManager.screenOffset.y;
+    this.controlManager.gridManager.screenOffset = screenOffset
+    this.dragCurrent.x = this.dragStart.x = this.p5.mouseX - this.controlManager.gridManager.screenOffset.x;
+    this.dragCurrent.y = this.dragStart.y = this.p5.mouseY - this.controlManager.gridManager.screenOffset.y;
     this.drawRectangle();
     return true;
   }
 
   mouseReleased() {
-    
+    this.dragPrevious = {
+      x: 0,
+      y: 0
+    };
   }
 
   mouseMove(isMouseDown: boolean) {
-    if(this.dragCurrent.x == 0 && this.dragCurrent.y == 0) return this.controlManager.screenOffset;
-    this.dragCurrent.x = this.p5.mouseX - this.controlManager.screenOffset.x;
-    this.dragCurrent.y = this.p5.mouseY - this.controlManager.screenOffset.y;
+    this.dragCurrent.x = this.p5.mouseX - this.controlManager.gridManager.screenOffset.x;
+    this.dragCurrent.y = this.p5.mouseY - this.controlManager.gridManager.screenOffset.y;
     this.drawRectangle();
-    return this.controlManager.screenOffset;
+    return this.controlManager.gridManager.screenOffset;
   }
 
   getType: () => null | typeof Tool = () => {
@@ -61,9 +63,9 @@ export default class SelectionTool extends Tool {
   }
 
   protected drawRectangle() {
-    console.log("drawRectangle", this.dragPrevious.x, this.dragCurrent.x)
     if(this.dragPrevious.x == this.dragCurrent.x && this.dragPrevious.y == this.dragCurrent.y) return;
-    this.controlManager.gridManager.drawRectangleOverlay(this.dragStart, this.dragCurrent, "white");
+    this.controlManager.gridManager.updateRectangleOverlay(this.dragStart, this.dragCurrent, "black");
+    this.dragPrevious = {...this.dragCurrent};
   }
 
 }

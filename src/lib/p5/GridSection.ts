@@ -53,7 +53,7 @@ export default class GridSection {
     this.p5.image(this.img, this.offset.x, this.offset.y)
   }
 
-  drawPixel(position: Coord, c: string) {
+  storePixel(position: Coord, c: string) {
     const i = position.x + (this.sectionWidth * position.y)
     
     this.colors[i] = c
