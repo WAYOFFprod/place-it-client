@@ -135,11 +135,12 @@ export default class GridManager {
   updateRectangleOverlay = (start: Coord, end: Coord, color: string) => {
     if(this.overlay == null) return;
 
-    const widthInPixels = Math.round(Math.abs(start.x - end.x) / this.currentScale);
-    const heightInPixels = Math.round(Math.abs(start.y - end.y) / this.currentScale);
-    if(widthInPixels - this.overlayRectangleSize.width == 0 
-      || heightInPixels - this.overlayRectangleSize.height == 0) return;
+    const widthInPixels = Math.abs(Math.round(start.x / this.currentScale) - Math.round(end.x / this.currentScale )) + 1;
+    const heightInPixels = Math.abs(Math.round(start.y / this.currentScale) - Math.round(end.y / this.currentScale)) + 1;
 
+    // don't rerender if the size of rectangle hasn't change
+    if(widthInPixels - this.overlayRectangleSize.width == 0 
+      && heightInPixels - this.overlayRectangleSize.height == 0) return;
     this.overlayRectangleSize = {
       width: widthInPixels,
       height: heightInPixels
@@ -151,12 +152,14 @@ export default class GridManager {
     this.overlay.stroke('black');
     this.overlay.strokeWeight(4);
     
-    const x = Math.round(Math.min(start.x , end.x) / this.currentScale) * this.currentScale;
-    const y = Math.round(Math.min(start.y , end.y) / this.currentScale) * this.currentScale;
+    const startX = start.x > end.x ? end.x : start.x;
+    const startY = start.y > end.y ? end.y : start.y;
+    
+    const x = Math.round(startX / this.currentScale) * this.currentScale;
+    const y = Math.round(startY / this.currentScale) * this.currentScale;
 
     this.overlay.rect(x, y, this.overlayRectangleSize.width * this.currentScale , this.overlayRectangleSize.height * this.currentScale);
     
-    // this.p5.image(this.overlay, this.overlay.width / 2, this.overlay.height / 2);
     this.needsUpdate = true;
   }
 
