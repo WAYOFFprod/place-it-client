@@ -24,6 +24,20 @@ export default class GridManager {
   overlay: P5.Graphics | null = null;
   overlayRectangleSize: Size2D;
 
+  sel: {
+    pos: Coord,
+    size: Size2D
+  } = {
+    pos: {
+      x: 0,
+      y: 0
+    },
+    size: {
+      width: 0,
+      height: 0
+    }
+  }
+
   
   MIN_ZOOM = 0.5
   MAX_ZOOM = 128
@@ -134,9 +148,16 @@ export default class GridManager {
 
   updateRectangleOverlay = (start: Coord, end: Coord, color: string) => {
     if(this.overlay == null) return;
-
-    const widthInPixels = Math.abs(Math.round(start.x / this.currentScale) - Math.round(end.x / this.currentScale )) + 1;
-    const heightInPixels = Math.abs(Math.round(start.y / this.currentScale) - Math.round(end.y / this.currentScale)) + 1;
+    const startPos = {
+      x: start.x > end.x ? end.x : start.x,
+      y: start.y > end.y ? end.y : start.y
+    };
+    const endPos = {
+      x: start.x > end.x ? start.x : end.x,
+      y: start.y > end.y ? start.y : end.y
+    };
+    const widthInPixels = Math.abs(Math.round(startPos.x / this.currentScale) - Math.round(endPos.x / this.currentScale )) + 1;
+    const heightInPixels = Math.abs(Math.round(startPos.y / this.currentScale) - Math.round(endPos.y / this.currentScale)) + 1;
 
     // don't rerender if the size of rectangle hasn't change
     if(widthInPixels - this.overlayRectangleSize.width == 0 
@@ -153,14 +174,67 @@ export default class GridManager {
     this.overlay.stroke('black');
     this.overlay.strokeWeight(4);
     
-    const startX = start.x > end.x ? end.x : start.x;
-    const startY = start.y > end.y ? end.y : start.y;
-    
-    const x = Math.round(startX / this.currentScale) * this.currentScale;
-    const y = Math.round(startY / this.currentScale) * this.currentScale;
+    this.sel.pos = {
+      x: Math.round(startPos.x / this.currentScale) * this.currentScale,
+      y: Math.round(startPos.y / this.currentScale) * this.currentScale
+    }
 
-    this.overlay.rect(x, y, this.overlayRectangleSize.width * this.currentScale , this.overlayRectangleSize.height * this.currentScale);
+    this.sel.size = {
+      width: this.overlayRectangleSize.width * this.currentScale,
+      height: this.overlayRectangleSize.height * this.currentScale
+    }
+
+    this.overlay.rect(
+      this.sel.pos.x,
+      this.sel.pos.y,
+      this.sel.size.width,
+      this.sel.size.height
+    );
     
+    this.needsUpdate = true;
+  }
+
+  clipboard: P5.Image[] = []
+  copySelection = () => {
+    console.log("copy selection", this.sel);
+    const startCoord: Coord = {
+      x: Math.round((this.sel.pos.x) / this.currentScale),
+      y: Math.round((this.sel.pos.y) / this.currentScale)
+    };
+    const endCoord: Coord = {
+      x: Math.round((this.sel.pos.x + this.sel.size.width) / this.currentScale),
+      y: Math.round((this.sel.pos.y + this.sel.size.height) / this.currentScale)
+    };
+    const startSection = this.getGridSectionIndex({
+      x: startCoord.x,
+      y: startCoord.y
+    });
+    const endSection = this.getGridSectionIndex({
+      x: endCoord.x,
+      y: endCoord.y
+    });
+    // let clipboard = [];
+    this.clipboard = [];
+    for (let index = startSection; index <= endSection; index++) {
+      const start = this.getPositionRelativeToSection(startCoord)
+      const end = this.getPositionRelativeToSection(endCoord)
+      this.clipboard.push(this.gridSections[index].copyContent(start, end));
+    }
+    // console.log(clipboard[0])
+  }
+
+  pasteClipboard = () => {
+    const startCoord: Coord = {
+      x: Math.floor((this.sel.pos.x) / this.currentScale),
+      y: Math.floor((this.sel.pos.y) / this.currentScale)
+    };
+    // const startSection = this.getGridSectionIndex({
+    //   x: startCoord.x,
+    //   y: startCoord.y
+    // });
+
+    const start = this.getPositionRelativeToSection(startCoord)
+    this.gridSections[0].pasteContent(start, this.clipboard[0])
     this.needsUpdate = true;
   }
 
@@ -170,7 +244,7 @@ export default class GridManager {
         const index = parseInt(id);
         const absolutePosition = this.getCoordFromIndex(index, this.canvas.width)
         const gridIndex = this.getGridSectionIndex(absolutePosition);
-        const relPosition = this.getSectionRelativePixelPosition(absolutePosition);
+        const relPosition = this.getPositionRelativeToSection(absolutePosition);
 
         this.gridSections[gridIndex].storePixel(relPosition, color);
       }
@@ -182,7 +256,7 @@ export default class GridManager {
       return false
     }
     
-    const relPosition = this.getSectionRelativePixelPosition(absolutePosition);
+    const relPosition = this.getPositionRelativeToSection(absolutePosition);
     const i = this.getGridSectionIndex(absolutePosition);
     this.gridSections[i].storePixel(relPosition, color);
     this.needsUpdate = true;
@@ -211,6 +285,7 @@ export default class GridManager {
   }
 
   private getGridSectionIndex(position: Coord): number {
+    console.log("position", position);
     const gridX = Math.floor(position.x / PIXEL_IN_SECTION)
     const gridY = Math.floor(position.y / PIXEL_IN_SECTION)
     return gridX + (this.sectionGrid.width * gridY)
@@ -221,7 +296,7 @@ export default class GridManager {
   }
 
   /* return the position of a pixel as if all grid start at 0 */
-  private getSectionRelativePixelPosition(absolutePosition: Coord): Coord {
+  private getPositionRelativeToSection(absolutePosition: Coord): Coord {
     return {
       x: absolutePosition.x % PIXEL_IN_SECTION,
       y: absolutePosition.y % PIXEL_IN_SECTION

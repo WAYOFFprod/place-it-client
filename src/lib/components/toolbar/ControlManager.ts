@@ -84,6 +84,14 @@ export default class ControlManager {
     this.isMouseDown = false;
   }
 
+  keyUp() {
+    this.toolManager.keyUp()
+  }
+
+  keyDown() {
+    this.toolManager.keyDown()
+  }
+
   hasNewScreenOffset() {
     if(!this.previousOffset) return true;
     if(this.previousOffset.x == this.gridManager.screenOffset.x && this.previousOffset.y == this.gridManager.screenOffset.y) return false;

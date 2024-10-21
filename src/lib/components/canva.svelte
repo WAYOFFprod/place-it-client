@@ -159,6 +159,8 @@
 			);
 
 			p5.keyPressed = () => {
+				if (!controlManager) return;
+				controlManager.keyDown();
 				switch (p5.keyCode) {
 					case p5.OPTION:
 						setTempTool(ToolType.Hand, p5);
@@ -169,6 +171,7 @@
 			};
 			p5.keyReleased = () => {
 				if (!controlManager) return;
+				controlManager.keyUp();
 				switch (p5.keyCode) {
 					case p5.UP_ARROW:
 						controlManager.scroll(1 + zoomSensitivity);

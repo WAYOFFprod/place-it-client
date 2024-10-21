@@ -49,6 +49,18 @@ export default class ToolManager {
     }
     return true
   }
+  
+  keyDown() {
+    if(this.activeTool) {
+      this.activeTool.keyDown();
+    }
+  }
+
+  keyUp() {
+    if(this.activeTool) {
+      this.activeTool.keyUp();
+    }
+  }
 
   mouseReleased() {
     if(this.activeTool) {

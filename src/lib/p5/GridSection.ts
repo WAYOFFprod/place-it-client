@@ -69,6 +69,32 @@ export default class GridSection {
     }
   }
 
+  copyContent(start: Coord, end: Coord ) {
+    console.log("copy at", start, "width", end.x - start.x, "height", end.y - start.y);
+    return this.img.get(start.x, start.y, end.x - start.x, end.y - start.y);
+  }
+
+  pasteContent(start:Coord, image: P5.Image) {
+    image.loadPixels();
+    this.img.set(start.x, start.y, image);
+
+    // TODO: use updatePixel way
+    // TODO: save to server as well
+
+    // for (const key in this.colors) {
+    //   if (Object.hasOwnProperty.call(this.colors, key)) { 
+    //     const color = this.colors[key];
+    //     const id = parseInt(key);
+    //     const x =  (id % this.sectionWidth)
+    //     const y =  Math.floor(id / this.sectionWidth)
+
+    //     // only render if in bounding box
+    //     this.img.set(x, y, [this.p5.red(color), this.p5.green(color), this.p5.blue(color), 255]);
+    //   }
+    // }
+    // this.img.updatePixels();
+  }
+
   hasPixelAtPosition(x:number, y:number) {
     const i = x + (this.sectionWidth * y)
     if(this.colors[i]) {

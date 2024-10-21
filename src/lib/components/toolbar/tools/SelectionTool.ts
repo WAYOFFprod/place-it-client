@@ -33,7 +33,16 @@ export default class SelectionTool extends Tool {
   }
 
   keyUp() {
-
+    // TODO: support CMD on mac instead of CTRL
+    switch(this.p5.keyCode) {
+      case 67: // C
+        this.p5.keyIsDown(this.p5.CONTROL) ? this.copySelection() : null;
+        break;
+      case 86: // V
+          this.p5.keyIsDown(this.p5.CONTROL) ? this.pasteClipboard() : null;
+        break;
+    }
+    console.log(this.p5.keyCode)
   }
 
   mousePressed(screenOffset: Coord): boolean {
@@ -60,6 +69,15 @@ export default class SelectionTool extends Tool {
 
   getType: () => null | typeof Tool = () => {
     return SelectionTool
+  }
+
+  clipboard:any = null;
+  protected copySelection() {
+    this.clipboard = this.controlManager.gridManager.copySelection();
+  }
+
+  protected pasteClipboard() {
+    this.controlManager.gridManager.pasteClipboard()
   }
 
   protected drawRectangle() {
