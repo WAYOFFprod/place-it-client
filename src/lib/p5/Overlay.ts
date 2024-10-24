@@ -113,7 +113,8 @@ export default class Overlay {
     return this.img;
   }
   isInSelection = (x: number, y: number): boolean => {
+    console.log(x > this.sel.pos.x, x < this.sel.pos.x + this.sel.size.width, y > this.sel.pos.y, y < this.sel.pos.y + this.sel.size.height)
     return x > this.sel.pos.x && x < this.sel.pos.x + this.sel.size.width
-      && x > this.sel.pos.y && y < this.sel.pos.y + this.sel.size.height
+      && y > this.sel.pos.y && y < this.sel.pos.y + this.sel.size.height
   }
 }
