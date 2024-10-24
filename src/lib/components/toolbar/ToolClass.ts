@@ -1,6 +1,7 @@
 
 import P5 from 'p5';
 import ControlManager from './ControlManager';
+import { writable, type Writable } from 'svelte/store';
 
 
 export enum ToolType {
@@ -13,9 +14,14 @@ export enum ToolType {
 
 export default class Tool {
   
-  static cursor: string = ''
+  static cursor: string = 'pointer'
   static type: ToolType 
   static icon: any
+
+  cursorW: Writable<string> = writable<string>(Tool.cursor);
+  getCursor(): string {
+    return Tool.cursor;
+  }
   
 
   scaleFactor = 0;
@@ -46,10 +52,11 @@ export default class Tool {
   }
 
   mouseMove(isMouseDown: boolean): Coord {
-    return {
+    if(isMouseDown) return {
       x: this.p5.mouseX,
       y: this.p5.mouseX
     };
+    return this.controlManager.gridManager.screenOffset
   }
 
   // returns: boolean that represent if pressing down should be saved

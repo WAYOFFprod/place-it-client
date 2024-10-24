@@ -36,9 +36,9 @@ export default class ToolManager {
     });
   }
 
-  updateOffset() {
+  updateOffset(isMouseDown: boolean) {
     if (this.activeTool) {
-      this.controlManager.gridManager.screenOffset = this.activeTool.mouseMove(true);
+      this.controlManager.gridManager.screenOffset = this.activeTool.mouseMove(isMouseDown);
     }
   }
 

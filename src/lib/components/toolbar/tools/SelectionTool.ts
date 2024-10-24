@@ -1,20 +1,23 @@
 import { ToolType } from "$lib/stores/toolStore";
 import Tool from "../ToolClass";
 import SelectionIcon from "$lib/icons/selection.svelte"
+import { writable, type Writable } from "svelte/store";
 
 export default class SelectionTool extends Tool {
   static cursor = "selection"
   static type = ToolType.Selection
   static icon = SelectionIcon
 
-  previousCanvaPosition: Coord = {
-    x: 0,
-    y: 0
+  hover = writable<boolean>(false);
+
+  cursorW: Writable<string> = writable<string>(SelectionTool.cursor);
+
+  isHoveringSelection = false;
+  getCursor(): string {
+    this.cursorW.subscribe
+    return this.hover ? SelectionTool.cursor : "hand"
   }
-  currentCanvaPosition: Coord = {
-    x: 0,
-    y: 0
-  }
+
   dragStart: Coord = {
     x: 0,
     y: 0
@@ -24,6 +27,10 @@ export default class SelectionTool extends Tool {
     y: 0
   }
   dragCurrent: Coord = {
+		x: 0,
+		y: 0
+	};
+  dragEnd: Coord = {
 		x: 0,
 		y: 0
 	};
@@ -42,10 +49,10 @@ export default class SelectionTool extends Tool {
           this.p5.keyIsDown(this.p5.CONTROL) ? this.pasteClipboard() : null;
         break;
     }
-    console.log(this.p5.keyCode)
   }
 
   mousePressed(screenOffset: Coord): boolean {
+    if(this.isHoveringSelection) return false;
     this.controlManager.gridManager.screenOffset = screenOffset
     this.dragCurrent.x = this.dragStart.x = this.p5.mouseX - this.controlManager.gridManager.screenOffset.x;
     this.dragCurrent.y = this.dragStart.y = this.p5.mouseY - this.controlManager.gridManager.screenOffset.y;
@@ -54,6 +61,8 @@ export default class SelectionTool extends Tool {
   }
 
   mouseReleased() {
+    if(this.isHoveringSelection) return;
+    this.dragEnd = {...this.dragCurrent};
     this.dragPrevious = {
       x: 0,
       y: 0
@@ -61,9 +70,14 @@ export default class SelectionTool extends Tool {
   }
 
   mouseMove(isMouseDown: boolean) {
-    this.dragCurrent.x = this.p5.mouseX - this.controlManager.gridManager.screenOffset.x;
-    this.dragCurrent.y = this.p5.mouseY - this.controlManager.gridManager.screenOffset.y;
-    this.drawRectangle();
+    if(isMouseDown) {
+      if(!this.isHoveringSelection) {
+        this.dragCurrent.x = this.p5.mouseX - this.controlManager.gridManager.screenOffset.x;
+        this.dragCurrent.y = this.p5.mouseY - this.controlManager.gridManager.screenOffset.y;
+        this.drawRectangle();
+      }
+    }
+    this.defineCursor(isMouseDown)
     return this.controlManager.gridManager.screenOffset;
   }
 
@@ -84,6 +98,19 @@ export default class SelectionTool extends Tool {
     if(this.dragPrevious.x == this.dragCurrent.x && this.dragPrevious.y == this.dragCurrent.y) return;
     this.controlManager.gridManager.updateRectangleOverlay(this.dragStart, this.dragCurrent, "black");
     this.dragPrevious = {...this.dragCurrent};
+  }
+
+  protected defineCursor(isMouseDown: boolean) {
+    if(isMouseDown) {
+      this.cursorW.set('selection')
+      this.isHoveringSelection = false;
+    } else if(this.controlManager.gridManager.isInSelection(this.p5.mouseX, this.p5.mouseY)) {
+      this.isHoveringSelection = true;
+      this.cursorW.set('hand')
+    } else {
+      this.isHoveringSelection = false;
+      this.cursorW.set('selection')
+    }
   }
 
 }

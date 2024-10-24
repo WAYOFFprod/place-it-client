@@ -15,6 +15,8 @@
 	import Chat from './chat/chat.svelte';
 	import ZoomCounter from './metric/zoomCounter.svelte';
 	import CoordViewer from './metric/coordViewer.svelte';
+	import Cursor from '$lib/icons/cursor.svelte';
+	import { derived } from 'svelte/store';
 
 	export let canva: CanvaPreviewData;
 	export let viewOnly: boolean = true;
@@ -36,12 +38,20 @@
 	const zoomSensitivity = 0.1;
 
 	let currentToolType: typeof Tool = Tool;
+	let currentTool: Tool | undefined;
+	let cursorUnsub: () => void;
+	let cursor: string;
 
 	const unsubscribeTool = selectedTool.subscribe((newTool: Tool | undefined) => {
+		if (cursorUnsub) cursorUnsub();
 		if (newTool == undefined) return;
 		const type = newTool.getType();
 		if (type == null) return;
 		currentToolType = type;
+		currentTool = newTool;
+		cursorUnsub = currentTool.cursorW.subscribe((newCursor: string) => {
+			cursor = newCursor;
+		});
 	});
 
 	const unsubscribeEvent = event.subscribe((newEvent) => {
@@ -208,10 +218,16 @@
 		unsubscribeEvent();
 		unsubscribeReady();
 	});
+
+	// $: cursor = () => {
+	// 	if (currentTool == undefined) return '';
+	// 	return 'cursor-' + currentTool.getCursor();
+	// };
+	$: cursor;
 </script>
 
 <Modal></Modal>
-<div {id} class="relative cursor-{currentToolType.cursor} {$$props.class}">
+<div {id} class="relative cursor-{cursor} {$$props.class}">
 	<!-- overlay -->
 	<div class="absolute inset-0 pointer-events-none">
 		{#if currentToolType.type == ToolType.Place}

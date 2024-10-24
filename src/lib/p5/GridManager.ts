@@ -1,5 +1,6 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
+import Overlay from './Overlay';
 
 let PIXEL_IN_SECTION: number;
 
@@ -9,34 +10,17 @@ export default class GridManager {
   p5: P5
   canvasId: number
   gridSections: GridSection[];
-  canvas: {width: number, height: number};
+  overlay: Overlay;
+  canvas: Size2D;
   sectionGrid: {width: number, height: number};
   color: string = '#ffffff';
   pixelsAdded = false;
   imageLoaded = false;
   needsUpdate: boolean = true;
   screenOffset: Coord;
-  previousScale: number;
   currentScale: number;
   
   marginBottom: number;
-  
-  overlay: P5.Graphics | null = null;
-  overlayRectangleSize: Size2D;
-
-  sel: {
-    pos: Coord,
-    size: Size2D
-  } = {
-    pos: {
-      x: 0,
-      y: 0
-    },
-    size: {
-      width: 0,
-      height: 0
-    }
-  }
 
   
   MIN_ZOOM = 0.5
@@ -64,7 +48,7 @@ export default class GridManager {
     // set scaleFactor
     const widthRatio = this.p5.windowWidth / canvas.width;
 		const heightRatio = (this.p5.windowHeight - this.marginBottom) / canvas.height;
-    this.previousScale = this.currentScale = Math.max(widthRatio < heightRatio ? widthRatio : heightRatio, this.MIN_ZOOM);
+    this.currentScale = Math.max(widthRatio < heightRatio ? widthRatio : heightRatio, this.MIN_ZOOM);
     
 
 
@@ -84,11 +68,12 @@ export default class GridManager {
       y: screenCenter.y - y
     };
 
-    this.overlay = this.p5.createGraphics(this.canvas.height * this.currentScale, this.canvas.width * this.currentScale);
-    this.overlayRectangleSize = {
-      width: 0,
-      height: 0
-    }
+    this.overlay = new Overlay(p5, this);
+    // this.overlay = this.p5.createGraphics(this.canvas.height * this.currentScale, this.canvas.width * this.currentScale);
+    // this.overlayRectangleSize = {
+    //   width: 0,
+    //   height: 0
+    // }
     // create gridSections
     for(let y = 0; y < this.canvas.height / PIXEL_IN_SECTION; y++) {
       for(let x = 0; x < this.canvas.width / PIXEL_IN_SECTION; x++) {
@@ -147,91 +132,31 @@ export default class GridManager {
   }
 
   updateRectangleOverlay = (start: Coord, end: Coord, color: string) => {
-    if(this.overlay == null) return;
-    const startPos = {
-      x: start.x > end.x ? end.x : start.x,
-      y: start.y > end.y ? end.y : start.y
-    };
-    const endPos = {
-      x: start.x > end.x ? start.x : end.x,
-      y: start.y > end.y ? start.y : end.y
-    };
-    const widthInPixels = Math.abs(Math.round(startPos.x / this.currentScale) - Math.round(endPos.x / this.currentScale )) + 1;
-    const heightInPixels = Math.abs(Math.round(startPos.y / this.currentScale) - Math.round(endPos.y / this.currentScale)) + 1;
-
-    // don't rerender if the size of rectangle hasn't change
-    if(widthInPixels - this.overlayRectangleSize.width == 0 
-      && heightInPixels - this.overlayRectangleSize.height == 0) return;
-    this.overlayRectangleSize = {
-      width: widthInPixels,
-      height: heightInPixels
-    }
-
-    this.overlay.clear();
-    this.overlay.drawingContext.setLineDash([10, 10]);
-    this.overlay.strokeCap(this.p5.SQUARE);
-    this.overlay.noFill();
-    this.overlay.stroke('black');
-    this.overlay.strokeWeight(4);
-    
-    this.sel.pos = {
-      x: Math.round(startPos.x / this.currentScale) * this.currentScale,
-      y: Math.round(startPos.y / this.currentScale) * this.currentScale
-    }
-
-    this.sel.size = {
-      width: this.overlayRectangleSize.width * this.currentScale,
-      height: this.overlayRectangleSize.height * this.currentScale
-    }
-
-    this.overlay.rect(
-      this.sel.pos.x,
-      this.sel.pos.y,
-      this.sel.size.width,
-      this.sel.size.height
-    );
-    
-    this.needsUpdate = true;
+    this.needsUpdate = this.overlay.updateOverlay(start, end, color);;
   }
 
   clipboard: P5.Image[] = []
   copySelection = () => {
-    console.log("copy selection", this.sel);
-    const startCoord: Coord = {
-      x: Math.round((this.sel.pos.x) / this.currentScale),
-      y: Math.round((this.sel.pos.y) / this.currentScale)
-    };
-    const endCoord: Coord = {
-      x: Math.round((this.sel.pos.x + this.sel.size.width) / this.currentScale),
-      y: Math.round((this.sel.pos.y + this.sel.size.height) / this.currentScale)
-    };
+    const coords = this.overlay.getSelection();
     const startSection = this.getGridSectionIndex({
-      x: startCoord.x,
-      y: startCoord.y
+      x: coords.start.x,
+      y: coords.start.y
     });
     const endSection = this.getGridSectionIndex({
-      x: endCoord.x,
-      y: endCoord.y
+      x: coords.end.x,
+      y: coords.end.y
     });
-    // let clipboard = [];
+
     this.clipboard = [];
     for (let index = startSection; index <= endSection; index++) {
-      const start = this.getPositionRelativeToSection(startCoord)
-      const end = this.getPositionRelativeToSection(endCoord)
+      const start = this.getPositionRelativeToSection(coords.start)
+      const end = this.getPositionRelativeToSection(coords.end)
       this.clipboard.push(this.gridSections[index].copyContent(start, end));
     }
-    // console.log(clipboard[0])
   }
 
   pasteClipboard = () => {
-    const startCoord: Coord = {
-      x: Math.floor((this.sel.pos.x) / this.currentScale),
-      y: Math.floor((this.sel.pos.y) / this.currentScale)
-    };
-    // const startSection = this.getGridSectionIndex({
-    //   x: startCoord.x,
-    //   y: startCoord.y
-    // });
+    const startCoord = this.overlay.getStart();
 
     const start = this.getPositionRelativeToSection(startCoord)
     this.gridSections[0].pasteContent(start, this.clipboard[0])
@@ -274,18 +199,18 @@ export default class GridManager {
     }
     // update overlay
     if(this.overlay != null) {
-      const scaleChange = this.currentScale/ this.previousScale;
-
-      if(scaleChange != 0) {
-        this.overlay.scale(this.canvas.width / (this.canvas.width * scaleChange));
-        this.previousScale = this.currentScale;
-      }
-      this.p5.image(this.overlay, 0, 0, this.canvas.width, this.canvas.height);
+      
+      this.p5.image(this.overlay.updateAndGetImg(), 0, 0, this.canvas.width, this.canvas.height);
     }
   }
 
+  isInSelection = (x: number, y: number): boolean => {
+    const mouseX = x - this.screenOffset.x;
+    const mouseY = y - this.screenOffset.y;
+    return this.overlay.isInSelection(mouseX, mouseY);
+  }
+
   private getGridSectionIndex(position: Coord): number {
-    console.log("position", position);
     const gridX = Math.floor(position.x / PIXEL_IN_SECTION)
     const gridY = Math.floor(position.y / PIXEL_IN_SECTION)
     return gridX + (this.sectionGrid.width * gridY)
@@ -310,6 +235,7 @@ export default class GridManager {
     }
   }
 
+  // check if pixel is in bound of canva
   private isSectionIndexInBound(coord: Coord): boolean {
     if(coord.x < 0 || coord.x >= this.canvas.width) {
       console.error("grid section not in bound x", coord.x);

@@ -4,7 +4,7 @@ import CursorIcon from "$lib/icons/cursor.svelte"
 import Networker from "$lib/utility/Networker";
 
 import { selectedColor } from "$lib/stores/colorStore";
-import { get } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 
 export default class PointTool extends Tool {
   static cursor = "pointer"
@@ -13,6 +13,7 @@ export default class PointTool extends Tool {
   static unsubscribeColors: any | undefined = undefined;
   static color: string | undefined;
 
+  cursorW: Writable<string> = writable<string>(PointTool.cursor);
 
   networker: Networker = Networker.getInstance();
 
@@ -44,10 +45,7 @@ export default class PointTool extends Tool {
   }
 
   mouseMove(isMouseDown: boolean) {
-    if(!PointTool.color || !isMouseDown) return {
-      x: this.controlManager.gridManager.screenOffset.x,
-      y: this.controlManager.gridManager.screenOffset.y
-    };
+    if(!PointTool.color || !isMouseDown) return this.controlManager.gridManager.screenOffset;
 
     // check if mouse position in on new pixel
     const coords: Coord = {

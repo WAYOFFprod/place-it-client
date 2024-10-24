@@ -4,6 +4,7 @@ import EraseIcon from "$lib/icons/erase.svelte"
 import Networker from "$lib/utility/Networker";
 import { selectedColor } from "$lib/stores/colorStore";
 import type { Unsubscriber } from "svelte/motion";
+import { writable, type Writable } from "svelte/store";
 
 export default class EraserTool extends Tool {
   static cursor = "eraser"
@@ -12,6 +13,8 @@ export default class EraserTool extends Tool {
   static unsubscribeSelectedColor: Unsubscriber | undefined;
   static savedColor: string = '';
   static init: boolean = false
+
+  cursorW: Writable<string> = writable<string>(EraserTool.cursor);
 
   networker: Networker = Networker.getInstance();
 
@@ -50,10 +53,7 @@ export default class EraserTool extends Tool {
   }
 
   mouseMove(isMouseDown: boolean) {
-    if(!isMouseDown) return {
-      x: this.controlManager.gridManager.screenOffset.x,
-      y: this.controlManager.gridManager.screenOffset.y
-    };
+    if(!isMouseDown) return this.controlManager.gridManager.screenOffset;
 
     // check if mouse position in on new pixel
     const coords: Coord = {

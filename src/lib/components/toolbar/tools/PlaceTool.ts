@@ -5,7 +5,7 @@ import Networker from "$lib/utility/Networker";
 
 import ControlManager from "../ControlManager";
 import { selectedColor } from "$lib/stores/colorStore";
-import { get } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 
 export default class PlaceTool extends Tool {
   static cursor = "place"
@@ -13,6 +13,8 @@ export default class PlaceTool extends Tool {
   static icon = PlusIcon
   static unsubscribeColors: any | undefined = undefined;
   static color: string | undefined;
+
+  cursorW: Writable<string> = writable<string>(PlaceTool.cursor);
 
   interval: any;
   timer: number = 0;
@@ -76,7 +78,8 @@ export default class PlaceTool extends Tool {
   }
 
   mouseMove(isMouseDown: boolean) {
-    if(this.dragOffset.x == 0 && this.dragOffset.y == 0) return this.controlManager.gridManager.screenOffset;
+    
+    if(this.dragOffset.x == 0 && this.dragOffset.y == 0 || !isMouseDown) return this.controlManager.gridManager.screenOffset;
     if(this.p5.touches.length >= 2) {
       // zoom
       const distance = this.p5.dist(this.p5.touches[0].x, this.p5.touches[0].y, this.p5.touches[1].x, this.p5.touches[1].y);

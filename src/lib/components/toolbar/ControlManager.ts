@@ -60,9 +60,7 @@ export default class ControlManager {
   }
 
   checkMousePosition() {
-    if(this.isMouseDown) {
-      this.toolManager.updateOffset()
-    }
+    this.toolManager.updateOffset(this.isMouseDown)
     const coords: Coord = {
       x: Math.floor((this.p5.mouseX - this.gridManager.screenOffset.x) / this.gridManager.currentScale),
       y: Math.floor((this.p5.mouseY - this.gridManager.screenOffset.y) / this.gridManager.currentScale)
