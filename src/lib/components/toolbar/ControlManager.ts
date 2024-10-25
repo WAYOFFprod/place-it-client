@@ -45,17 +45,7 @@ export default class ControlManager {
     // init tailwind store
     windowSize(window)
     
-		// this.init(size)
-    
     this.toolManager = new ToolManager(p5, viewOnly);
-
-    // initialize scale factor
-		
-    
-		// get scale factor by getting the one from the axies with the least pixels
-    
-    console.log("this.currentScale", this.gridManager.currentScale)
-		// this.currentScale = 1;
 		
   }
 

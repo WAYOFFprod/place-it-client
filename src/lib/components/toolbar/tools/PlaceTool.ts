@@ -56,7 +56,6 @@ export default class PlaceTool extends Tool {
   mousePressed(screenOffset: Coord) {
     const distance = this.p5.dist(this.p5.touches[0].x, this.p5.touches[0].y, 0, 0);
     this.pinchDistance = distance;
-    console.log("this.controlManager.gridManager.screenOffset", this.controlManager.gridManager.screenOffset)
     this.controlManager.gridManager.screenOffset = screenOffset
     this.dragOffset.x = this.p5.touches[0].x - screenOffset.x;
     this.dragOffset.y = this.p5.touches[0].y - screenOffset.y;

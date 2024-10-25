@@ -14,7 +14,6 @@ const graphicToPixels = (graphic: p5.Graphics, offset: Coord, canvaSize: Size2D)
     const color = rgbToHex(graphic.pixels[i], graphic.pixels[i+1], graphic.pixels[i+2])
     pixels[""+absoluteIndex] = color
   }
-  console.log("pixels", pixels);
   return pixels
 }
 

@@ -73,9 +73,16 @@ export default class Networker {
     // listen to socket server message
     
     this.socket.on('canva:new-pixel-from-others', (coord, color) => {
-      console.log("NEW PIXEL FROM OTHERS");
+      console.log("NEW PIXEL FROM OTHERS", color, coord);
       if(!this.gridManager) return console.error("missing grid manager");
       this.gridManager.addPixelOnCanvas(coord, color);
+    });
+
+    this.socket.on('canva:new-pixels-from-others', (pixels: Pixels) => {
+      console.log("NEW PIXELS FROM OTHERS", pixels);
+      if(!this.gridManager) return console.error("missing grid manager");
+      this.gridManager.addPixelsToCanvaFromIndex(pixels);
+      this.gridManager.needsUpdate = true;
     });
 
     this.socket.on('chat:get-message', (message: Message) => {

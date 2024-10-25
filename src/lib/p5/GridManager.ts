@@ -120,7 +120,7 @@ export default class GridManager {
     this.attemptAddAdditionalPixels(this.additionalData);
   }
 
-  attemptAddAdditionalPixels(additionalData: {[key: string]: string} = {}) {
+  attemptAddAdditionalPixels(additionalData: Pixels = {}) {
     if(!this.pixelsAdded && this.imageLoaded) {
       if(Object.keys(additionalData).length > 0) {
         this.addPixelsToCanvaFromIndex(additionalData)
@@ -135,15 +135,8 @@ export default class GridManager {
   clipboard: P5.Graphics[] = []
   copySelection = () => {
     const {start, end} = this.overlay.getSelection();
-    const startSection = this.getGridSectionIndex({
-      x: start.x,
-      y: start.y
-    });
-    const endSection = this.getGridSectionIndex({
-      x: end.x,
-      y: end.y
-    });
 
+    // init clipboard and graphic
     this.clipboard = [];
     const graphic = this.p5.createGraphics(end.x -start.x, end.y - start.y);
     graphic.pixelDensity(1);
@@ -152,39 +145,31 @@ export default class GridManager {
       y: start.y
     }
 
-    for (let index = startSection; index <= endSection; index++) {
-      const relStart = this.gridSections[index].closestStartInBound(start);
-      const relEnd = this.gridSections[index].closestEndInBound(end);
-      const graphicSection = this.gridSections[index].copyContent(relStart, relEnd);
+    // for each concerned section, copy the content
+    const sections = this.getConcernedSections(start, end);
+    sections.forEach((sectionIndex) => {
+      // get the relative start and end of the section
+      const relStart = this.gridSections[sectionIndex].closestStartInBound(start);
+      const relEnd = this.gridSections[sectionIndex].closestEndInBound(end);
+      // get the section of the graphic
+      const graphicSection = this.gridSections[sectionIndex].copyContent(relStart, relEnd);
 
+      // get the relative position of the section to save it in the cliboard graphic
       const x = relStart.x - copyOffset.x;
       const y = relStart.y - copyOffset.y;
       graphic.set(x, y, graphicSection);
-    }
+    });
     this.clipboard.push(graphic);
   }
 
   pasteClipboard = (): Pixels => {
+    if(this.clipboard.length === 0) {
+      console.warn("no clipboard to paste");
+      return {};
+    }
+
     const {start} = this.overlay.getSelection();
-    const end = {
-      x: start.x + this.clipboard[0].width,
-      y: start.y + this.clipboard[0].height
-    }
-    
-
-    const sections = this.getConcernedSections(start, end)
-    const pasteOffset = {
-      x: start.x,
-      y: start.y
-    }
-    for (let index = 0; index < sections.length; index++) {
-      const relStart = this.gridSections[sections[index]].closestStartInBound(start);
-      const relEnd = this.gridSections[sections[index]].closestEndInBound(end);
-      this.gridSections[sections[index]].pasteContent(relStart, relEnd, pasteOffset,  this.clipboard[0]);
-      
-    }
-
-    const pixels = graphicToPixels(this.clipboard[0], pasteOffset, this.canvas);
+    const pixels = graphicToPixels(this.clipboard[0], start, this.canvas);
     
     this.needsUpdate = true;
     return pixels;
