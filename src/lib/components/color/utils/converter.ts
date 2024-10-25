@@ -1,4 +1,22 @@
+import type p5 from "p5";
 
+const graphicToPixels = (graphic: p5.Graphics, offset: Coord, canvaSize: Size2D): Pixels  =>  {
+  const pixels: Pixels = {}
+  graphic.loadPixels();
+  for (let i = 0; i < graphic.pixels.length; i+=4) {
+    const relativeIndex = i / 4;
+    const relativePos = {
+      x: relativeIndex % graphic.width + offset.x,
+      y: Math.floor(relativeIndex / graphic.width) + offset.y
+    }
+    const absoluteIndex = relativePos.x + (canvaSize.width * relativePos.y)
+
+    const color = rgbToHex(graphic.pixels[i], graphic.pixels[i+1], graphic.pixels[i+2])
+    pixels[""+absoluteIndex] = color
+  }
+  console.log("pixels", pixels);
+  return pixels
+}
 
 
 const componentToHex = (c: number) => {
@@ -143,6 +161,7 @@ const hsv2rgb = (h: number, s: number, v: number) => {
 
 
 export {
+  graphicToPixels,
   rgbToHsv,
   rgbToHex,
   hexToRgb,

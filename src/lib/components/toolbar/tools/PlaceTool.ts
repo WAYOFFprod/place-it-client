@@ -108,7 +108,7 @@ export default class PlaceTool extends Tool {
       y: Math.floor((((window.innerHeight - 56) / 2 ) -this.controlManager.gridManager.screenOffset.y) / this.controlManager.gridManager.currentScale)
     };
     this.pixels.push(coords);
-    this.networker.placePixel(coords, PlaceTool.color);
+    this.networker.savePixel(coords, PlaceTool.color);
   }
 
 

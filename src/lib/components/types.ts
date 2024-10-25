@@ -9,6 +9,10 @@ interface ModalData {
   data?: any
 }
 
+interface Pixels {
+  [key: string]: string
+}
+
 interface CanvaPreviewData {
   id: number,
   name: string,

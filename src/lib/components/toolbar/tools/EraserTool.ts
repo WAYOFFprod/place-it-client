@@ -64,7 +64,7 @@ export default class EraserTool extends Tool {
     // if these coords are new in this stroke add it to array and place pixel
     if(!this.pixels.find(coord => coord.x == coords.x && coord.y == coords.y)) {
       this.pixels.push(coords);
-      this.networker.placePixel(coords, '#ffffff');
+      this.networker.savePixel(coords, '#ffffff');
     }
 
     // return save offset in order to not move screen
@@ -74,14 +74,14 @@ export default class EraserTool extends Tool {
     };
   }
 
-  protected placePixel() {
+  protected Pixel() {
     // calculate on which pixel the mouse is over
     const coords: Coord = {
       x: Math.floor((this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) / this.controlManager.currentScale),
       y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.currentScale)
     };
     this.pixels.push(coords);
-    this.networker.placePixel(coords, '#ffffff');
+    this.networker.savePixel(coords, '#ffffff');
   }
 
 

@@ -56,7 +56,7 @@ export default class PointTool extends Tool {
     // if these coords are new in this stroke add it to array and place pixel
     if(!this.pixels.find(coord => coord.x == coords.x && coord.y == coords.y)) {
       this.pixels.push(coords);
-      this.networker.placePixel(coords, PointTool.color);
+      this.networker.savePixel(coords, PointTool.color);
     }
 
     // return save offset in order to not move screen
@@ -71,7 +71,7 @@ export default class PointTool extends Tool {
       y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.gridManager.currentScale)
     };
     this.pixels.push(coords);
-    this.networker.placePixel(coords, PointTool.color);
+    this.networker.savePixel(coords, PointTool.color);
   }
 
 

@@ -276,7 +276,7 @@ export default class Networker {
     })
   }
 
-  placePixel = (coord: Coord, color: string | null) => {
+  savePixel = (coord: Coord, color: string | null) => {
     if(this.canvaToken == undefined) {
       console.warn("missing token to placePixel")
       return
@@ -295,6 +295,24 @@ export default class Networker {
         token: this.canvaToken
       }
       this.socket.emit('canva:new-pixel:'+this.gridManager.canvasId, auth, index, coord, color);
+    }
+  }
+
+  placePixelsByIndex = (pixels: Pixels) => {
+    if(this.gridManager == undefined) return
+    // for (let key in pixels) {
+    //   console.log(key, pixels[key]);
+    //   const coord = this.gridManager.getCoordFromIndex(parseInt(key));
+    //   const index = this.gridManager.addPixelOnCanvas(coord, pixels[key]);
+    //   if(index === false) return
+    // }
+
+    if(this.socket != undefined) {
+      const auth: any = {
+        user_id: this.userData?.id,
+        token: this.canvaToken
+      }
+      this.socket.emit('canva:new-pixels:'+this.gridManager.canvasId, auth, pixels);
     }
 
   }

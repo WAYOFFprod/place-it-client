@@ -8,8 +8,8 @@ interface Size2D {
 }
 
 interface CreateCanvaPayload {
-  name: string,
-  category: 'pixelwar' | 'artistic' | 'free',
+  name: string
+  category: 'pixelwar' | 'artistic' | 'free'
   access: 'open' | 'invite_only' | 'request_only' | 'closed'
   visibility: 'public' | 'friends_only' | 'private'
   width: number,

@@ -2,11 +2,14 @@ import { ToolType } from "$lib/stores/toolStore";
 import Tool from "../ToolClass";
 import SelectionIcon from "$lib/icons/selection.svelte"
 import { writable, type Writable } from "svelte/store";
+import Networker from "$lib/utility/Networker";
 
 export default class SelectionTool extends Tool {
   static cursor = "selection"
   static type = ToolType.Selection
   static icon = SelectionIcon
+
+  networker: Networker = Networker.getInstance();
 
   hover = writable<boolean>(false);
 
@@ -46,7 +49,9 @@ export default class SelectionTool extends Tool {
         this.p5.keyIsDown(this.p5.CONTROL) ? this.copySelection() : null;
         break;
       case 86: // V
-          this.p5.keyIsDown(this.p5.CONTROL) ? this.pasteClipboard() : null;
+          if(this.p5.keyIsDown(this.p5.CONTROL)) {
+            this.pasteClipboard()
+          }
         break;
     }
   }
@@ -91,7 +96,8 @@ export default class SelectionTool extends Tool {
   }
 
   protected pasteClipboard() {
-    this.controlManager.gridManager.pasteClipboard()
+    const pixels = this.controlManager.gridManager.pasteClipboard()
+    this.networker.placePixelsByIndex(pixels)
   }
 
   protected drawRectangle() {

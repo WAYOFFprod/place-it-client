@@ -1,6 +1,7 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
 import CanvaOverlay from './CanvaOverlay';
+import { graphicToPixels } from '$lib/components/color/utils/converter';
 
 let PIXEL_IN_SECTION: number;
 
@@ -122,7 +123,7 @@ export default class GridManager {
   attemptAddAdditionalPixels(additionalData: {[key: string]: string} = {}) {
     if(!this.pixelsAdded && this.imageLoaded) {
       if(Object.keys(additionalData).length > 0) {
-        this.addPixelsFromIndex(additionalData)
+        this.addPixelsToCanvaFromIndex(additionalData)
       }
     }
   }
@@ -163,7 +164,7 @@ export default class GridManager {
     this.clipboard.push(graphic);
   }
 
-  pasteClipboard = () => {
+  pasteClipboard = (): Pixels => {
     const {start} = this.overlay.getSelection();
     const end = {
       x: start.x + this.clipboard[0].width,
@@ -179,16 +180,17 @@ export default class GridManager {
     for (let index = 0; index < sections.length; index++) {
       const relStart = this.gridSections[sections[index]].closestStartInBound(start);
       const relEnd = this.gridSections[sections[index]].closestEndInBound(end);
-      const graphicPart = this.gridSections[sections[index]].pasteContent(relStart, relEnd, pasteOffset,  this.clipboard[0]);
-      // const relStart = this.getPositionRelativeToSection(start)
-      //const start = this.getPositionRelativeToSection(coords.start)
-      // this.gridSections[index].pasteContent(relStart, trimedImage)
+      this.gridSections[sections[index]].pasteContent(relStart, relEnd, pasteOffset,  this.clipboard[0]);
+      
     }
+
+    const pixels = graphicToPixels(this.clipboard[0], pasteOffset, this.canvas);
     
     this.needsUpdate = true;
+    return pixels;
   }
 
-  addPixelsFromIndex = (data: {[key: string]: string}) => {
+  addPixelsToCanvaFromIndex = (data: Pixels) => {
     if(data != null) {
       for (const [id, color] of Object.entries(data)) {
         const index = parseInt(id);
@@ -196,7 +198,7 @@ export default class GridManager {
         const gridIndex = this.getGridSectionIndex(absolutePosition);
         const relPosition = this.getPositionRelativeToSection(absolutePosition);
 
-        this.gridSections[gridIndex].storePixel(relPosition, color);
+        this.gridSections[gridIndex].addPixelToImage(relPosition, color);
       }
     }
   }
@@ -208,7 +210,7 @@ export default class GridManager {
     
     const relPosition = this.getPositionRelativeToSection(absolutePosition);
     const i = this.getGridSectionIndex(absolutePosition);
-    this.gridSections[i].storePixel(relPosition, color);
+    this.gridSections[i].addPixelToImage(relPosition, color);
     this.needsUpdate = true;
     
     return this.getPixelPositionIndex(absolutePosition);
