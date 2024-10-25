@@ -1,6 +1,6 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
-import Overlay from './Overlay';
+import CanvaOverlay from './CanvaOverlay';
 
 let PIXEL_IN_SECTION: number;
 
@@ -10,7 +10,7 @@ export default class GridManager {
   p5: P5
   canvasId: number
   gridSections: GridSection[];
-  overlay: Overlay;
+  overlay: CanvaOverlay;
   canvas: Size2D;
   sectionGrid: {width: number, height: number};
   color: string = '#ffffff';
@@ -28,8 +28,8 @@ export default class GridManager {
 
   constructor(p5: P5, canvas: Size2D, canvasId: number, marginBottom: number) {
     // pixel per tile
-    const MAX_PPT = 512
-    const MIN_PPT = 32
+    const MAX_PPT = 16
+    const MIN_PPT = 16
     let PPT = (Math.ceil(canvas.width/32) * 32);
     PPT = Math.max(PPT, MIN_PPT)
     PIXEL_IN_SECTION = Math.min(PPT, MAX_PPT)
@@ -68,12 +68,8 @@ export default class GridManager {
       y: screenCenter.y - y
     };
 
-    this.overlay = new Overlay(p5, this);
-    // this.overlay = this.p5.createGraphics(this.canvas.height * this.currentScale, this.canvas.width * this.currentScale);
-    // this.overlayRectangleSize = {
-    //   width: 0,
-    //   height: 0
-    // }
+    this.overlay = new CanvaOverlay(p5, this);
+
     // create gridSections
     for(let y = 0; y < this.canvas.height / PIXEL_IN_SECTION; y++) {
       for(let x = 0; x < this.canvas.width / PIXEL_IN_SECTION; x++) {
@@ -135,31 +131,60 @@ export default class GridManager {
     this.needsUpdate = this.overlay.updateOverlay(start, end, color);;
   }
 
-  clipboard: P5.Image[] = []
+  clipboard: P5.Graphics[] = []
   copySelection = () => {
-    const coords = this.overlay.getSelection();
+    const {start, end} = this.overlay.getSelection();
     const startSection = this.getGridSectionIndex({
-      x: coords.start.x,
-      y: coords.start.y
+      x: start.x,
+      y: start.y
     });
     const endSection = this.getGridSectionIndex({
-      x: coords.end.x,
-      y: coords.end.y
+      x: end.x,
+      y: end.y
     });
 
     this.clipboard = [];
-    for (let index = startSection; index <= endSection; index++) {
-      const start = this.getPositionRelativeToSection(coords.start)
-      const end = this.getPositionRelativeToSection(coords.end)
-      this.clipboard.push(this.gridSections[index].copyContent(start, end));
+    const graphic = this.p5.createGraphics(end.x -start.x, end.y - start.y);
+    graphic.pixelDensity(1);
+    const copyOffset = {
+      x: start.x,
+      y: start.y
     }
+
+    for (let index = startSection; index <= endSection; index++) {
+      const relStart = this.gridSections[index].closestStartInBound(start);
+      const relEnd = this.gridSections[index].closestEndInBound(end);
+      const graphicSection = this.gridSections[index].copyContent(relStart, relEnd);
+
+      const x = relStart.x - copyOffset.x;
+      const y = relStart.y - copyOffset.y;
+      graphic.set(x, y, graphicSection);
+    }
+    this.clipboard.push(graphic);
   }
 
   pasteClipboard = () => {
-    const startCoord = this.overlay.getStart();
+    const {start} = this.overlay.getSelection();
+    const end = {
+      x: start.x + this.clipboard[0].width,
+      y: start.y + this.clipboard[0].height
+    }
+    
 
-    const start = this.getPositionRelativeToSection(startCoord)
-    this.gridSections[0].pasteContent(start, this.clipboard[0])
+    const sections = this.getConcernedSections(start, end)
+    const pasteOffset = {
+      x: start.x,
+      y: start.y
+    }
+    for (let index = 0; index < sections.length; index++) {
+      const relStart = this.gridSections[sections[index]].closestStartInBound(start);
+      const relEnd = this.gridSections[sections[index]].closestEndInBound(end);
+      const graphicPart = this.gridSections[sections[index]].pasteContent(relStart, relEnd, pasteOffset,  this.clipboard[0]);
+      // const relStart = this.getPositionRelativeToSection(start)
+      //const start = this.getPositionRelativeToSection(coords.start)
+      // this.gridSections[index].pasteContent(relStart, trimedImage)
+    }
+    
     this.needsUpdate = true;
   }
 
@@ -185,11 +210,11 @@ export default class GridManager {
     const i = this.getGridSectionIndex(absolutePosition);
     this.gridSections[i].storePixel(relPosition, color);
     this.needsUpdate = true;
-
+    
     return this.getPixelPositionIndex(absolutePosition);
   }
 
-  updateCanvasPosition = () => {
+  refreshCanva = () => {
     this.p5.fill(this.color)
     this.p5.noStroke()
     this.p5.rect(0, 0, this.canvas.width, this.canvas.height);
@@ -198,10 +223,7 @@ export default class GridManager {
       this.gridSections[i].updateCanvasPosition()
     }
     // update overlay
-    if(this.overlay != null) {
-      
-      this.p5.image(this.overlay.updateAndGetImg(), 0, 0, this.canvas.width, this.canvas.height);
-    }
+    this.overlay.refreshOverlay();
   }
 
   isInSelection = (x: number, y: number): boolean => {
@@ -233,6 +255,18 @@ export default class GridManager {
       x: index % width,
       y: Math.floor(index / width)
     }
+  }
+
+  private getConcernedSections(start: Coord, end: Coord): number[] {
+    const startSection = this.getGridSectionIndex(start);
+    const endSection = this.getGridSectionIndex(end);
+    const sections = [];
+    for (let i = startSection; i <= endSection; i++) {
+      if(this.gridSections[i].isIntersecting(start, end)) {
+        sections.push(i)
+      } 
+    }
+    return sections
   }
 
   // check if pixel is in bound of canva

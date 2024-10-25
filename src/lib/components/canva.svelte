@@ -15,8 +15,6 @@
 	import Chat from './chat/chat.svelte';
 	import ZoomCounter from './metric/zoomCounter.svelte';
 	import CoordViewer from './metric/coordViewer.svelte';
-	import Cursor from '$lib/icons/cursor.svelte';
-	import { derived } from 'svelte/store';
 
 	export let canva: CanvaPreviewData;
 	export let viewOnly: boolean = true;
@@ -123,7 +121,7 @@
 					p5.scale(gridManager.currentScale);
 
 					// draw content
-					gridManager.updateCanvasPosition();
+					gridManager.refreshCanva();
 					p5.pop();
 					gridManager.needsUpdate = false;
 

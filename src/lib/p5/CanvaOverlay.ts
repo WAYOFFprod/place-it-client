@@ -1,7 +1,7 @@
 import P5 from 'p5';
 import type GridManager from './GridManager';
 
-export default class Overlay {
+export default class CanvaOverlay {
   p5: P5
   img: P5.Graphics
   gridManager: GridManager
@@ -32,6 +32,16 @@ export default class Overlay {
       width: 0,
       height: 0
     }
+  }
+
+  refreshOverlay = () => {
+    const scaleChange = this.gridManager.currentScale / this.previousScale;
+
+    if(scaleChange != 0) {
+      this.img.scale(this.gridManager.canvas.width / (this.gridManager.canvas.width * scaleChange));
+      this.previousScale = this.gridManager.currentScale;
+    }
+    this.p5.image(this.img, 0, 0, this.gridManager.canvas.width, this.gridManager.canvas.height);
   }
 
   updateOverlay(start: Coord, end: Coord, color: string): boolean {
@@ -81,6 +91,10 @@ export default class Overlay {
     
     return true;
   }
+
+  getImageSection = (start: Coord, end: Coord) => {
+    return this.img.get(start.x, start.y, end.x - start.x, end.y - start.y);
+  }
   getSelection = () => {
     const startCoord: Coord = {
       x: Math.round((this.sel.pos.x) / this.gridManager.currentScale),
@@ -103,15 +117,6 @@ export default class Overlay {
     };
   }
 
-  updateAndGetImg = (): P5.Graphics => {
-    const scaleChange = this.gridManager.currentScale / this.previousScale;
-
-    if(scaleChange != 0) {
-      this.img.scale(this.gridManager.canvas.width / (this.gridManager.canvas.width * scaleChange));
-      this.previousScale = this.gridManager.currentScale;
-    }
-    return this.img;
-  }
   isInSelection = (x: number, y: number): boolean => {
     return x > this.sel.pos.x && x < this.sel.pos.x + this.sel.size.width
       && y > this.sel.pos.y && y < this.sel.pos.y + this.sel.size.height
