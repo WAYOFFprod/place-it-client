@@ -10,9 +10,10 @@ export default class EraserTool extends Tool {
   static cursor = "eraser"
   static type = ToolType.Eraser
   static icon = EraseIcon
+  // color
   static unsubscribeSelectedColor: Unsubscriber | undefined;
-  static savedColor: string = '';
   static init: boolean = false
+  static savedColor: string = '';
 
   cursorW: Writable<string> = writable<string>(EraserTool.cursor);
 
@@ -57,8 +58,8 @@ export default class EraserTool extends Tool {
 
     // check if mouse position in on new pixel
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) / this.controlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.currentScale)
+      x: Math.floor((this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) / this.controlManager.gridManager.currentScale),
+      y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.gridManager.currentScale)
     };
 
     // if these coords are new in this stroke add it to array and place pixel
@@ -77,8 +78,8 @@ export default class EraserTool extends Tool {
   protected Pixel() {
     // calculate on which pixel the mouse is over
     const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) / this.controlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.currentScale)
+      x: Math.floor((this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) / this.controlManager.gridManager.currentScale),
+      y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.gridManager.currentScale)
     };
     this.pixels.push(coords);
     this.networker.savePixel(coords, '#ffffff');

@@ -6,7 +6,6 @@ import { graphicToPixels } from '$lib/components/color/utils/converter';
 let PIXEL_IN_SECTION: number;
 
 
-
 export default class GridManager {
   p5: P5
   canvasId: number
@@ -128,8 +127,12 @@ export default class GridManager {
     }
   }
 
-  updateRectangleOverlay = (start: Coord, end: Coord, color: string) => {
-    this.needsUpdate = this.overlay.updateOverlay(start, end, color);;
+  update = () => {
+    this.needsUpdate = true;
+  }
+
+  updateRectangleOverlay = (start: Coord, end: Coord, color: string, fill: boolean | undefined) => {
+    this.needsUpdate = this.overlay.updateRectangleOverlay(start, end, color, fill);;
   }
 
   clipboard: P5.Graphics[] = []

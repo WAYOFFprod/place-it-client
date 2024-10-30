@@ -46,8 +46,9 @@ export default class ControlManager {
     windowSize(window)
     
     this.toolManager = new ToolManager(p5, viewOnly);
-		
   }
+
+  
 
   checkMousePosition() {
     this.toolManager.updateOffset(this.isMouseDown)

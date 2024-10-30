@@ -53,10 +53,10 @@ export default class GridSection {
     this.p5.image(this.img, this.offset.x, this.offset.y)
 
     // debug
-    this.p5.stroke(0,255)
-    this.p5.noFill()
-    this.p5.strokeWeight(0.1)
-    this.p5.rect(this.offset.x, this.offset.y, this.sectionWidth, this.sectionHeight)
+    // this.p5.stroke(0,255)
+    // this.p5.noFill()
+    // this.p5.strokeWeight(0.1)
+    // this.p5.rect(this.offset.x, this.offset.y, this.sectionWidth, this.sectionHeight)
   }
 
   addPixelToImage(position: Coord, c: string) {

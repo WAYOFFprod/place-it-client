@@ -9,7 +9,8 @@ export enum ToolType {
   Hand = 'hand',
   Selection = 'selection',
   Eraser = 'eraser',
-  Place = 'place'
+  Place = 'place',
+  Rect = 'rect'
 }
 
 export default class Tool {
