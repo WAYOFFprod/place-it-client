@@ -42,7 +42,7 @@
 	const onSaveName = (event: CustomEvent<SettingOption>) => {
 		const formData = new FormData(form);
 		const value = formData.get(event.detail.field) as string;
-		networker.saveCanvaField({
+		networker.saveCanvaInputField({
 			id: canvaId,
 			field: 'name',
 			value: value
