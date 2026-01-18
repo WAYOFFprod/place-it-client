@@ -11,7 +11,7 @@ name: Create and publish to Kreativmedia
 
 on:
   push:
-    # branches: ['release']
+    branches: ['none']
 
 env:
   REGISTRY: ghcr.io
