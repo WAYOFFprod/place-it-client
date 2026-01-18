@@ -11,7 +11,7 @@ name: Build and push to registry
 
 on:
   push:
-    # branches: ['release']
+    branches: ['release']
 
 env:
   REGISTRY: ghcr.io
