@@ -30,10 +30,12 @@ export default class SelectionRect {
 			y: start.y > end.y ? start.y : end.y
 		};
 
+		const widthInPx = endPos.x - startPos.x;
+		const heightInPx = endPos.y - startPos.y;
 		const widthInPixels =
-			Math.abs(Math.round(startPos.x / currentScale) - Math.round(endPos.x / currentScale)) + 1;
+			Math.round(widthInPx / currentScale) > 0 ? Math.round(widthInPx / currentScale) : 1;
 		const heightInPixels =
-			Math.abs(Math.round(startPos.y / currentScale) - Math.round(endPos.y / currentScale)) + 1;
+			Math.round(heightInPx / currentScale) > 0 ? Math.round(heightInPx / currentScale) : 1;
 		// don't rerender if the size and position of rectangle hasn't change
 		if (
 			widthInPixels - this.overlayRectangleSize.width == 0 &&
@@ -47,7 +49,6 @@ export default class SelectionRect {
 			width: widthInPixels,
 			height: heightInPixels
 		};
-
 		this.selection.pos = {
 			x: Math.round(startPos.x / currentScale) * currentScale,
 			y: Math.round(startPos.y / currentScale) * currentScale

@@ -16,11 +16,20 @@ export default class SelectionTool extends Tool {
 	cursorW: Writable<string> = writable<string>(SelectionTool.cursor);
 
 	isHoveringSelection = false;
+	isMovingSelection = false;
 	getCursor(): string {
 		this.cursorW.subscribe;
 		return this.hover ? SelectionTool.cursor : 'hand';
 	}
 
+	selectionStart: Coord = {
+		x: 0,
+		y: 0
+	};
+	selectionEnd: Coord = {
+		x: 0,
+		y: 0
+	};
 	dragStart: Coord = {
 		x: 0,
 		y: 0
@@ -30,10 +39,6 @@ export default class SelectionTool extends Tool {
 		y: 0
 	};
 	dragCurrent: Coord = {
-		x: 0,
-		y: 0
-	};
-	dragEnd: Coord = {
 		x: 0,
 		y: 0
 	};
@@ -54,19 +59,28 @@ export default class SelectionTool extends Tool {
 	keyUp() {}
 
 	mousePressed(screenOffset: Coord): boolean {
-		if (this.isHoveringSelection) return false;
 		this.controlManager.gridManager.screenOffset = screenOffset;
-		this.dragCurrent.x = this.dragStart.x =
-			this.p5.mouseX - this.controlManager.gridManager.screenOffset.x;
-		this.dragCurrent.y = this.dragStart.y =
-			this.p5.mouseY - this.controlManager.gridManager.screenOffset.y;
-		this.drawRectangle();
+		this.dragCurrent = this.calculatePositionOnCanvas();
+		this.dragStart = { ...this.dragCurrent };
+		if (this.isHoveringSelection) {
+			this.dragPrevious = { ...this.dragCurrent };
+			this.isMovingSelection = true;
+			return true;
+		}
+
+		if (!this.isMovingSelection) {
+			this.selectionStart.x = this.selectionEnd.x = this.dragCurrent.x;
+			this.selectionStart.y = this.selectionEnd.y = this.dragCurrent.y;
+		}
+
+		this.updateSelection();
 		return true;
 	}
 
 	mouseReleased() {
+		if (this.isMovingSelection) this.isMovingSelection = false;
 		if (this.isHoveringSelection) return;
-		this.dragEnd = { ...this.dragCurrent };
+		this.selectionEnd = { ...this.dragCurrent };
 		this.dragPrevious = {
 			x: 0,
 			y: 0
@@ -75,9 +89,16 @@ export default class SelectionTool extends Tool {
 
 	mouseMove(isMouseDown: boolean) {
 		if (isMouseDown) {
-			if (!this.isHoveringSelection) {
-				this.dragCurrent = this.calculatePositionChange();
-				this.drawRectangle();
+			this.dragCurrent = this.calculatePositionOnCanvas();
+			if (this.isMovingSelection) {
+				const pxDeltaX = this.dragCurrent.x - this.dragPrevious.x;
+				const pxDeltaY = this.dragCurrent.y - this.dragPrevious.y;
+				this.moveSelectionByDelta(pxDeltaX, pxDeltaY);
+			}
+
+			if (!this.isHoveringSelection && !this.isMovingSelection) {
+				this.selectionEnd = this.dragCurrent;
+				this.updateSelection();
 			}
 		}
 		this.defineCursor(isMouseDown);
@@ -88,7 +109,7 @@ export default class SelectionTool extends Tool {
 		return SelectionTool;
 	};
 
-	protected calculatePositionChange() {
+	protected calculatePositionOnCanvas() {
 		return {
 			x: this.p5.mouseX - this.controlManager.gridManager.screenOffset.x,
 			y: this.p5.mouseY - this.controlManager.gridManager.screenOffset.y
@@ -106,11 +127,24 @@ export default class SelectionTool extends Tool {
 		this.networker.placePixelsByIndex(pixels);
 	}
 
-	protected drawRectangle() {
+	protected moveSelectionByDelta(pxDeltaX: number, pxDeltaY: number) {
+		this.selectionStart.x += pxDeltaX;
+		this.selectionStart.y += pxDeltaY;
+		this.selectionEnd.x += pxDeltaX;
+		this.selectionEnd.y += pxDeltaY;
+		this.updateSelection();
+	}
+
+	protected updateSelection() {
+		// Make sure there is an actual change
 		if (this.dragPrevious.x == this.dragCurrent.x && this.dragPrevious.y == this.dragCurrent.y)
 			return;
 		// make sure the selection is at least 1 pixel wide and high
-		this.controlManager.gridManager.updateRectangleOverlay(this.dragStart, this.dragCurrent, false);
+		this.controlManager.gridManager.updateRectangleOverlay(
+			this.selectionStart,
+			this.selectionEnd,
+			false
+		);
 		this.dragPrevious = { ...this.dragCurrent };
 	}
 

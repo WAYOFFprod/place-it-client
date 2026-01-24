@@ -1,4 +1,4 @@
-import { toolClasses, ToolType } from '$lib/stores/toolStore';
+import { ToolType } from '$lib/stores/toolStore';
 import Tool from '../ToolClass';
 import PlusIcon from '$lib/icons/plus.svelte';
 import Networker from '$lib/utility/Networker';
