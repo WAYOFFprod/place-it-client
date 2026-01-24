@@ -1,88 +1,93 @@
-import { ToolType } from "$lib/stores/toolStore";
-import Tool from "../ToolClass";
-import CursorIcon from "$lib/icons/cursor.svelte"
-import Networker from "$lib/utility/Networker";
+import { ToolType } from '$lib/stores/toolStore';
+import Tool from '../ToolClass';
+import CursorIcon from '$lib/icons/cursor.svelte';
+import Networker from '$lib/utility/Networker';
 
-import { selectedColor } from "$lib/stores/colorStore";
-import { get, writable, type Writable } from "svelte/store";
+import { selectedColor } from '$lib/stores/colorStore';
+import { get, writable, type Writable } from 'svelte/store';
 
 export default class PointTool extends Tool {
-  static cursor = "pointer"
-  static type = ToolType.Cursor
-  static icon = CursorIcon
-  static unsubscribeColors: any | undefined = undefined;
-  static color: string | undefined;
+	static cursor = 'pointer';
+	static type = ToolType.Cursor;
+	static icon = CursorIcon;
+	static unsubscribeColors: any | undefined = undefined;
+	static color: string | undefined;
 
-  cursorW: Writable<string> = writable<string>(PointTool.cursor);
+	cursorW: Writable<string> = writable<string>(PointTool.cursor);
 
-  networker: Networker = Networker.getInstance();
+	networker: Networker = Networker.getInstance();
 
-  pixels: Coord[] = [];
+	pixels: Coord[] = [];
 
+	protected init() {
+		PointTool.color = get(selectedColor);
+		PointTool.unsubscribeColors = selectedColor.subscribe((newColor) => {
+			PointTool.color = newColor;
+		});
+	}
 
-  protected init() {
-    PointTool.color = get(selectedColor);
-    PointTool.unsubscribeColors = selectedColor.subscribe((newColor) => {
-      PointTool.color = newColor;
-    });
-  }
+	keyDown() {}
 
-  keyDown() {
+	keyUp() {}
 
-  }
+	mousePressed(mousePressed: Coord) {
+		this.placePixel();
+		return true;
+	}
 
-  keyUp() {
+	mouseReleased() {
+		this.pixels = [];
+	}
 
-  }
+	mouseMove(isMouseDown: boolean) {
+		if (!PointTool.color || !isMouseDown) return this.controlManager.gridManager.screenOffset;
 
-  mousePressed(mousePressed: Coord) {
-    this.placePixel();
-    return true
-  }
+		// check if mouse position in on new pixel
+		const coords: Coord = {
+			x: Math.floor(
+				(this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) /
+					this.controlManager.gridManager.currentScale
+			),
+			y: Math.floor(
+				(this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) /
+					this.controlManager.gridManager.currentScale
+			)
+		};
 
-  mouseReleased() {
-    this.pixels = []
-  }
+		// if these coords are new in this stroke add it to array and place pixel
+		if (!this.pixels.find((coord) => coord.x == coords.x && coord.y == coords.y)) {
+			this.pixels.push(coords);
+			this.networker.savePixel(coords, PointTool.color);
+		}
 
-  mouseMove(isMouseDown: boolean) {
-    if(!PointTool.color || !isMouseDown) return this.controlManager.gridManager.screenOffset;
+		// return save offset in order to not move screen
+		return this.controlManager.gridManager.screenOffset;
+	}
 
-    // check if mouse position in on new pixel
-    const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) / this.controlManager.gridManager.currentScale),
-      y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.gridManager.currentScale)
-    };
+	protected placePixel() {
+		if (!PointTool.color) return;
+		// calculate on which pixel the mouse is over
+		const coords: Coord = {
+			x: Math.floor(
+				(this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) /
+					this.controlManager.gridManager.currentScale
+			),
+			y: Math.floor(
+				(this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) /
+					this.controlManager.gridManager.currentScale
+			)
+		};
+		this.pixels.push(coords);
+		this.networker.savePixel(coords, PointTool.color);
+	}
 
-    // if these coords are new in this stroke add it to array and place pixel
-    if(!this.pixels.find(coord => coord.x == coords.x && coord.y == coords.y)) {
-      this.pixels.push(coords);
-      this.networker.savePixel(coords, PointTool.color);
-    }
+	getType: () => null | typeof Tool = () => {
+		return PointTool;
+	};
 
-    // return save offset in order to not move screen
-    return this.controlManager.gridManager.screenOffset
-  }
-
-  protected placePixel() {
-    if(!PointTool.color) return;
-    // calculate on which pixel the mouse is over
-    const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.controlManager.gridManager.screenOffset.x) / this.controlManager.gridManager.currentScale),
-      y: Math.floor((this.p5.mouseY - this.controlManager.gridManager.screenOffset.y) / this.controlManager.gridManager.currentScale)
-    };
-    this.pixels.push(coords);
-    this.networker.savePixel(coords, PointTool.color);
-  }
-
-
-  getType: () => null | typeof Tool = () => {
-    return PointTool
-  }
-
-  destroy() {
-    if(PointTool.unsubscribeColors) {
-      PointTool.unsubscribeColors();
-    }
-  }
-
+	destroy() {
+		if (PointTool.unsubscribeColors) {
+			PointTool.unsubscribeColors();
+		}
+	}
 }

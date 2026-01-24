@@ -4,6 +4,6 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [sveltekit()],
 	build: {
-    sourcemap: true, // Doesn't work with the "inline" option either
-  },
+		sourcemap: true // Doesn't work with the "inline" option either
+	}
 });

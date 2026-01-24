@@ -94,10 +94,10 @@
 			};
 			gridManager = new GridManager(p5, data.size, canva.id, marginBottom);
 			controlManager = ControlManager.getInstance(p5, viewOnly, gridManager);
+
 			connect(data);
 		}
 	};
-
 	onMount(() => {
 		const script = (canvas: P5) => {
 			p5 = canvas;
@@ -136,7 +136,6 @@
 
 			p5.touchStarted = (e: TouchEvent) => {
 				if (!isTargeting(e.target, 'place-it-canvas') || !controlManager) return;
-				console.log('touch started', e.touches);
 				controlManager.mousePressed();
 			};
 

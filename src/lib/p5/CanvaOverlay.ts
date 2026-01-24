@@ -50,19 +50,29 @@ export default class CanvaOverlay {
 	};
 
 	updateRectangleOverlay(
-		start: Coord,
-		end: Coord,
-		color: string,
+		selectionStartPx: Coord,
+		selectionEndPx: Coord,
+
 		fill: boolean | undefined
 	): boolean {
 		if (this.img == null) return false;
 		this.fill = fill || false;
 
-		this.selectionRect.updateOverlay(start, end, this.gridManager.currentScale);
+		this.selectionRect.updateOverlay(
+			selectionStartPx,
+			selectionEndPx,
+			this.gridManager.currentScale
+		);
 
 		this.drawRectangle();
 
 		return true;
+	}
+
+	moveSelectionOverlay(deltaX: number, deltaY: number) {
+		this.selectionRect.selection.pos.x += deltaX;
+		this.selectionRect.selection.pos.y += deltaY;
+		this.drawRectangle();
 	}
 
 	protected drawRectangle() {

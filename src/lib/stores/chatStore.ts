@@ -1,7 +1,5 @@
-import { writable } from "svelte/store";
+import { writable } from 'svelte/store';
 
-const chatMessages = writable<Message[]>([])
+const chatMessages = writable<Message[]>([]);
 
-export {
-  chatMessages
-}
+export { chatMessages };
