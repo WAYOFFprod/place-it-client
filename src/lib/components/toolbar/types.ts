@@ -1,9 +1,9 @@
-import { ToolType } from "$lib/stores/toolStore";
+import { ToolType } from '$lib/stores/toolStore';
 
 export interface selectToolEvent {
-  selectTool: selectTool;
+	selectTool: selectTool;
 }
 
 export interface selectTool {
-  tool: ToolType
+	tool: ToolType;
 }

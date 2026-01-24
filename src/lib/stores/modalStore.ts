@@ -1,7 +1,5 @@
 import { writable } from 'svelte/store';
 
-const openedModal = writable<ModalData>({name: ''});
+const openedModal = writable<ModalData>({ name: '' });
 
-export {
-  openedModal
-}
+export { openedModal };

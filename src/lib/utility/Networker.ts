@@ -1,343 +1,344 @@
-
-import type GridManager from "$lib/p5/GridManager";
-import ServerRequests from "./ServerRequests";
+import type GridManager from '$lib/p5/GridManager';
+import ServerRequests from './ServerRequests';
 import { Socket, io } from 'socket.io-client';
 import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
-import { chatMessages } from "$lib/stores/chatStore";
-import { authStatus, tokenStore, userStore } from "$lib/stores/authStore";
-import { isReady } from "$lib/stores/canvaStore";
+import { chatMessages } from '$lib/stores/chatStore';
+import { authStatus, tokenStore, userStore } from '$lib/stores/authStore';
+import { isReady } from '$lib/stores/canvaStore';
 
 export default class Networker {
-  static #instance: Networker
-  shortClientId: string | undefined;
-  server: ServerRequests
-  socket: Socket | undefined
-  gridManager: GridManager | undefined
-  tempPoints: {[key: string]: string} | undefined
-  websocket: string
-  messages: Message[] = []
-  userData: User | undefined
-  canvaToken: string | undefined
+	static #instance: Networker;
+	shortClientId: string | undefined;
+	server: ServerRequests;
+	socket: Socket | undefined;
+	gridManager: GridManager | undefined;
+	tempPoints: { [key: string]: string } | undefined;
+	websocket: string;
+	messages: Message[] = [];
+	userData: User | undefined;
+	canvaToken: string | undefined;
 
-  static getInstance() {
-    if (!this.#instance) {
-      this.#instance = new Networker(PUBLIC_SERVER_URL, PUBLIC_WEBSOCKET_URL);
-    }
-    return this.#instance;
-  }
+	static getInstance() {
+		if (!this.#instance) {
+			this.#instance = new Networker(PUBLIC_SERVER_URL, PUBLIC_WEBSOCKET_URL);
+		}
+		return this.#instance;
+	}
 
-  constructor(server: string, websocket: string) {
-    this.websocket = websocket
-    this.server = new ServerRequests(server);
-    userStore.subscribe((newUserData: User | undefined) => {
-      this.userData = newUserData;
-    })
-    tokenStore.subscribe((newToken) => {
-      this.canvaToken = newToken
-    })
-  }
+	constructor(server: string, websocket: string) {
+		this.websocket = websocket;
+		this.server = new ServerRequests(server);
+		userStore.subscribe((newUserData: User | undefined) => {
+			this.userData = newUserData;
+		});
+		tokenStore.subscribe((newToken) => {
+			this.canvaToken = newToken;
+		});
+	}
 
-  connectToSocket = (gridManager: GridManager) => {
-    this.gridManager = gridManager;
-    this.socket = io(this.websocket);
-    
-    this.socket.on('error', (payload) => {
-      console.error(payload);
-    })
+	connectToSocket = (gridManager: GridManager) => {
+		this.gridManager = gridManager;
+		this.socket = io(this.websocket);
 
-    this.socket.on("connect", () => {
-      if(this.socket != undefined && this.gridManager != null)
-      this.socket.emit('get-init-state', {
-        'canvaId': this.gridManager.canvasId
-      });
-      this.shortClientId = this.socket?.id?.slice(6);
-    });
+		this.socket.on('error', (payload) => {
+			console.error(payload);
+		});
 
-    this.socket.on('live-canva-ready', (payload) => {
-      console.log("canva ready", payload);
-      isReady.set(true);
-    })
+		this.socket.on('connect', () => {
+			if (this.socket != undefined && this.gridManager != null)
+				this.socket.emit('get-init-state', {
+					canvaId: this.gridManager.canvasId
+				});
+			this.shortClientId = this.socket?.id?.slice(6);
+		});
 
-    this.socket.on('canva:init-pixels', (payload) => {
-      if(this.gridManager != undefined)
-      if(payload) {
-        this.tempPoints = payload.pixels
-        this.gridManager.attemptAddAdditionalPixels(this.tempPoints);
-      }
-    });
+		this.socket.on('live-canva-ready', (payload) => {
+			console.log('canva ready', payload);
+			isReady.set(true);
+		});
 
-    this.socket.on('disconnect', () => {
-      console.log('user disconnected');
-    });
-    this.gridManager = gridManager;
-    // listen to socket server message
-    
-    this.socket.on('canva:new-pixel-from-others', (coord, color) => {
-      console.log("NEW PIXEL FROM OTHERS");
-      if(!this.gridManager) return console.error("missing grid manager");
-      this.gridManager.drawPixelOnCanvas(coord, color);
-    });
+		this.socket.on('canva:init-pixels', (payload) => {
+			if (this.gridManager != undefined)
+				if (payload) {
+					this.tempPoints = payload.pixels;
+					this.gridManager.attemptAddAdditionalPixels(this.tempPoints);
+				}
+		});
 
-    this.socket.on('chat:get-message', (message: Message) => {
-      this.messages.push(message)
-      console.log("this.messages",this.messages);
-      chatMessages.set(this.messages);
-    });
+		this.socket.on('disconnect', () => {
+			console.log('user disconnected');
+		});
+		this.gridManager = gridManager;
+		// listen to socket server message
 
-    this.socket.on('chat:init-messages', (newMessages: string[]) => {
-      const messages = newMessages.map(x => {
-        return JSON.parse(x)
-      })
+		this.socket.on('canva:new-pixel-from-others', (coord, color) => {
+			console.log('NEW PIXEL FROM OTHERS');
+			if (!this.gridManager) return console.error('missing grid manager');
+			this.gridManager.drawPixelOnCanvas(coord, color);
+		});
 
-      this.messages = messages
-      chatMessages.set(this.messages);
-    });
-  }
+		this.socket.on('chat:get-message', (message: Message) => {
+			this.messages.push(message);
+			console.log('this.messages', this.messages);
+			chatMessages.set(this.messages);
+		});
 
-  // Auth
+		this.socket.on('chat:init-messages', (newMessages: string[]) => {
+			const messages = newMessages.map((x) => {
+				return JSON.parse(x);
+			});
 
-  login = async (payload: LoginPayload) => {
-    await this.server.get('/sanctum/csrf-cookie')
-    const response: any = await this.server.post("/auth/login", payload);
-    if(response?.status == 200) {
-      userStore.set(response.response.data);
-      authStatus.set(true);
-    }
-    return response;
-  }
+			this.messages = messages;
+			chatMessages.set(this.messages);
+		});
+	};
 
-  register = async (payload: RegisterPayload) => {
-    await this.server.get('/sanctum/csrf-cookie')
-    const response: any = await this.server.post("/auth/register", payload);
-    if(response?.status == 200) {
-      userStore.set(response.response);
-      authStatus.set(true);
-    }
-    return response;
-  }
+	// Auth
 
-  logout = async () => {
-    const response = await this.server.post('/auth/logout', {});
-    if(response?.status == 204) {
-      authStatus.set(false);
-    }
-  }
+	login = async (payload: LoginPayload) => {
+		await this.server.get('/sanctum/csrf-cookie');
+		const response: any = await this.server.post('/auth/login', payload);
+		if (response?.status == 200) {
+			userStore.set(response.response.data);
+			authStatus.set(true);
+		}
+		return response;
+	};
 
-  getSession = async () => {
-    const response = await this.server.get('/session')
-    if(response.isConnected) {
-      userStore.set(response.user);
-      authStatus.set(true);
-    } else {
-      authStatus.set(false);
-    }
-  }
+	register = async (payload: RegisterPayload) => {
+		await this.server.get('/sanctum/csrf-cookie');
+		const response: any = await this.server.post('/auth/register', payload);
+		if (response?.status == 200) {
+			userStore.set(response.response);
+			authStatus.set(true);
+		}
+		return response;
+	};
 
-  saveUserField = async (payload: SettingOption) => {
-    const response: any = await this.server.post('/user/update', payload)
-    if(response?.response.data) {
-      console.log("update user: ", response.response.data);
-      userStore.set(response.response.data);
-      authStatus.set(true);
-    }
-  }
+	logout = async () => {
+		const response = await this.server.post('/auth/logout', {});
+		if (response?.status == 204) {
+			authStatus.set(false);
+		}
+	};
 
-  // Friends
-  getFriends = async () => {
-    const response: any = await this.server.get('/friends');
-    return response;
-  }
+	getSession = async () => {
+		const response = await this.server.get('/session');
+		if (response.isConnected) {
+			userStore.set(response.user);
+			authStatus.set(true);
+		} else {
+			authStatus.set(false);
+		}
+	};
 
-  requestFriend = async (id: number) => {
-    const response: any = await this.server.post('/friend/request', {friend_id: id})
-    return response;
-  }
+	saveUserField = async (payload: SettingOption) => {
+		const response: any = await this.server.post('/user/update', payload);
+		if (response?.response.data) {
+			console.log('update user: ', response.response.data);
+			userStore.set(response.response.data);
+			authStatus.set(true);
+		}
+	};
 
-  acceptFriendRequest = async (id: number) => {
-    const response: any = await this.server.post('/friend/accept', {
-      'friend_id': id
-    })
-    return response.response;
-  }
+	// Friends
+	getFriends = async () => {
+		const response: any = await this.server.get('/friends');
+		return response;
+	};
 
-  removeFriend = async (id: number) => {
-    const response: any = await this.server.delete('/friend/'+id+'/remove')
-    return response;
-  }
+	requestFriend = async (id: number) => {
+		const response: any = await this.server.post('/friend/request', { friend_id: id });
+		return response;
+	};
 
-  blockUser = async (id: number) => {
-    const response: any = await this.server.post('/friend/block', {friend_id: id})
-    return response;
-  }
+	acceptFriendRequest = async (id: number) => {
+		const response: any = await this.server.post('/friend/accept', {
+			friend_id: id
+		});
+		return response.response;
+	};
 
-  blockedUser = async () => {
-    const response: any = await this.server.get('/friends/blocked')
-    return response;
-  }
+	removeFriend = async (id: number) => {
+		const response: any = await this.server.delete('/friend/' + id + '/remove');
+		return response;
+	};
 
-  unblockAccount = async (id: number) => {
-    const response: any = await this.server.delete('/friend/'+id+'/unblock')
-    return response;
-  }
+	blockUser = async (id: number) => {
+		const response: any = await this.server.post('/friend/block', { friend_id: id });
+		return response;
+	};
 
-  // Canvas
+	blockedUser = async () => {
+		const response: any = await this.server.get('/friends/blocked');
+		return response;
+	};
 
-  getCanvas = async (scope: 'personal' | 'community', sort : undefined | 'asc' | 'desc' = undefined, favorit: undefined | 1 = undefined, search: string = '') => {
-    const response: any = await this
-      .server
-      .get("/canvas?scope="+scope
-        +(sort != undefined ? '&sort='+sort : '')
-        +(favorit != undefined ? '&favorit='+favorit : '')
-        +(search != '' ? '&search='+search : '' )
-      );
-    return response;
-  }
+	unblockAccount = async (id: number) => {
+		const response: any = await this.server.delete('/friend/' + id + '/unblock');
+		return response;
+	};
 
-  getCanva = async (id: number) => {
-    const response = await this.server.get("/canvas/"+id);
-    if(response.meta.token) {
-      tokenStore.set(response.meta.token)
-    }
-    return response.data;
-  }
+	// Canvas
 
-  saveCanvaField = async (payload: CanvaFieldUpdate) => {
-    const response: any = await this.server.post('/canva/update', payload)
-    if(response?.response.data) {
-      authStatus.set(true);
-    }
-  }
+	getCanvas = async (
+		scope: 'personal' | 'community',
+		sort: undefined | 'asc' | 'desc' = undefined,
+		favorit: undefined | 1 = undefined,
+		search: string = ''
+	) => {
+		const response: any = await this.server.get(
+			'/canvas?scope=' +
+				scope +
+				(sort != undefined ? '&sort=' + sort : '') +
+				(favorit != undefined ? '&favorit=' + favorit : '') +
+				(search != '' ? '&search=' + search : '')
+		);
+		return response;
+	};
 
-  inviteToCanva = async (friend_id: number, canva_id: number) => {
-    const response: any = await this.server.post("/canva/invite/", {
-      "user_id": friend_id,
-      'canva_id': canva_id
-    });
-    console.log(response);
-  }
+	getCanva = async (id: number) => {
+		const response = await this.server.get('/canvas/' + id);
+		if (response.meta.token) {
+			tokenStore.set(response.meta.token);
+		}
+		return response.data;
+	};
 
-  requestAccess = async (canva_id: number) => {
-    const response: any = await this.server.post("/canva/request_access/", {
-      'canva_id': canva_id
-    });
-    console.log(response);
-  }
+	saveCanvaField = async (payload: CanvaFieldUpdate) => {
+		const response: any = await this.server.post('/canva/update', payload);
+		if (response?.response.data) {
+			authStatus.set(true);
+		}
+	};
 
-  getParticipants = async (id: number) => {
-    const response: any = await this.server.get("/canva/"+id+"/participants");
-    return response;
-  }
+	inviteToCanva = async (friend_id: number, canva_id: number) => {
+		const response: any = await this.server.post('/canva/invite/', {
+			user_id: friend_id,
+			canva_id: canva_id
+		});
+		console.log(response);
+	};
 
-  acceptParticipationRequest = async (friend_id: number, canva_id: number) => {
-    const response: any = await this.server.post("/canva/accept_request/", {
-      "user_id": friend_id,
-      'canva_id': canva_id
-    });
-    return response.response
-  }
+	requestAccess = async (canva_id: number) => {
+		const response: any = await this.server.post('/canva/request_access/', {
+			canva_id: canva_id
+		});
+		console.log(response);
+	};
 
-  rejectParticipationRequest = async (friend_id: number, canva_id: number) => {
-    const response: any = await this.server.post("/canva/reject_request/", {
-      "user_id": friend_id,
-      'canva_id': canva_id
-    });
-    return response.response
-  }
+	getParticipants = async (id: number) => {
+		const response: any = await this.server.get('/canva/' + id + '/participants');
+		return response;
+	};
 
-  // updateParticipation = async (userId: number, canvaId: number, status: ParticipationStatus ) => {
-  //   const response: any = await this.server.patch("/participant/",{
-  //     'user_id': userId,
-  //     'canva_id': canvaId,
-  //     'status': status
-  //   });
-  //   return response.response;
-  // }
+	acceptParticipationRequest = async (friend_id: number, canva_id: number) => {
+		const response: any = await this.server.post('/canva/accept_request/', {
+			user_id: friend_id,
+			canva_id: canva_id
+		});
+		return response.response;
+	};
 
-  likeCanva = async (id: number) => {
-    const response: any = await this.server.post("/canva/like", {"canvaId": id});
-    return response.response.added;
-  }
+	rejectParticipationRequest = async (friend_id: number, canva_id: number) => {
+		const response: any = await this.server.post('/canva/reject_request/', {
+			user_id: friend_id,
+			canva_id: canva_id
+		});
+		return response.response;
+	};
 
-  deleteCanva = async (id: number) => {
-    const response = await this.server.delete("/canvas/"+id);
-    return response;
-  }
+	// updateParticipation = async (userId: number, canvaId: number, status: ParticipationStatus ) => {
+	//   const response: any = await this.server.patch("/participant/",{
+	//     'user_id': userId,
+	//     'canva_id': canvaId,
+	//     'status': status
+	//   });
+	//   return response.response;
+	// }
 
-  joinLiveCanva = (canvaId: number,) => {
-    if(this.canvaToken == undefined) {
-      console.warn("missing token to joinLiveCanva")
-      return
-    }
-    this.socket?.emit('join-room', {
-      "canvaId": canvaId,
-      "userId": this.userData?.id,
-      "username": this.userData?.name,
-      "token": this.canvaToken
-    })
-  }
+	likeCanva = async (id: number) => {
+		const response: any = await this.server.post('/canva/like', { canvaId: id });
+		return response.response.added;
+	};
 
-  placePixel = (coord: Coord, color: string | null) => {
-    if(this.canvaToken == undefined) {
-      console.warn("missing token to placePixel")
-      return
-    }
-    if(!color) {
-      return console.error("no color selected");
-    }
-    if(!this.gridManager) {
-      return console.error("missing grid manager");
-    }
-    const index = this.gridManager.drawPixelOnCanvas(coord, color);
-    if(index === false) return
-    if(this.socket != undefined) {
-      const auth: any = {
-        user_id: this.userData?.id,
-        token: this.canvaToken
-      }
-      this.socket.emit('canva:new-pixel:'+this.gridManager.canvasId, auth, index, coord, color);
-    }
+	deleteCanva = async (id: number) => {
+		const response = await this.server.delete('/canvas/' + id);
+		return response;
+	};
 
-  }
+	joinLiveCanva = (canvaId: number) => {
+		if (this.canvaToken == undefined) {
+			console.warn('missing token to joinLiveCanva');
+			return;
+		}
+		this.socket?.emit('join-room', {
+			canvaId: canvaId,
+			userId: this.userData?.id,
+			username: this.userData?.name,
+			token: this.canvaToken
+		});
+	};
 
-  replaceColors = async (id: number, colors: string[]) => {
-    const payload = {
-      id: id,
-      colors: colors
-    }
-    const response = await this.server.post("/canvas/color/replace", payload);
-    return response;
-  }
+	placePixel = (coord: Coord, color: string | null) => {
+		if (this.canvaToken == undefined) {
+			console.warn('missing token to placePixel');
+			return;
+		}
+		if (!color) {
+			return console.error('no color selected');
+		}
+		if (!this.gridManager) {
+			return console.error('missing grid manager');
+		}
+		const index = this.gridManager.drawPixelOnCanvas(coord, color);
+		if (index === false) return;
+		if (this.socket != undefined) {
+			const auth: any = {
+				user_id: this.userData?.id,
+				token: this.canvaToken
+			};
+			this.socket.emit('canva:new-pixel:' + this.gridManager.canvasId, auth, index, coord, color);
+		}
+	};
 
-  createCanva = async (payload: CreateCanvaPayload) => {
-    const response = await this.server.post("/canvas/create", payload);
-    return response;
-  }
+	replaceColors = async (id: number, colors: string[]) => {
+		const payload = {
+			id: id,
+			colors: colors
+		};
+		const response = await this.server.post('/canvas/color/replace', payload);
+		return response;
+	};
 
-  // Messages
+	createCanva = async (payload: CreateCanvaPayload) => {
+		const response = await this.server.post('/canvas/create', payload);
+		return response;
+	};
 
-  sendMessage(message: Message) {
-    if(this.socket != undefined) {
-      this.socket.emit('chat:new-message', message);
-      this.messages.push(message)
-      chatMessages.set(this.messages);
-    }
-  }
+	// Messages
 
-  disconnect = () => {
-    if(this.socket != undefined)
-    this.socket.disconnect();
-  }
+	sendMessage(message: Message) {
+		if (this.socket != undefined) {
+			this.socket.emit('chat:new-message', message);
+			this.messages.push(message);
+			chatMessages.set(this.messages);
+		}
+	}
 
-  // Notification settings
+	disconnect = () => {
+		if (this.socket != undefined) this.socket.disconnect();
+	};
 
-  getNotificationSettings = async () => {
-    const response: any = await this.server.get('/settings/notifications');
-    return response;
-  }
+	// Notification settings
 
-  saveNotificationSetting = async (payload: BoolSettingOption) => {
-    const response: any = await this.server.patch('/settings/update', payload)
-    return response.response;
-  }
+	getNotificationSettings = async () => {
+		const response: any = await this.server.get('/settings/notifications');
+		return response;
+	};
 
+	saveNotificationSetting = async (payload: BoolSettingOption) => {
+		const response: any = await this.server.patch('/settings/update', payload);
+		return response.response;
+	};
 }

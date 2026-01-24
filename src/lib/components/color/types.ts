@@ -1,9 +1,9 @@
 interface selectColorEvent {
-  selectColor: selectColor;
+	selectColor: selectColor;
 }
 interface updateColorEvent {
-  updateColor: selectColor;
+	updateColor: selectColor;
 }
 interface selectColor {
-  color: string
+	color: string;
 }

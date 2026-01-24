@@ -1,8 +1,8 @@
 interface User {
-  id: number,
-  email: string,
-  name: string,
-  discord_user: string,
-  language: 'fr' | 'en'
-  token: '',
+	id: number;
+	email: string;
+	name: string;
+	discord_user: string;
+	language: 'fr' | 'en';
+	token: '';
 }

@@ -1,7 +1,5 @@
-import { writable } from "svelte/store";
+import { writable } from 'svelte/store';
 
-const settingsInputState = writable('')
+const settingsInputState = writable('');
 
-export {
-  settingsInputState
-}
+export { settingsInputState };

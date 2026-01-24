@@ -1,102 +1,105 @@
-import { setTool, ToolType } from "$lib/stores/toolStore";
-import Tool from "../ToolClass";
-import EraseIcon from "$lib/icons/erase.svelte"
-import Networker from "$lib/utility/Networker";
-import { selectedColor } from "$lib/stores/colorStore";
-import type { Unsubscriber } from "svelte/motion";
+import { setTool, ToolType } from '$lib/stores/toolStore';
+import Tool from '../ToolClass';
+import EraseIcon from '$lib/icons/erase.svelte';
+import Networker from '$lib/utility/Networker';
+import { selectedColor } from '$lib/stores/colorStore';
+import type { Unsubscriber } from 'svelte/motion';
 
 export default class EraserTool extends Tool {
-  static cursor = "eraser"
-  static type = ToolType.Eraser
-  static icon = EraseIcon
-  static unsubscribeSelectedColor: Unsubscriber | undefined;
-  static savedColor: string = '';
-  static init: boolean = false
+	static cursor = 'eraser';
+	static type = ToolType.Eraser;
+	static icon = EraseIcon;
+	static unsubscribeSelectedColor: Unsubscriber | undefined;
+	static savedColor: string = '';
+	static init: boolean = false;
 
-  networker: Networker = Networker.getInstance();
+	networker: Networker = Networker.getInstance();
 
-  pixels: Coord[] = [];
+	pixels: Coord[] = [];
 
-  protected init() {
-    EraserTool.unsubscribeSelectedColor = selectedColor.subscribe((newColor) => {
-      if(EraserTool.init) {
-        if(newColor != '') {
-          EraserTool.savedColor = ''
-          setTool(ToolType.Cursor);
-        }
-      } else {
-        EraserTool.savedColor = newColor;
-        EraserTool.init = true;
-        selectedColor.set('')
-      }
-    });
-  }
+	protected init() {
+		EraserTool.unsubscribeSelectedColor = selectedColor.subscribe((newColor) => {
+			if (EraserTool.init) {
+				if (newColor != '') {
+					EraserTool.savedColor = '';
+					setTool(ToolType.Cursor);
+				}
+			} else {
+				EraserTool.savedColor = newColor;
+				EraserTool.init = true;
+				selectedColor.set('');
+			}
+		});
+	}
 
-  keyDown() {
+	keyDown() {}
 
-  }
+	keyUp() {}
 
-  keyUp() {
+	mousePressed(_mousePressed: Coord) {
+		this.placePixel();
+		return true;
+	}
 
-  }
+	mouseReleased() {
+		this.pixels = [];
+	}
 
-  mousePressed(_mousePressed: Coord) {
-    this.placePixel();
-    return true
-  }
+	mouseMove(isMouseDown: boolean) {
+		if (!isMouseDown)
+			return {
+				x: this.controlManager.screenOffset.x,
+				y: this.controlManager.screenOffset.y
+			};
 
-  mouseReleased() {
-    this.pixels = []
-  }
+		// check if mouse position in on new pixel
+		const coords: Coord = {
+			x: Math.floor(
+				(this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale
+			),
+			y: Math.floor(
+				(this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale
+			)
+		};
 
-  mouseMove(isMouseDown: boolean) {
-    if(!isMouseDown) return {
-      x: this.controlManager.screenOffset.x,
-      y: this.controlManager.screenOffset.y
-    };
+		// if these coords are new in this stroke add it to array and place pixel
+		if (!this.pixels.find((coord) => coord.x == coords.x && coord.y == coords.y)) {
+			this.pixels.push(coords);
+			this.networker.placePixel(coords, '#ffffff');
+		}
 
-    // check if mouse position in on new pixel
-    const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale)
-    };
+		// return save offset in order to not move screen
+		return {
+			x: this.controlManager.screenOffset.x,
+			y: this.controlManager.screenOffset.y
+		};
+	}
 
-    // if these coords are new in this stroke add it to array and place pixel
-    if(!this.pixels.find(coord => coord.x == coords.x && coord.y == coords.y)) {
-      this.pixels.push(coords);
-      this.networker.placePixel(coords, '#ffffff');
-    }
+	protected placePixel() {
+		// calculate on which pixel the mouse is over
+		const coords: Coord = {
+			x: Math.floor(
+				(this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale
+			),
+			y: Math.floor(
+				(this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale
+			)
+		};
+		this.pixels.push(coords);
+		this.networker.placePixel(coords, '#ffffff');
+	}
 
-    // return save offset in order to not move screen
-    return {
-      x: this.controlManager.screenOffset.x,
-      y: this.controlManager.screenOffset.y
-    };
-  }
+	getType: () => null | typeof Tool = () => {
+		return EraserTool;
+	};
 
-  protected placePixel() {
-    // calculate on which pixel the mouse is over
-    const coords: Coord = {
-      x: Math.floor((this.p5.mouseX - this.controlManager.screenOffset.x) / this.controlManager.currentScale),
-      y: Math.floor((this.p5.mouseY - this.controlManager.screenOffset.y) / this.controlManager.currentScale)
-    };
-    this.pixels.push(coords);
-    this.networker.placePixel(coords, '#ffffff');
-  }
-
-
-  getType: () => null | typeof Tool = () => {
-    return EraserTool
-  }
-
-  destroy() {
-    EraserTool.init = false;
-    if(EraserTool.unsubscribeSelectedColor) {
-      EraserTool.unsubscribeSelectedColor();
-    }
-    if(EraserTool.savedColor != '') {
-      selectedColor.set(EraserTool.savedColor);
-    }
-  }
-
+	destroy() {
+		EraserTool.init = false;
+		if (EraserTool.unsubscribeSelectedColor) {
+			EraserTool.unsubscribeSelectedColor();
+		}
+		if (EraserTool.savedColor != '') {
+			selectedColor.set(EraserTool.savedColor);
+		}
+	}
 }

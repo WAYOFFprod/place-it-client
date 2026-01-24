@@ -1,25 +1,18 @@
-import { ToolType } from "$lib/stores/toolStore";
-import Tool from "../ToolClass";
-import SelectionIcon from "$lib/icons/selection.svelte"
+import { ToolType } from '$lib/stores/toolStore';
+import Tool from '../ToolClass';
+import SelectionIcon from '$lib/icons/selection.svelte';
 
 export default class SelectionTool extends Tool {
-  static cursor = "selection"
-  static type = ToolType.Selection
-  static icon = SelectionIcon
-  keyDown() {
+	static cursor = 'selection';
+	static type = ToolType.Selection;
+	static icon = SelectionIcon;
+	keyDown() {}
 
-  }
+	keyUp() {}
 
-  keyUp() {
+	moveMouse(isMouseDown: boolean) {}
 
-  }
-
-  moveMouse(isMouseDown: boolean) {
-    
-  }
-
-  getType: () => null | typeof Tool = () => {
-    return SelectionTool
-  }
-
+	getType: () => null | typeof Tool = () => {
+		return SelectionTool;
+	};
 }
