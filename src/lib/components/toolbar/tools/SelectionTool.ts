@@ -78,7 +78,10 @@ export default class SelectionTool extends Tool {
 	}
 
 	mouseReleased() {
-		if (this.isMovingSelection) this.isMovingSelection = false;
+		if (this.isMovingSelection) {
+			this.isMovingSelection = false;
+			return;
+		}
 		if (this.isHoveringSelection) return;
 		this.selectionEnd = { ...this.dragCurrent };
 		this.dragPrevious = {
