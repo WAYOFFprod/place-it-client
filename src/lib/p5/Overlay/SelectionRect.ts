@@ -32,10 +32,8 @@ export default class SelectionRect {
 
 		const widthInPx = endPos.x - startPos.x;
 		const heightInPx = endPos.y - startPos.y;
-		const widthInPixels =
-			Math.round(widthInPx / currentScale) > 0 ? Math.round(widthInPx / currentScale) : 1;
-		const heightInPixels =
-			Math.round(heightInPx / currentScale) > 0 ? Math.round(heightInPx / currentScale) : 1;
+		const widthInPixels = Math.round(widthInPx / currentScale) + 1;
+		const heightInPixels = Math.round(heightInPx / currentScale) + 1;
 		// don't rerender if the size and position of rectangle hasn't change
 		if (
 			widthInPixels - this.overlayRectangleSize.width == 0 &&
