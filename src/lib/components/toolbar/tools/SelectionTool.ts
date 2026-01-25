@@ -77,27 +77,9 @@ export default class SelectionTool extends Tool {
 			if (this.isMovingSelection) {
 				const deltaXScreen = this.dragCurrent.x - this.dragPrevious.x;
 				const deltaYScreen = this.dragCurrent.y - this.dragPrevious.y;
+				const hasMoved = this.selectionRect.moveRect(deltaXScreen, deltaYScreen);
 
-				const scale = this.controlManager.gridManager.currentScale;
-				const deltaXGrid = Math.round(deltaXScreen / scale);
-				const deltaYGrid = Math.round(deltaYScreen / scale);
-
-				if (deltaXGrid !== 0 || deltaYGrid !== 0) {
-					// Apply movement exactly matching the grid step
-					const appliedDeltaX = deltaXGrid * scale;
-					const appliedDeltaY = deltaYGrid * scale;
-
-					this.selectionRect.moveRect(appliedDeltaX, appliedDeltaY);
-
-					// Manually update overlay to avoid calling updateSelection()
-					// updateSelection() resets dragPrevious to the mouse position, which we want to avoid
-					this.controlManager.gridManager.updateOverlay();
-
-					// Update dragPrevious by the amount we ACTUALLY moved (grid snapped)
-					// This keeps the accumulated drag delta accurate relative to the grid
-					this.dragPrevious.x += appliedDeltaX;
-					this.dragPrevious.y += appliedDeltaY;
-				}
+				if (hasMoved) this.updateSelection();
 			}
 
 			// update selection size of rectangle if not moving selection
