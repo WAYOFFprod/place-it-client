@@ -121,10 +121,6 @@
 		isCommunity = !isCommunity;
 	};
 
-	const close = () => {
-		dispatch('close');
-	};
-
 	$: getError = (value: string) => {
 		if (errors?.[value]) {
 			return errors[value]?.[0];

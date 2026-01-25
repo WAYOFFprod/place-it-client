@@ -48,8 +48,9 @@
 			value: value
 		});
 		wasUpdated = true;
+		close();
 	};
-
+	
 	const close = () => {
 		if (wasUpdated) event.set('updateCanvas');
 		dispatch('close');

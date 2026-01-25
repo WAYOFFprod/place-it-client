@@ -13,7 +13,6 @@
 
 	let darkmode = false;
 
-	let nameInput: HTMLInputElement;
 	let nameValue: string = '';
 	let nameEditable: boolean = false;
 
@@ -67,7 +66,7 @@
 	<div class="w-40 flex flex-col items-center gap-2 mx-auto">
 		<div class="rounded-full w-36 h-36 border-2 border-black"></div>
 		<input
-			bind:this={nameInput}
+
 			id="name"
 			name="name"
 			type="text"

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { mdBreak } from '$lib/stores/tailwindStore';
 	import { createEventDispatcher, onMount } from 'svelte';
-	import type { FormEventHandler } from 'svelte/elements';
 
 	export let placeholder: string = '';
 	export let label: string = '';
@@ -35,8 +34,9 @@
 			}
 		}, 1000);
 	};
-	const onChange = (event: FormEventHandler<HTMLInputElement>) => {
-		if (event.target.value == '' || (event.target.value.length > 2 && !onCooldown)) {
+	const onChange = (event: Event) => {
+		const target = event.target as HTMLInputElement;
+		if (target.value == '' || (target.value.length > 2 && !onCooldown)) {
 			changedSinceCooldown = true;
 			cooldown();
 		} else {

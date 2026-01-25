@@ -4,7 +4,7 @@
 
 	const dispatch = createEventDispatcher();
 	export let placeholder: string = '';
-	export let label: string | undefined;
+	export let label: string | undefined = undefined;
 	export let id: string;
 	export let toggle = false;
 	export let disabled = false;

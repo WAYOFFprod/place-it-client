@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, tick } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 	import Select from './select.svelte';
 	import ToggleButton from './toggleButton.svelte';
 	import { settingsInputState } from '$lib/stores/settingsInputState';
@@ -20,15 +20,17 @@
 	let buttonLabel = 'Modifier';
 
 	const setEditable = async () => {};
+
 	const save = () => {
 		const data = { field: field, value: value } as SettingOption;
 		dispatch('saveField', data);
 	};
+
 	const discard = () => {
 		console.log('discard');
 	};
 
-	settingsInputState.subscribe((newSetting) => {
+	settingsInputState.subscribe((newSetting: string) => {
 		if (newSetting == id) {
 			buttonLabel = 'Enregistrer';
 			setEditable();
