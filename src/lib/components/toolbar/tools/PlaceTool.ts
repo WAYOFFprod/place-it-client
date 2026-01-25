@@ -82,7 +82,6 @@ export default class PlaceTool extends Tool {
 				this.p5.touches[1].y
 			);
 			const scaleFactor = distance / this.pinchDistance;
-			console.log('scaleFactor', scaleFactor);
 			const newCurrentScale = this.controlManager.gridManager.currentScale * scaleFactor;
 			let newScaleFactor = newCurrentScale / this.controlManager.gridManager.currentScale;
 			this.controlManager.scroll(newScaleFactor);

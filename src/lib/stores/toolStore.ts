@@ -8,7 +8,7 @@ import PointTool from '$lib/components/toolbar/tools/PointTool';
 import EraserTool from '$lib/components/toolbar/tools/EraserTool';
 import PlaceTool from '$lib/components/toolbar/tools/PlaceTool';
 import SelectionTool from '$lib/components/toolbar/tools/SelectionTool';
-import RectTool from '$lib/components/toolbar/tools/RectTool';
+// import RectTool from '$lib/components/toolbar/tools/RectTool';
 
 interface Tools {
 	[key: string]: typeof Tool;
@@ -45,6 +45,7 @@ let p5: P5 | undefined;
 const selectedTool = writable<Tool | undefined>();
 
 const destroyActiveTool = () => {
+	console.log('Destroying active tool', activeTool);
 	if (activeTool != undefined) {
 		activeTool.destroy();
 	}

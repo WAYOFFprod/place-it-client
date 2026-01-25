@@ -40,6 +40,11 @@ export default class CanvaOverlay {
 	addSelectionRect = (selectionRect: SelectionRect) => {
 		this.selectionRect = selectionRect;
 	};
+	removeSelectionRect = () => {
+		this.selectionRect = undefined;
+		this.img.clear();
+		this.gridManager.update();
+	};
 
 	refreshOverlay = () => {
 		const scaleChange = this.gridManager.currentScale / this.previousScale;

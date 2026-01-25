@@ -10,7 +10,7 @@ export default class PointTool extends Tool {
 	static cursor = 'pointer';
 	static type = ToolType.Cursor;
 	static icon = CursorIcon;
-	static unsubscribeColors: any | undefined = undefined;
+	static unsubscribeColors: () => void;
 	static color: string | undefined;
 
 	cursorW: Writable<string> = writable<string>(PointTool.cursor);
@@ -30,6 +30,7 @@ export default class PointTool extends Tool {
 
 	keyUp() {}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	mousePressed(mousePressed: Coord) {
 		this.placePixel();
 		return true;
@@ -54,14 +55,60 @@ export default class PointTool extends Tool {
 			)
 		};
 
-		// if these coords are new in this stroke add it to array and place pixel
-		if (!this.pixels.find((coord) => coord.x == coords.x && coord.y == coords.y)) {
-			this.pixels.push(coords);
-			this.networker.savePixel(coords, PointTool.color);
+		const lastPixel = this.pixels.length > 0 ? this.pixels[this.pixels.length - 1] : undefined;
+
+		if (lastPixel) {
+			const points = this.bresenhamLine(lastPixel, coords);
+			points.forEach((p) => this.trySavePixel(p));
+		} else {
+			this.trySavePixel(coords);
 		}
 
 		// return save offset in order to not move screen
 		return this.controlManager.gridManager.screenOffset;
+	}
+
+	private trySavePixel(coords: Coord) {
+		if (
+			PointTool.color &&
+			!this.pixels.find((coord) => coord.x == coords.x && coord.y == coords.y)
+		) {
+			this.pixels.push(coords);
+			this.networker.savePixel(coords, PointTool.color);
+		}
+	}
+
+	// Bresenham's line algorithm to place points between two coordinates
+	private bresenhamLine(p0: Coord, p1: Coord): Coord[] {
+		const points: Coord[] = [];
+		const dx = Math.abs(p1.x - p0.x);
+		const dy = Math.abs(p1.y - p0.y);
+		const sx = p0.x < p1.x ? 1 : -1;
+		const sy = p0.y < p1.y ? 1 : -1;
+		let err = dx - dy;
+
+		let x = p0.x;
+		let y = p0.y;
+
+		const maxIterations = dx + dy + 1;
+		let iterations = 0;
+
+		while (iterations < maxIterations) {
+			points.push({ x, y });
+
+			if (x === p1.x && y === p1.y) break;
+			const e2 = 2 * err;
+			if (e2 > -dy) {
+				err -= dy;
+				x += sx;
+			}
+			if (e2 < dx) {
+				err += dx;
+				y += sy;
+			}
+			iterations++;
+		}
+		return points;
 	}
 
 	protected placePixel() {
@@ -88,6 +135,7 @@ export default class PointTool extends Tool {
 	destroy() {
 		if (PointTool.unsubscribeColors) {
 			PointTool.unsubscribeColors();
+			this.p5.frameRate(60);
 		}
 	}
 }

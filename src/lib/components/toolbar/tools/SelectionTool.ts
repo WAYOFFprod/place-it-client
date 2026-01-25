@@ -150,4 +150,8 @@ export default class SelectionTool extends Tool {
 			this.cursorW.set('selection');
 		}
 	}
+
+	destroy() {
+		this.controlManager.gridManager.removeRectFromOverlay();
+	}
 }

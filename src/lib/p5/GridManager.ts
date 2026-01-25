@@ -150,6 +150,10 @@ export default class GridManager {
 		this.overlay.addSelectionRect(selectionRect);
 		this.needsUpdate = true;
 	};
+	removeRectFromOverlay = () => {
+		this.overlay.removeSelectionRect();
+		this.needsUpdate = true;
+	};
 
 	updateOverlay = () => {
 		this.needsUpdate = true;
@@ -233,7 +237,9 @@ export default class GridManager {
 			this.gridSections[i].updateCanvasPosition();
 		}
 		// update overlay
-		this.overlay.refreshOverlay();
+		if (this.overlay.selectionRect) {
+			this.overlay.refreshOverlay();
+		}
 	};
 
 	private getGridSectionIndex(position: Coord): number {
