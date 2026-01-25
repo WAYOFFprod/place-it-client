@@ -1,20 +1,10 @@
-ARG NODE_VERSION=18.19.0
+FROM nginx:alpine
 
-FROM node:${NODE_VERSION}-alpine
+# Copy pre-built static files
+COPY build /usr/share/nginx/html
 
-WORKDIR /
+# Copy nginx configuration
+COPY docker/nginx.default.conf /etc/nginx/conf.d/default.conf
 
-ARG PORT=3000
-
-ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_ENV=production
-
-ENV PORT=$PORT
-
-COPY ./ ./
-# Optional, only needed if you rely on unbundled dependencies
-# COPY --from=build /src/node_modules /src/node_modules
-
-
-EXPOSE 3000
-CMD [ "node", "dist/index.js" ]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
