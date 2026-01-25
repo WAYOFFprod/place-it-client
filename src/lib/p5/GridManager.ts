@@ -129,12 +129,32 @@ export default class GridManager {
 		this.needsUpdate = true;
 	};
 
+	onScaleChange = (scaleFactor: number) => {
+		const relMouse = {
+			x: this.p5.mouseX * scaleFactor,
+			y: this.p5.mouseY * scaleFactor
+		};
+		// get the current screen offset relative to the canvas
+		const relOffset = {
+			x: this.screenOffset.x * scaleFactor,
+			y: this.screenOffset.y * scaleFactor
+		};
+
+		this.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
+		this.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
+		this.overlay.onScaleChange();
+	};
+
 	updateRectangleOverlay = (
-		selectionStartPx: Coord,
-		selectionEndPx: Coord,
+		selectionStartScreen: Coord,
+		selectionEndScreen: Coord,
 		fill: boolean | undefined
 	) => {
-		this.needsUpdate = this.overlay.updateRectangleOverlay(selectionStartPx, selectionEndPx, fill);
+		this.needsUpdate = this.overlay.updateRectangleOverlay(
+			selectionStartScreen,
+			selectionEndScreen,
+			fill
+		);
 	};
 
 	clipboard: P5.Graphics[] = [];

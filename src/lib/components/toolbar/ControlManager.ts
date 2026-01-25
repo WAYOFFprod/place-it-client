@@ -130,19 +130,8 @@ export default class ControlManager {
 		this.scaleFactor = newScaleFactor;
 		this.gridManager.currentScale = limitScaleFactor;
 		// get mouse position relative to canvas zoom
-		const relMouse = {
-			x: this.p5.mouseX * this.scaleFactor,
-			y: this.p5.mouseY * this.scaleFactor
-		};
 
-		// get the current screen offset relative to the canvas
-		const relOffset = {
-			x: this.gridManager.screenOffset.x * this.scaleFactor,
-			y: this.gridManager.screenOffset.y * this.scaleFactor
-		};
-
-		this.gridManager.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
-		this.gridManager.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
+		this.gridManager.onScaleChange(this.scaleFactor);
 
 		const percentScale = ((newScaleFactor / this.MAX_ZOOM) * 100) as number;
 		zoom.set(percentScale);

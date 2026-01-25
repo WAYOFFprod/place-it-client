@@ -22,18 +22,15 @@ export default class SelectionTool extends Tool {
 		return this.hover ? SelectionTool.cursor : 'hand';
 	}
 
-	selectionStart: Coord = {
+	selectionStartScreen: Coord = {
 		x: 0,
 		y: 0
 	};
-	selectionEnd: Coord = {
+	selectionEndScreen: Coord = {
 		x: 0,
 		y: 0
 	};
-	dragStart: Coord = {
-		x: 0,
-		y: 0
-	};
+
 	dragPrevious: Coord = {
 		x: 0,
 		y: 0
@@ -61,7 +58,7 @@ export default class SelectionTool extends Tool {
 	mousePressed(screenOffset: Coord): boolean {
 		this.controlManager.gridManager.screenOffset = screenOffset;
 		this.dragCurrent = this.calculatePositionOnCanvas();
-		this.dragStart = { ...this.dragCurrent };
+
 		if (this.isHoveringSelection) {
 			this.dragPrevious = { ...this.dragCurrent };
 			this.isMovingSelection = true;
@@ -69,8 +66,8 @@ export default class SelectionTool extends Tool {
 		}
 
 		if (!this.isMovingSelection) {
-			this.selectionStart.x = this.selectionEnd.x = this.dragCurrent.x;
-			this.selectionStart.y = this.selectionEnd.y = this.dragCurrent.y;
+			this.selectionStartScreen.x = this.selectionEndScreen.x = this.dragCurrent.x;
+			this.selectionStartScreen.y = this.selectionEndScreen.y = this.dragCurrent.y;
 		}
 
 		this.updateSelection();
@@ -82,8 +79,9 @@ export default class SelectionTool extends Tool {
 			this.isMovingSelection = false;
 			return;
 		}
+
 		if (this.isHoveringSelection) return;
-		this.selectionEnd = { ...this.dragCurrent };
+		this.selectionEndScreen = { ...this.dragCurrent };
 		this.dragPrevious = {
 			x: 0,
 			y: 0
@@ -94,13 +92,13 @@ export default class SelectionTool extends Tool {
 		if (isMouseDown) {
 			this.dragCurrent = this.calculatePositionOnCanvas();
 			if (this.isMovingSelection) {
-				const pxDeltaX = this.dragCurrent.x - this.dragPrevious.x;
-				const pxDeltaY = this.dragCurrent.y - this.dragPrevious.y;
-				this.moveSelectionByDelta(pxDeltaX, pxDeltaY);
+				const deltaXScreen = this.dragCurrent.x - this.dragPrevious.x;
+				const deltaYScreen = this.dragCurrent.y - this.dragPrevious.y;
+				this.moveSelectionByDelta(deltaXScreen, deltaYScreen);
 			}
 
 			if (!this.isHoveringSelection && !this.isMovingSelection) {
-				this.selectionEnd = this.dragCurrent;
+				this.selectionEndScreen = this.dragCurrent;
 				this.updateSelection();
 			}
 		}
@@ -130,11 +128,11 @@ export default class SelectionTool extends Tool {
 		this.networker.placePixelsByIndex(pixels);
 	}
 
-	protected moveSelectionByDelta(pxDeltaX: number, pxDeltaY: number) {
-		this.selectionStart.x += pxDeltaX;
-		this.selectionStart.y += pxDeltaY;
-		this.selectionEnd.x += pxDeltaX;
-		this.selectionEnd.y += pxDeltaY;
+	protected moveSelectionByDelta(deltaXScreen: number, deltaYScreen: number) {
+		this.selectionStartScreen.x += deltaXScreen;
+		this.selectionStartScreen.y += deltaYScreen;
+		this.selectionEndScreen.x += deltaXScreen;
+		this.selectionEndScreen.y += deltaYScreen;
 		this.updateSelection();
 	}
 
@@ -144,8 +142,8 @@ export default class SelectionTool extends Tool {
 			return;
 		// make sure the selection is at least 1 pixel wide and high
 		this.controlManager.gridManager.updateRectangleOverlay(
-			this.selectionStart,
-			this.selectionEnd,
+			this.selectionStartScreen,
+			this.selectionEndScreen,
 			false
 		);
 		this.dragPrevious = { ...this.dragCurrent };

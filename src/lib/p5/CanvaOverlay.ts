@@ -41,38 +41,32 @@ export default class CanvaOverlay {
 
 	refreshOverlay = () => {
 		const scaleChange = this.gridManager.currentScale / this.previousScale;
-
 		if (scaleChange != 0) {
 			this.img.scale(this.gridManager.canvas.width / (this.gridManager.canvas.width * scaleChange));
 			this.previousScale = this.gridManager.currentScale;
 		}
 		this.p5.image(this.img, 0, 0, this.gridManager.canvas.width, this.gridManager.canvas.height);
+		this.drawRectangle();
 	};
 
 	updateRectangleOverlay(
-		selectionStartPx: Coord,
-		selectionEndPx: Coord,
-
+		selectionStartScreen: Coord,
+		selectionEndScreen: Coord,
 		fill: boolean | undefined
 	): boolean {
 		if (this.img == null) return false;
 		this.fill = fill || false;
-
-		this.selectionRect.updateOverlay(
-			selectionStartPx,
-			selectionEndPx,
+		this.selectionRect.updateRectCalc(
+			selectionStartScreen,
+			selectionEndScreen,
 			this.gridManager.currentScale
 		);
-
-		this.drawRectangle();
 
 		return true;
 	}
 
-	moveSelectionOverlay(deltaX: number, deltaY: number) {
-		this.selectionRect.selection.pos.x += deltaX;
-		this.selectionRect.selection.pos.y += deltaY;
-		this.drawRectangle();
+	onScaleChange() {
+		this.selectionRect.updateScale(this.gridManager.currentScale);
 	}
 
 	protected drawRectangle() {
@@ -88,8 +82,8 @@ export default class CanvaOverlay {
 		this.img.strokeWeight(4);
 
 		// console.log('drawing rectangle', this.selectionRect);
-		const pos = this.selectionRect.selection.pos;
-		const size = this.selectionRect.selection.size;
+		const pos = this.selectionRect.getPosition();
+		const size = this.selectionRect.getSize();
 		this.img.rect(pos.x, pos.y, size.width, size.height);
 	}
 
@@ -99,12 +93,8 @@ export default class CanvaOverlay {
 
 	// Selection Rectangle
 	getSelection = () => {
-		return this.selectionRect.getSelection(this.gridManager.currentScale);
+		return this.selectionRect.getSelection();
 	};
-
-	getStart(): Coord {
-		return this.selectionRect.getStart(this.gridManager.currentScale);
-	}
 
 	isInSelection = (x: number, y: number): boolean => {
 		return this.selectionRect.isInSelection(x, y);
