@@ -1,9 +1,8 @@
 <script lang="ts">
-	import Panel from '$lib/components/layout/panel.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import Swatch from '../swatch.svelte';
 	import { selectedColor } from '$lib/stores/colorStore';
-	import { hexToRgb, hsv2rgb, rectToRGB, rgbToHsl, rgbToHex, rgbToHsv } from '../utils/converter';
+	import { hexToRgb, hsv2rgb, rectToRGB, rgbToHex, rgbToHsv } from '../utils/converter';
 
 	const dispatch = createEventDispatcher<updateColorEvent>();
 

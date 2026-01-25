@@ -1,18 +1,25 @@
 import P5 from 'p5';
 import ControlManager from './ControlManager';
+import { writable, type Writable } from 'svelte/store';
 
 export enum ToolType {
 	Cursor = 'cursor',
 	Hand = 'hand',
 	Selection = 'selection',
 	Eraser = 'eraser',
-	Place = 'place'
+	Place = 'place',
+	Rect = 'rect'
 }
 
 export default class Tool {
-	static cursor: string = '';
+	static cursor: string = 'pointer';
 	static type: ToolType;
 	static icon: any;
+
+	cursorW: Writable<string> = writable<string>(Tool.cursor);
+	getCursor(): string {
+		return Tool.cursor;
+	}
 
 	scaleFactor = 0;
 
@@ -32,22 +39,26 @@ export default class Tool {
 
 	keyDown() {
 		this.isMouseDown = true;
-		console.log(`keyup with cursor-${Tool.cursor}`);
-	}
-
-	keyUp() {
-		this.isMouseDown = false;
 		console.log(`keydown with cursor-${Tool.cursor}`);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	keyUp(event?: KeyboardEvent, isModKeyDown?: boolean) {
+		this.isMouseDown = false;
+		console.log(`keydown with cursor-${Tool.cursor}, event:`, event, isModKeyDown);
+	}
+
 	mouseMove(isMouseDown: boolean): Coord {
-		return {
-			x: this.p5.mouseX,
-			y: this.p5.mouseX
-		};
+		if (isMouseDown)
+			return {
+				x: this.p5.mouseX,
+				y: this.p5.mouseX
+			};
+		return this.controlManager.gridManager.screenOffset;
 	}
 
 	// returns: boolean that represent if pressing down should be saved
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	mousePressed(_mousePressed: Coord): boolean {
 		return false;
 	}

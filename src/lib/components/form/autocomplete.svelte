@@ -21,7 +21,6 @@
 		setTimeout(() => {
 			onCooldown = false;
 			if (changedSinceCooldown) {
-				console.log('update', val);
 				filteredOptions = options.filter((x) => x.value.toLowerCase().includes(val.toLowerCase()));
 				cooldown();
 				changedSinceCooldown = false;

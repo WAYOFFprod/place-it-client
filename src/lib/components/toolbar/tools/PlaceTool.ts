@@ -1,11 +1,11 @@
-import { toolClasses, ToolType } from '$lib/stores/toolStore';
+import { ToolType } from '$lib/stores/toolStore';
 import Tool from '../ToolClass';
 import PlusIcon from '$lib/icons/plus.svelte';
 import Networker from '$lib/utility/Networker';
 
 import ControlManager from '../ControlManager';
 import { selectedColor } from '$lib/stores/colorStore';
-import { get } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 
 export default class PlaceTool extends Tool {
 	static cursor = 'place';
@@ -13,6 +13,8 @@ export default class PlaceTool extends Tool {
 	static icon = PlusIcon;
 	static unsubscribeColors: any | undefined = undefined;
 	static color: string | undefined;
+
+	cursorW: Writable<string> = writable<string>(PlaceTool.cursor);
 
 	interval: any;
 	timer: number = 0;
@@ -48,8 +50,7 @@ export default class PlaceTool extends Tool {
 	mousePressed(screenOffset: Coord) {
 		const distance = this.p5.dist(this.p5.touches[0].x, this.p5.touches[0].y, 0, 0);
 		this.pinchDistance = distance;
-		console.log('this.controlManager.screenOffset', this.controlManager.screenOffset);
-		this.controlManager.screenOffset = screenOffset;
+		this.controlManager.gridManager.screenOffset = screenOffset;
 		this.dragOffset.x = this.p5.touches[0].x - screenOffset.x;
 		this.dragOffset.y = this.p5.touches[0].y - screenOffset.y;
 		this.startTimer();
@@ -70,7 +71,8 @@ export default class PlaceTool extends Tool {
 	}
 
 	mouseMove(isMouseDown: boolean) {
-		if (this.dragOffset.x == 0 && this.dragOffset.y == 0) return this.controlManager.screenOffset;
+		if ((this.dragOffset.x == 0 && this.dragOffset.y == 0) || !isMouseDown)
+			return this.controlManager.gridManager.screenOffset;
 		if (this.p5.touches.length >= 2) {
 			// zoom
 			const distance = this.p5.dist(
@@ -81,19 +83,19 @@ export default class PlaceTool extends Tool {
 			);
 			const scaleFactor = distance / this.pinchDistance;
 			console.log('scaleFactor', scaleFactor);
-			const newCurrentScale = this.controlManager.currentScale * scaleFactor;
-			let newScaleFactor = newCurrentScale / this.controlManager.currentScale;
+			const newCurrentScale = this.controlManager.gridManager.currentScale * scaleFactor;
+			let newScaleFactor = newCurrentScale / this.controlManager.gridManager.currentScale;
 			this.controlManager.scroll(newScaleFactor);
 
 			this.pinchDistance = distance;
 		} else {
 			// drag
-			this.controlManager.screenOffset.x = this.p5.mouseX - this.dragOffset.x;
-			this.controlManager.screenOffset.y = this.p5.mouseY - this.dragOffset.y;
+			this.controlManager.gridManager.screenOffset.x = this.p5.mouseX - this.dragOffset.x;
+			this.controlManager.gridManager.screenOffset.y = this.p5.mouseY - this.dragOffset.y;
 		}
 
 		// to move KEEP
-		return this.controlManager.screenOffset;
+		return this.controlManager.gridManager.screenOffset;
 	}
 
 	protected placePixel() {
@@ -101,16 +103,16 @@ export default class PlaceTool extends Tool {
 		// calculate on which pixel the mouse is over
 		const coords: Coord = {
 			x: Math.floor(
-				(window.innerWidth / 2 - this.controlManager.screenOffset.x) /
-					this.controlManager.currentScale
+				(window.innerWidth / 2 - this.controlManager.gridManager.screenOffset.x) /
+					this.controlManager.gridManager.currentScale
 			),
 			y: Math.floor(
-				((window.innerHeight - 56) / 2 - this.controlManager.screenOffset.y) /
-					this.controlManager.currentScale
+				((window.innerHeight - 56) / 2 - this.controlManager.gridManager.screenOffset.y) /
+					this.controlManager.gridManager.currentScale
 			)
 		};
 		this.pixels.push(coords);
-		this.networker.placePixel(coords, PlaceTool.color);
+		this.networker.savePixel(coords, PlaceTool.color);
 	}
 
 	getType: () => null | typeof Tool = () => {

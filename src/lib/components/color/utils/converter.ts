@@ -1,3 +1,22 @@
+import type p5 from 'p5';
+
+const graphicToPixels = (graphic: p5.Graphics, offset: Coord, canvaSize: Size2D): Pixels => {
+	const pixels: Pixels = {};
+	graphic.loadPixels();
+	for (let i = 0; i < graphic.pixels.length; i += 4) {
+		const relativeIndex = i / 4;
+		const relativePos = {
+			x: (relativeIndex % graphic.width) + offset.x,
+			y: Math.floor(relativeIndex / graphic.width) + offset.y
+		};
+		const absoluteIndex = relativePos.x + canvaSize.width * relativePos.y;
+
+		const color = rgbToHex(graphic.pixels[i], graphic.pixels[i + 1], graphic.pixels[i + 2]);
+		pixels['' + absoluteIndex] = color;
+	}
+	return pixels;
+};
+
 const componentToHex = (c: number) => {
 	const hex = c.toString(16);
 	return hex.length == 1 ? '0' + hex : hex;
@@ -136,4 +155,4 @@ const hsv2rgb = (h: number, s: number, v: number) => {
 	return [r, g, b];
 };
 
-export { rgbToHsv, rgbToHex, hexToRgb, rectToRGB, hsv2rgb, rgbToHsl };
+export { graphicToPixels, rgbToHsv, rgbToHex, hexToRgb, rectToRGB, hsv2rgb, rgbToHsl };

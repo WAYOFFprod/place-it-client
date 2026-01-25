@@ -8,7 +8,7 @@ export default class ToolManager {
 	p5: P5;
 	activeTool: Tool | undefined;
 	activeToolType: typeof Tool = Tool;
-	unsubscribeTool: any;
+	unsubscribeTool: () => void;
 	controlManager: ControlManager;
 	constructor(p5: P5, viewOnly: boolean) {
 		this.controlManager = ControlManager.getInstance();
@@ -34,18 +34,30 @@ export default class ToolManager {
 		});
 	}
 
-	updateOffset() {
+	updateOffset(isMouseDown: boolean) {
 		if (this.activeTool) {
-			this.controlManager.screenOffset = this.activeTool.mouseMove(true);
+			this.controlManager.gridManager.screenOffset = this.activeTool.mouseMove(isMouseDown);
 		}
 	}
 
 	// returns boolean representing if tool should toggle mousedown variable
 	mousePressed() {
 		if (this.activeTool) {
-			return this.activeTool.mousePressed(this.controlManager.screenOffset);
+			return this.activeTool.mousePressed(this.controlManager.gridManager.screenOffset);
 		}
 		return true;
+	}
+
+	keyDown() {
+		if (this.activeTool) {
+			this.activeTool.keyDown();
+		}
+	}
+
+	keyUp() {
+		if (this.activeTool) {
+			this.activeTool.keyUp();
+		}
 	}
 
 	mouseReleased() {

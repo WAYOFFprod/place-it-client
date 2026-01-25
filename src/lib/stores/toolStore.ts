@@ -7,27 +7,31 @@ import MoveTool from '$lib/components/toolbar/tools/MoveTool';
 import PointTool from '$lib/components/toolbar/tools/PointTool';
 import EraserTool from '$lib/components/toolbar/tools/EraserTool';
 import PlaceTool from '$lib/components/toolbar/tools/PlaceTool';
+import SelectionTool from '$lib/components/toolbar/tools/SelectionTool';
+import RectTool from '$lib/components/toolbar/tools/RectTool';
 
 interface Tools {
 	[key: string]: typeof Tool;
 }
 
-let desktopToolClasses: Tools = {
+const desktopToolClasses: Tools = {
 	[ToolType.Hand]: MoveTool,
 	[ToolType.Cursor]: PointTool,
-	[ToolType.Eraser]: EraserTool
+	[ToolType.Eraser]: EraserTool,
+	[ToolType.Selection]: SelectionTool
+	// [ToolType.Rect]: RectTool
 };
 
-let toolClasses: Writable<Tools | undefined> = writable<Tools>(undefined);
+const toolClasses: Writable<Tools | undefined> = writable<Tools>(undefined);
 let tools: Tools | undefined;
 
-let mobileToolClasses: Tools = {
+const mobileToolClasses: Tools = {
 	[ToolType.Hand]: MoveTool,
 	// [ToolType.Eraser]: EraserTool,
 	[ToolType.Place]: PlaceTool
 };
 
-let readOnlytoolClasses: Tools = {
+const readOnlytoolClasses: Tools = {
 	[ToolType.Hand]: MoveTool
 	// [ToolType.Selection]: SelectionTool
 };

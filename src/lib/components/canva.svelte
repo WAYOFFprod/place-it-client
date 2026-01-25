@@ -36,12 +36,20 @@
 	const zoomSensitivity = 0.1;
 
 	let currentToolType: typeof Tool = Tool;
+	let currentTool: Tool | undefined;
+	let cursorUnsub: () => void;
+	let cursor: string;
 
 	const unsubscribeTool = selectedTool.subscribe((newTool: Tool | undefined) => {
+		if (cursorUnsub) cursorUnsub();
 		if (newTool == undefined) return;
 		const type = newTool.getType();
 		if (type == null) return;
 		currentToolType = type;
+		currentTool = newTool;
+		cursorUnsub = currentTool.cursorW.subscribe((newCursor: string) => {
+			cursor = newCursor;
+		});
 	});
 
 	const unsubscribeEvent = event.subscribe((newEvent) => {
@@ -65,8 +73,6 @@
 	};
 
 	const connect = async (canvasData: CanvaData) => {
-		gridManager = new GridManager(p5, canvasData.size, canva.id);
-
 		networker.connectToSocket(gridManager);
 
 		const pixels = networker.tempPoints as { [key: string]: string };
@@ -77,7 +83,6 @@
 	};
 
 	const initCanvas = async () => {
-		console.log('initCanvas');
 		if (canva) {
 			width = canva.width;
 			height = canva.height;
@@ -87,11 +92,12 @@
 				data: canva,
 				size: size
 			};
-			controlManager = ControlManager.getInstance(p5, data.size, viewOnly, marginBottom);
+			gridManager = new GridManager(p5, data.size, canva.id, marginBottom);
+			controlManager = ControlManager.getInstance(p5, viewOnly, gridManager);
+
 			connect(data);
 		}
 	};
-
 	onMount(() => {
 		const script = (canvas: P5) => {
 			p5 = canvas;
@@ -111,11 +117,11 @@
 				if (gridManager.needsUpdate || controlManager.hasNewScreenOffset()) {
 					p5.push();
 					p5.background(150);
-					p5.translate(controlManager.screenOffset.x, controlManager.screenOffset.y);
-					p5.scale(controlManager.currentScale);
+					p5.translate(gridManager.screenOffset.x, gridManager.screenOffset.y);
+					p5.scale(gridManager.currentScale);
 
 					// draw content
-					gridManager.updateCanvasPosition();
+					gridManager.refreshCanva();
 					p5.pop();
 					gridManager.needsUpdate = false;
 
@@ -130,7 +136,6 @@
 
 			p5.touchStarted = (e: TouchEvent) => {
 				if (!isTargeting(e.target, 'place-it-canvas') || !controlManager) return;
-				console.log('touch started', e.touches);
 				controlManager.mousePressed();
 			};
 
@@ -161,6 +166,8 @@
 			);
 
 			p5.keyPressed = () => {
+				if (!controlManager) return;
+				controlManager.keyDown();
 				switch (p5.keyCode) {
 					case p5.OPTION:
 						setTempTool(ToolType.Hand, p5);
@@ -171,6 +178,7 @@
 			};
 			p5.keyReleased = () => {
 				if (!controlManager) return;
+				controlManager.keyUp();
 				switch (p5.keyCode) {
 					case p5.UP_ARROW:
 						controlManager.scroll(1 + zoomSensitivity);
@@ -207,10 +215,16 @@
 		unsubscribeEvent();
 		unsubscribeReady();
 	});
+
+	// $: cursor = () => {
+	// 	if (currentTool == undefined) return '';
+	// 	return 'cursor-' + currentTool.getCursor();
+	// };
+	$: cursor;
 </script>
 
 <Modal></Modal>
-<div {id} class="relative cursor-{currentToolType.cursor} {$$props.class}">
+<div {id} class="relative cursor-{cursor} {$$props.class}">
 	<!-- overlay -->
 	<div class="absolute inset-0 pointer-events-none">
 		{#if currentToolType.type == ToolType.Place}

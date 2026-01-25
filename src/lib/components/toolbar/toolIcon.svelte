@@ -5,7 +5,7 @@
 	const dispatch = createEventDispatcher<selectToolEvent>();
 
 	export let toolType: ToolType;
-	export let selected = false;
+	export let selected: boolean = false;
 
 	const select = () => {
 		dispatch('selectTool', { tool: toolType });

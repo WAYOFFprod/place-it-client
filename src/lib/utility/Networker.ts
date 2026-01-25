@@ -72,9 +72,16 @@ export default class Networker {
 		// listen to socket server message
 
 		this.socket.on('canva:new-pixel-from-others', (coord, color) => {
-			console.log('NEW PIXEL FROM OTHERS');
+			console.log('NEW PIXEL FROM OTHERS', color, coord);
 			if (!this.gridManager) return console.error('missing grid manager');
-			this.gridManager.drawPixelOnCanvas(coord, color);
+			this.gridManager.addPixelOnCanvas(coord, color);
+		});
+
+		this.socket.on('canva:new-pixels-from-others', (pixels: Pixels) => {
+			console.log('NEW PIXELS FROM OTHERS', pixels);
+			if (!this.gridManager) return console.error('missing grid manager');
+			this.gridManager.addPixelsToCanvaFromIndex(pixels);
+			this.gridManager.needsUpdate = true;
 		});
 
 		this.socket.on('chat:get-message', (message: Message) => {
@@ -95,6 +102,11 @@ export default class Networker {
 
 	// Auth
 
+	/**
+	 * Logs in a user.
+	 * @param payload LoginPayload
+	 * @returns
+	 */
 	login = async (payload: LoginPayload) => {
 		await this.server.get('/sanctum/csrf-cookie');
 		const response: any = await this.server.post('/auth/login', payload);
@@ -105,6 +117,11 @@ export default class Networker {
 		return response;
 	};
 
+	/**
+	 * Registers a new user.
+	 * @param payload RegisterPayload
+	 * @returns the response from the server
+	 */
 	register = async (payload: RegisterPayload) => {
 		await this.server.get('/sanctum/csrf-cookie');
 		const response: any = await this.server.post('/auth/register', payload);
@@ -115,6 +132,9 @@ export default class Networker {
 		return response;
 	};
 
+	/**
+	 * Logs out the current user.
+	 */
 	logout = async () => {
 		const response = await this.server.post('/auth/logout', {});
 		if (response?.status == 204) {
@@ -122,6 +142,10 @@ export default class Networker {
 		}
 	};
 
+	/**
+	 * Fetches the current session of the user.
+	 * and updates the userStore AuthStatus
+	 */
 	getSession = async () => {
 		const response = await this.server.get('/session');
 		if (response.isConnected) {
@@ -132,6 +156,11 @@ export default class Networker {
 		}
 	};
 
+	/**
+	 * Saves a single input field of a user.
+	 * These fields are settings like name, email, password etc...
+	 * @param payload
+	 */
 	saveUserField = async (payload: SettingOption) => {
 		const response: any = await this.server.post('/user/update', payload);
 		if (response?.response.data) {
@@ -141,17 +170,33 @@ export default class Networker {
 		}
 	};
 
-	// Friends
+	// Social
+
+	/**
+	 * Fetches the friends of the user using the session.
+	 * @returns a list of friends
+	 */
 	getFriends = async () => {
 		const response: any = await this.server.get('/friends');
 		return response;
 	};
 
+	/**
+	 * Sends a friend request to a user.
+	 * @param id id of the user to request as friend
+	 * @returns
+	 */
 	requestFriend = async (id: number) => {
 		const response: any = await this.server.post('/friend/request', { friend_id: id });
 		return response;
 	};
 
+	/**
+	 * Accepts a friend request from a user.
+	 * Needs an active request from that user.
+	 * @param id id of the user to accept as friend
+	 * @returns
+	 */
 	acceptFriendRequest = async (id: number) => {
 		const response: any = await this.server.post('/friend/accept', {
 			friend_id: id
@@ -159,59 +204,51 @@ export default class Networker {
 		return response.response;
 	};
 
+	/**
+	 * Rejects a friend request from a user.
+	 * Needs to already be friends and not be blocked
+	 * @param id id of the user to reject as friend
+	 * @returns
+	 */
 	removeFriend = async (id: number) => {
 		const response: any = await this.server.delete('/friend/' + id + '/remove');
 		return response;
 	};
 
+	/**
+	 * Blocks a user. friend or not
+	 * @param id id of the user to block
+	 * @returns
+	 */
 	blockUser = async (id: number) => {
 		const response: any = await this.server.post('/friend/block', { friend_id: id });
 		return response;
 	};
 
+	/**
+	 * Fetches the blocked users of the current user.
+	 * @returns a list of blocked users
+	 */
 	blockedUser = async () => {
 		const response: any = await this.server.get('/friends/blocked');
 		return response;
 	};
 
+	/**
+	 * Unblocks a user
+	 * @param id id of the user to unblock
+	 * @returns
+	 */
 	unblockAccount = async (id: number) => {
 		const response: any = await this.server.delete('/friend/' + id + '/unblock');
 		return response;
 	};
 
-	// Canvas
-
-	getCanvas = async (
-		scope: 'personal' | 'community',
-		sort: undefined | 'asc' | 'desc' = undefined,
-		favorit: undefined | 1 = undefined,
-		search: string = ''
-	) => {
-		const response: any = await this.server.get(
-			'/canvas?scope=' +
-				scope +
-				(sort != undefined ? '&sort=' + sort : '') +
-				(favorit != undefined ? '&favorit=' + favorit : '') +
-				(search != '' ? '&search=' + search : '')
-		);
-		return response;
-	};
-
-	getCanva = async (id: number) => {
-		const response = await this.server.get('/canvas/' + id);
-		if (response.meta.token) {
-			tokenStore.set(response.meta.token);
-		}
-		return response.data;
-	};
-
-	saveCanvaField = async (payload: CanvaFieldUpdate) => {
-		const response: any = await this.server.post('/canva/update', payload);
-		if (response?.response.data) {
-			authStatus.set(true);
-		}
-	};
-
+	/**
+	 * Invites a friend to a canva.
+	 * @param friend_id The id of the friend to invite
+	 * @param canva_id The id of the canva to invite the friend to
+	 */
 	inviteToCanva = async (friend_id: number, canva_id: number) => {
 		const response: any = await this.server.post('/canva/invite/', {
 			user_id: friend_id,
@@ -220,6 +257,11 @@ export default class Networker {
 		console.log(response);
 	};
 
+	/**
+	 * Request access to a private canva.
+	 * The session will be used to identify the user.
+	 * @param canva_id The id of the canva to request access to
+	 */
 	requestAccess = async (canva_id: number) => {
 		const response: any = await this.server.post('/canva/request_access/', {
 			canva_id: canva_id
@@ -227,11 +269,23 @@ export default class Networker {
 		console.log(response);
 	};
 
+	/**
+	 * Fetches the participants of a canva.
+	 * @param id canva id
+	 * @returns
+	 */
 	getParticipants = async (id: number) => {
 		const response: any = await this.server.get('/canva/' + id + '/participants');
 		return response;
 	};
 
+	/**
+	 * Accepts a participation request for a canva.
+	 * This will require the friend to have an active request.
+	 * @param friend_id The id of the friend whose request to accept
+	 * @param canva_id The id of the canva to accept the request for
+	 * @returns
+	 */
 	acceptParticipationRequest = async (friend_id: number, canva_id: number) => {
 		const response: any = await this.server.post('/canva/accept_request/', {
 			user_id: friend_id,
@@ -240,6 +294,13 @@ export default class Networker {
 		return response.response;
 	};
 
+	/**
+	 * Rejects a participation request for a canva.
+	 * This will require the friend to have an active request.
+	 * @param friend_id The id of the friend whose request to reject
+	 * @param canva_id The id of the canva to reject the request for
+	 * @returns
+	 */
 	rejectParticipationRequest = async (friend_id: number, canva_id: number) => {
 		const response: any = await this.server.post('/canva/reject_request/', {
 			user_id: friend_id,
@@ -257,16 +318,94 @@ export default class Networker {
 	//   return response.response;
 	// }
 
+	/**
+	 * Likes a canva.
+	 * @param id canva id
+	 * @returns
+	 */
 	likeCanva = async (id: number) => {
 		const response: any = await this.server.post('/canva/like', { canvaId: id });
 		return response.response.added;
 	};
 
+	/**
+	 * Canvas
+	 */
+
+	/**
+	 * let's you create a new canvas
+	 * @param payload CreateCanvaPayload
+	 * @returns newly created canva data
+	 */
+	createCanva = async (payload: CreateCanvaPayload) => {
+		const response = await this.server.post('/canvas/create', payload);
+		return response;
+	};
+
+	/**
+	 * fetches a list of canvas with optional filters
+	 * @param scope 'scope' can be 'personal' or 'community'
+	 * @param sort 'sort' can be 'asc' or 'desc'
+	 * @param favorit 'favorit' can be 1 or undefined
+	 * @param search 'search' can be a string or empty
+	 * @returns Canvas resource collections
+	 */
+	getCanvas = async (
+		scope: 'personal' | 'community',
+		sort: undefined | 'asc' | 'desc' = undefined,
+		favorit: undefined | 1 = undefined,
+		search: string = ''
+	) => {
+		const response: any = await this.server.get(
+			'/canvas?scope=' +
+				scope +
+				(sort != undefined ? '&sort=' + sort : '') +
+				(favorit != undefined ? '&favorit=' + favorit : '') +
+				(search != '' ? '&search=' + search : '')
+		);
+		return response;
+	};
+
+	/**
+	 * fetches a single canva by its id
+	 * @param id canva id
+	 * @returns Canvas resource
+	 */
+	getCanva = async (id: number) => {
+		const response = await this.server.get('/canvas/' + id);
+		if (response.meta.token) {
+			tokenStore.set(response.meta.token);
+		}
+		return response.data;
+	};
+
+	/**
+	 * saves a single input field of a canva.
+	 * These fields are settings like name, description, privacy, palette_id, width, height etc...
+	 * @param payload
+	 */
+	saveCanvaInputField = async (payload: CanvaFieldUpdate) => {
+		const response: any = await this.server.post('/canva/update', payload);
+		if (response?.response.data) {
+			authStatus.set(true);
+		}
+	};
+
+	/**
+	 * Deletes a canva.
+	 * @param id canva id
+	 * @returns
+	 */
 	deleteCanva = async (id: number) => {
 		const response = await this.server.delete('/canvas/' + id);
 		return response;
 	};
 
+	/**
+	 * This will attempt to join the canva live session using websockets.
+	 * @param canvaId
+	 * @returns
+	 */
 	joinLiveCanva = (canvaId: number) => {
 		if (this.canvaToken == undefined) {
 			console.warn('missing token to joinLiveCanva');
@@ -280,7 +419,13 @@ export default class Networker {
 		});
 	};
 
-	placePixel = (coord: Coord, color: string | null) => {
+	/**
+	 * Saves a single pixel with a color and coordinates to the liveserver using websocket.
+	 * @param coord The coordinates of the pixel to save.
+	 * @param color The color of the pixel to save.
+	 * @returns
+	 */
+	savePixel = (coord: Coord, color: string | null) => {
 		if (this.canvaToken == undefined) {
 			console.warn('missing token to placePixel');
 			return;
@@ -291,7 +436,7 @@ export default class Networker {
 		if (!this.gridManager) {
 			return console.error('missing grid manager');
 		}
-		const index = this.gridManager.drawPixelOnCanvas(coord, color);
+		const index = this.gridManager.addPixelOnCanvas(coord, color);
 		if (index === false) return;
 		if (this.socket != undefined) {
 			const auth: any = {
@@ -302,6 +447,36 @@ export default class Networker {
 		}
 	};
 
+	/**
+	 * Places multiple pixels on the canvas.
+	 * the index is calculated from the coordinates and the canvas width
+	 * @param pixels Pixels to place in format {index: color}
+	 * @returns
+	 */
+	placePixelsByIndex = (pixels: Pixels) => {
+		if (this.gridManager == undefined) return;
+		// for (let key in pixels) {
+		//   console.log(key, pixels[key]);
+		//   const coord = this.gridManager.getCoordFromIndex(parseInt(key));
+		//   const index = this.gridManager.addPixelOnCanvas(coord, pixels[key]);
+		//   if(index === false) return
+		// }
+
+		if (this.socket != undefined) {
+			const auth: any = {
+				user_id: this.userData?.id,
+				token: this.canvaToken
+			};
+			this.socket.emit('canva:new-pixels:' + this.gridManager.canvasId, auth, pixels);
+		}
+	};
+
+	/**
+	 * Replaces the a the colors of a canva.
+	 * @param id canva id
+	 * @param colors
+	 * @returns
+	 */
 	replaceColors = async (id: number, colors: string[]) => {
 		const payload = {
 			id: id,
@@ -311,13 +486,14 @@ export default class Networker {
 		return response;
 	};
 
-	createCanva = async (payload: CreateCanvaPayload) => {
-		const response = await this.server.post('/canvas/create', payload);
-		return response;
-	};
+	/**
+	 * Messages
+	 */
 
-	// Messages
-
+	/**
+	 * Sends a message to the chat.
+	 * @param message Message to send
+	 */
 	sendMessage(message: Message) {
 		if (this.socket != undefined) {
 			this.socket.emit('chat:new-message', message);
@@ -326,17 +502,29 @@ export default class Networker {
 		}
 	}
 
+	/**
+	 * disconnect from the websocket server
+	 */
 	disconnect = () => {
 		if (this.socket != undefined) this.socket.disconnect();
 	};
 
 	// Notification settings
 
+	/**
+	 * Gets the notification settings of the user.
+	 * @returns the notification settings of the user
+	 */
 	getNotificationSettings = async () => {
 		const response: any = await this.server.get('/settings/notifications');
 		return response;
 	};
 
+	/**
+	 * Saves a notification setting.
+	 * @param payload the setting to update
+	 * @returns the updated notification settings
+	 */
 	saveNotificationSetting = async (payload: BoolSettingOption) => {
 		const response: any = await this.server.patch('/settings/update', payload);
 		return response.response;

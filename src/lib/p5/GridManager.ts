@@ -1,5 +1,8 @@
 import P5 from 'p5';
 import GridSection from './GridSection';
+import CanvaOverlay from './CanvaOverlay';
+import { graphicToPixels } from '$lib/components/color/utils/converter';
+import type SelectionRect from './Overlay/SelectionRect';
 
 let PIXEL_IN_SECTION: number;
 
@@ -7,23 +10,32 @@ export default class GridManager {
 	p5: P5;
 	canvasId: number;
 	gridSections: GridSection[];
-	canvas: { width: number; height: number };
+	overlay: CanvaOverlay;
+	canvas: Size2D;
 	sectionGrid: { width: number; height: number };
 	color: string = '#ffffff';
 	pixelsAdded = false;
 	imageLoaded = false;
 	needsUpdate: boolean = true;
+	screenOffset: Coord;
+	currentScale: number;
 
-	constructor(p5: P5, canvas: Size2D, canvasId: number) {
+	marginBottom: number;
+
+	MIN_ZOOM = 0.5;
+	MAX_ZOOM = 128;
+
+	constructor(p5: P5, canvas: Size2D, canvasId: number, marginBottom: number) {
 		// pixel per tile
-		const MAX_PPT = 512;
-		const MIN_PPT = 32;
+		const MAX_PPT = 16;
+		const MIN_PPT = 16;
 		let PPT = Math.ceil(canvas.width / 32) * 32;
 		PPT = Math.max(PPT, MIN_PPT);
 		PIXEL_IN_SECTION = Math.min(PPT, MAX_PPT);
 
 		// init values
 		this.canvasId = canvasId;
+		this.marginBottom = marginBottom;
 		this.p5 = p5;
 		this.gridSections = [];
 		this.canvas = canvas;
@@ -31,6 +43,32 @@ export default class GridManager {
 			width: Math.ceil(this.canvas.width / PIXEL_IN_SECTION),
 			height: Math.ceil(this.canvas.height / PIXEL_IN_SECTION)
 		};
+
+		// set scaleFactor
+		const widthRatio = this.p5.windowWidth / canvas.width;
+		const heightRatio = (this.p5.windowHeight - this.marginBottom) / canvas.height;
+		this.currentScale = Math.max(
+			widthRatio < heightRatio ? widthRatio : heightRatio,
+			this.MIN_ZOOM
+		);
+
+		// get screenCenter
+		const screenCenter = {
+			x: this.p5.windowWidth / 2,
+			y: (this.p5.windowHeight - this.marginBottom) / 2
+		};
+
+		// set initial offset to center image
+		const x = (canvas.width / 2) * this.currentScale;
+		const y = (canvas.height / 2) * this.currentScale;
+
+		// set initial offset
+		this.screenOffset = {
+			x: screenCenter.x - x,
+			y: screenCenter.y - y
+		};
+
+		this.overlay = new CanvaOverlay(p5, this);
 
 		// create gridSections
 		for (let y = 0; y < this.canvas.height / PIXEL_IN_SECTION; y++) {
@@ -57,7 +95,7 @@ export default class GridManager {
 
 	handleImage = (fullImage: P5.Image) => {
 		// load pixel in each section image
-		let imageSections: P5.Image[] = [];
+		const imageSections: P5.Image[] = [];
 		for (let i = 0; i < this.gridSections.length; i++) {
 			const coords = this.getCoordFromIndex(i, this.sectionGrid.width);
 			imageSections[i] = fullImage.get(
@@ -80,48 +118,122 @@ export default class GridManager {
 		this.attemptAddAdditionalPixels(this.additionalData);
 	};
 
-	attemptAddAdditionalPixels(additionalData: { [key: string]: string } = {}) {
+	attemptAddAdditionalPixels(additionalData: Pixels = {}) {
 		if (!this.pixelsAdded && this.imageLoaded) {
 			if (Object.keys(additionalData).length > 0) {
-				this.drawPixelsFromIndex(additionalData);
+				this.addPixelsToCanvaFromIndex(additionalData);
 			}
 		}
 	}
 
-	drawPixelsFromIndex = (data: { [key: string]: string }) => {
+	update = () => {
+		this.needsUpdate = true;
+	};
+
+	onScaleChange = (scaleFactor: number) => {
+		const relMouse = {
+			x: this.p5.mouseX * scaleFactor,
+			y: this.p5.mouseY * scaleFactor
+		};
+		// get the current screen offset relative to the canvas
+		const relOffset = {
+			x: this.screenOffset.x * scaleFactor,
+			y: this.screenOffset.y * scaleFactor
+		};
+
+		this.screenOffset.x = this.p5.mouseX - relMouse.x + relOffset.x;
+		this.screenOffset.y = this.p5.mouseY - relMouse.y + relOffset.y;
+		this.overlay.onScaleChange();
+	};
+
+	addRectToOverlay = (selectionRect: SelectionRect) => {
+		this.overlay.addSelectionRect(selectionRect);
+		this.needsUpdate = true;
+	};
+
+	updateOverlay = () => {
+		this.needsUpdate = true;
+	};
+
+	clipboard: P5.Graphics[] = [];
+	copySelection = () => {
+		const { start, end } = this.overlay.getSelection();
+
+		// init clipboard and graphic
+		this.clipboard = [];
+		const graphic = this.p5.createGraphics(end.x - start.x, end.y - start.y);
+		graphic.pixelDensity(1);
+		const copyOffset = {
+			x: start.x,
+			y: start.y
+		};
+
+		// for each concerned section, copy the content
+		const sections = this.getConcernedSections(start, end);
+		sections.forEach((sectionIndex) => {
+			// get the relative start and end of the section
+			const relStart = this.gridSections[sectionIndex].closestStartInBound(start);
+			const relEnd = this.gridSections[sectionIndex].closestEndInBound(end);
+			// get the section of the graphic
+			const graphicSection = this.gridSections[sectionIndex].copyContent(relStart, relEnd);
+
+			// get the relative position of the section to save it in the cliboard graphic
+			const x = relStart.x - copyOffset.x;
+			const y = relStart.y - copyOffset.y;
+			graphic.set(x, y, graphicSection);
+		});
+		this.clipboard.push(graphic);
+	};
+
+	pasteClipboard = (): Pixels => {
+		if (this.clipboard.length === 0) {
+			console.warn('no clipboard to paste');
+			return {};
+		}
+
+		const { start } = this.overlay.getSelection();
+		const pixels = graphicToPixels(this.clipboard[0], start, this.canvas);
+
+		this.needsUpdate = true;
+		return pixels;
+	};
+
+	addPixelsToCanvaFromIndex = (data: Pixels) => {
 		if (data != null) {
 			for (const [id, color] of Object.entries(data)) {
 				const index = parseInt(id);
 				const absolutePosition = this.getCoordFromIndex(index, this.canvas.width);
 				const gridIndex = this.getGridSectionIndex(absolutePosition);
-				const relPosition = this.getRelativePixelPosition(absolutePosition);
+				const relPosition = this.getPositionRelativeToSection(absolutePosition);
 
-				this.gridSections[gridIndex].drawPixel(relPosition, color);
+				this.gridSections[gridIndex].addPixelToImage(relPosition, color);
 			}
 		}
 	};
 
-	drawPixelOnCanvas = (absolutePosition: Coord, color: string) => {
+	addPixelOnCanvas = (absolutePosition: Coord, color: string) => {
 		if (!this.isSectionIndexInBound(absolutePosition)) {
 			return false;
 		}
 
-		const relPosition = this.getRelativePixelPosition(absolutePosition);
+		const relPosition = this.getPositionRelativeToSection(absolutePosition);
 		const i = this.getGridSectionIndex(absolutePosition);
-		this.gridSections[i].drawPixel(relPosition, color);
-
+		this.gridSections[i].addPixelToImage(relPosition, color);
 		this.needsUpdate = true;
 
-		return this.getAbsolutePixelPosition(absolutePosition);
+		return this.getPixelPositionIndex(absolutePosition);
 	};
 
-	updateCanvasPosition = () => {
+	refreshCanva = () => {
 		this.p5.fill(this.color);
 		this.p5.noStroke();
 		this.p5.rect(0, 0, this.canvas.width, this.canvas.height);
+		// tell each section to update
 		for (let i = 0; i < this.gridSections.length; i++) {
 			this.gridSections[i].updateCanvasPosition();
 		}
+		// update overlay
+		this.overlay.refreshOverlay();
 	};
 
 	private getGridSectionIndex(position: Coord): number {
@@ -130,12 +242,12 @@ export default class GridManager {
 		return gridX + this.sectionGrid.width * gridY;
 	}
 
-	private getAbsolutePixelPosition(position: Coord): number {
+	private getPixelPositionIndex(position: Coord): number {
 		return position.x + this.canvas.width * position.y;
 	}
 
 	/* return the position of a pixel as if all grid start at 0 */
-	private getRelativePixelPosition(absolutePosition: Coord): Coord {
+	private getPositionRelativeToSection(absolutePosition: Coord): Coord {
 		return {
 			x: absolutePosition.x % PIXEL_IN_SECTION,
 			y: absolutePosition.y % PIXEL_IN_SECTION
@@ -149,6 +261,19 @@ export default class GridManager {
 		};
 	}
 
+	private getConcernedSections(start: Coord, end: Coord): number[] {
+		const startSection = this.getGridSectionIndex(start);
+		const endSection = this.getGridSectionIndex(end);
+		const sections = [];
+		for (let i = startSection; i <= endSection; i++) {
+			if (this.gridSections[i].isIntersecting(start, end)) {
+				sections.push(i);
+			}
+		}
+		return sections;
+	}
+
+	// check if pixel is in bound of canva
 	private isSectionIndexInBound(coord: Coord): boolean {
 		if (coord.x < 0 || coord.x >= this.canvas.width) {
 			console.error('grid section not in bound x', coord.x);
