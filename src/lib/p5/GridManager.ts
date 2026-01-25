@@ -2,6 +2,7 @@ import P5 from 'p5';
 import GridSection from './GridSection';
 import CanvaOverlay from './CanvaOverlay';
 import { graphicToPixels } from '$lib/components/color/utils/converter';
+import type SelectionRect from './Overlay/SelectionRect';
 
 let PIXEL_IN_SECTION: number;
 
@@ -145,16 +146,13 @@ export default class GridManager {
 		this.overlay.onScaleChange();
 	};
 
-	updateRectangleOverlay = (
-		selectionStartScreen: Coord,
-		selectionEndScreen: Coord,
-		fill: boolean | undefined
-	) => {
-		this.needsUpdate = this.overlay.updateRectangleOverlay(
-			selectionStartScreen,
-			selectionEndScreen,
-			fill
-		);
+	addRectToOverlay = (selectionRect: SelectionRect) => {
+		this.overlay.addSelectionRect(selectionRect);
+		this.needsUpdate = true;
+	};
+
+	updateOverlay = () => {
+		this.needsUpdate = true;
 	};
 
 	clipboard: P5.Graphics[] = [];
@@ -236,12 +234,6 @@ export default class GridManager {
 		}
 		// update overlay
 		this.overlay.refreshOverlay();
-	};
-
-	isInSelection = (x: number, y: number): boolean => {
-		const mouseX = x - this.screenOffset.x;
-		const mouseY = y - this.screenOffset.y;
-		return this.overlay.isInSelection(mouseX, mouseY);
 	};
 
 	private getGridSectionIndex(position: Coord): number {

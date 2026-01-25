@@ -13,8 +13,8 @@ export default class CanvaOverlay {
 	p5: P5;
 	img: P5.Graphics;
 	gridManager: GridManager;
-	selectionRect: SelectionRect;
 	// color
+	selectionRect?: SelectionRect;
 	unsubscribeSelectedColor: Unsubscriber | undefined;
 	savedColor: string = '';
 	fill: boolean = false;
@@ -22,7 +22,6 @@ export default class CanvaOverlay {
 	previousScale: number;
 
 	constructor(p5: P5, gridManager: GridManager) {
-		this.selectionRect = new SelectionRect();
 		this.p5 = p5;
 		this.gridManager = gridManager;
 		this.img = this.p5.createGraphics(
@@ -33,11 +32,14 @@ export default class CanvaOverlay {
 
 		this.unsubscribeSelectedColor = selectedColor.subscribe((newColor) => {
 			this.savedColor = newColor;
-			// console.log('new color', newColor);
 			this.drawRectangle();
 			this.gridManager.update();
 		});
 	}
+
+	addSelectionRect = (selectionRect: SelectionRect) => {
+		this.selectionRect = selectionRect;
+	};
 
 	refreshOverlay = () => {
 		const scaleChange = this.gridManager.currentScale / this.previousScale;
@@ -45,28 +47,12 @@ export default class CanvaOverlay {
 			this.img.scale(this.gridManager.canvas.width / (this.gridManager.canvas.width * scaleChange));
 			this.previousScale = this.gridManager.currentScale;
 		}
-		this.p5.image(this.img, 0, 0, this.gridManager.canvas.width, this.gridManager.canvas.height);
 		this.drawRectangle();
+		this.p5.image(this.img, 0, 0, this.gridManager.canvas.width, this.gridManager.canvas.height);
 	};
 
-	updateRectangleOverlay(
-		selectionStartScreen: Coord,
-		selectionEndScreen: Coord,
-		fill: boolean | undefined
-	): boolean {
-		if (this.img == null) return false;
-		this.fill = fill || false;
-		this.selectionRect.updateRectCalc(
-			selectionStartScreen,
-			selectionEndScreen,
-			this.gridManager.currentScale
-		);
-
-		return true;
-	}
-
 	onScaleChange() {
-		this.selectionRect.updateScale(this.gridManager.currentScale);
+		this.selectionRect?.updateScale(this.gridManager.currentScale);
 	}
 
 	protected drawRectangle() {
@@ -80,11 +66,12 @@ export default class CanvaOverlay {
 		}
 		this.img.stroke('black');
 		this.img.strokeWeight(4);
-
-		// console.log('drawing rectangle', this.selectionRect);
-		const pos = this.selectionRect.getPosition();
-		const size = this.selectionRect.getSize();
-		this.img.rect(pos.x, pos.y, size.width, size.height);
+		if (!this.selectionRect) console.warn('No selection rect to draw');
+		const pos = this.selectionRect?.getScreenPosition();
+		const size = this.selectionRect?.getScreenSize();
+		if (pos && size) {
+			this.img.rect(pos.x, pos.y, size.width, size.height);
+		}
 	}
 
 	getImageSection = (start: Coord, end: Coord) => {
@@ -93,11 +80,7 @@ export default class CanvaOverlay {
 
 	// Selection Rectangle
 	getSelection = () => {
-		return this.selectionRect.getSelection();
-	};
-
-	isInSelection = (x: number, y: number): boolean => {
-		return this.selectionRect.isInSelection(x, y);
+		return this.selectionRect?.getSelection() || { start: { x: 0, y: 0 }, end: { x: 0, y: 0 } };
 	};
 
 	// not called yet

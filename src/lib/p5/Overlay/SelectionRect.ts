@@ -5,6 +5,7 @@ export default class SelectionRect {
 		size: Size2D;
 	};
 	gridToScreenScale: number = 1;
+
 	constructor() {
 		this.overlayRectangleSize = {
 			width: 0,
@@ -22,79 +23,77 @@ export default class SelectionRect {
 		};
 	}
 
-	updateRectCalc(startScreen: Coord, endScreen: Coord, currentScale: number): void {
-		this.gridToScreenScale = currentScale;
-		const startScreenPos = {
-			x: startScreen.x > endScreen.x ? endScreen.x : startScreen.x,
-			y: startScreen.y > endScreen.y ? endScreen.y : startScreen.y
-		};
-		const endScreenPos = {
-			x: startScreen.x > endScreen.x ? startScreen.x : endScreen.x,
-			y: startScreen.y > endScreen.y ? startScreen.y : endScreen.y
-		};
-
-		const widthInScreen = endScreenPos.x - startScreenPos.x;
-		const heightInScreen = endScreenPos.y - startScreenPos.y;
-		const widthInPixels = Math.round(widthInScreen / this.gridToScreenScale) + 1;
-		const heightInPixels = Math.round(heightInScreen / this.gridToScreenScale) + 1;
-
-		// don't update if the size and position of rectangle hasn't change
-		if (
-			widthInPixels - this.overlayRectangleSize.width == 0 &&
-			heightInPixels - this.overlayRectangleSize.height == 0 &&
-			Math.round(this.selectionGrid.pos.x / this.gridToScreenScale) ==
-				Math.round(startScreenPos.x / this.gridToScreenScale) &&
-			Math.round(this.selectionGrid.pos.y / this.gridToScreenScale) ==
-				Math.round(startScreenPos.y / this.gridToScreenScale)
-		) {
-			return;
-		}
-
-		this.overlayRectangleSize = {
-			width: widthInPixels,
-			height: heightInPixels
-		};
-
-		// divide by this.gridToScreenScale then round to avoid sub-pixel rendering, then multiply back
-
+	resetAt(screenPos: Coord, scale: number): void {
+		this.gridToScreenScale = scale;
 		this.selectionGrid.pos = {
-			x: Math.round(startScreenPos.x / this.gridToScreenScale),
-			y: Math.round(startScreenPos.y / this.gridToScreenScale)
+			x: Math.round(screenPos.x / this.gridToScreenScale),
+			y: Math.round(screenPos.y / this.gridToScreenScale)
+		};
+		this.selectionGrid.size = {
+			width: 1,
+			height: 1
+		};
+	}
+
+	resizeRect(dir: string, newEndScreen: Coord): void {
+		if (dir === 'bottom-right') {
+			const widthInScreen = newEndScreen.x - this.getScreenPosition().x;
+			const heightInScreen = newEndScreen.y - this.getScreenPosition().y;
+			const widthInPixels = Math.round(widthInScreen / this.gridToScreenScale) + 1;
+			const heightInPixels = Math.round(heightInScreen / this.gridToScreenScale) + 1;
+
+			this.overlayRectangleSize = {
+				width: widthInPixels,
+				height: heightInPixels
+			};
+
+			this.selectionGrid.size = {
+				width: this.overlayRectangleSize.width,
+				height: this.overlayRectangleSize.height
+			};
+		}
+	}
+	// returns true if moved
+	moveRect(deltaXScreen: number, deltaYScreen: number): boolean {
+		const deltaXGrid = Math.round(deltaXScreen / this.gridToScreenScale);
+		const deltaYGrid = Math.round(deltaYScreen / this.gridToScreenScale);
+		this.selectionGrid.pos = {
+			x: this.selectionGrid.pos.x + deltaXGrid,
+			y: this.selectionGrid.pos.y + deltaYGrid
 		};
 
-		this.selectionGrid.size = {
-			width: this.overlayRectangleSize.width,
-			height: this.overlayRectangleSize.height
-		};
+		return deltaXGrid !== 0 || deltaYGrid !== 0;
 	}
 
 	updateScale(currentScale: number): void {
 		this.gridToScreenScale = currentScale;
 	}
 
-	isInSelection = (xScreen: number, yScreen: number): boolean => {
-		const xGrid = xScreen / this.gridToScreenScale;
-		const yGrid = yScreen / this.gridToScreenScale;
+	isInSelection = (screen: Coord): boolean => {
+		const xGrid = screen.x / this.gridToScreenScale;
+		const yGrid = screen.y / this.gridToScreenScale;
 		return (
-			xGrid > this.selectionGrid.pos.x &&
-			xGrid < this.selectionGrid.pos.x + this.selectionGrid.size.width &&
+			xGrid > this.selectionGrid.pos.x - 0.5 &&
+			xGrid < this.selectionGrid.pos.x - 0.5 + this.selectionGrid.size.width &&
 			yGrid > this.selectionGrid.pos.y &&
 			yGrid < this.selectionGrid.pos.y + this.selectionGrid.size.height
 		);
 	};
 
-	getPosition(): Coord {
+	getScreenPosition(): Coord {
 		return {
 			x: this.selectionGrid.pos.x * this.gridToScreenScale,
 			y: this.selectionGrid.pos.y * this.gridToScreenScale
 		};
 	}
-	getSize(): Size2D {
+
+	getScreenSize(): Size2D {
 		return {
 			width: this.selectionGrid.size.width * this.gridToScreenScale,
 			height: this.selectionGrid.size.height * this.gridToScreenScale
 		};
 	}
+
 	getSelection = () => {
 		const endCoord: Coord = {
 			x: this.selectionGrid.pos.x + this.selectionGrid.size.width,

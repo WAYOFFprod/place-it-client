@@ -81,20 +81,20 @@ export default class RectTool extends Tool {
 	protected drawRectangle() {
 		if (this.dragPrevious.x == this.dragCurrent.x && this.dragPrevious.y == this.dragCurrent.y)
 			return;
-		this.controlManager.gridManager.updateRectangleOverlay(this.dragStart, this.dragCurrent, true);
+		// this.controlManager.gridManager.updateRectangleOverlay(this.dragStart, this.dragCurrent, true);
 		this.dragPrevious = { ...this.dragCurrent };
 	}
 
 	protected defineCursor(isMouseDown: boolean) {
-		if (isMouseDown) {
-			this.cursorW.set('selection');
-			this.isHoveringSelection = false;
-		} else if (this.controlManager.gridManager.isInSelection(this.p5.mouseX, this.p5.mouseY)) {
-			this.isHoveringSelection = true;
-			this.cursorW.set('hand');
-		} else {
-			this.isHoveringSelection = false;
-			this.cursorW.set('selection');
-		}
+		// if (isMouseDown) {
+		// 	this.cursorW.set('selection');
+		// 	this.isHoveringSelection = false;
+		// } else if (this.controlManager.gridManager.isInSelection(this.p5.mouseX, this.p5.mouseY)) {
+		// 	this.isHoveringSelection = true;
+		// 	this.cursorW.set('hand');
+		// } else {
+		// 	this.isHoveringSelection = false;
+		// 	this.cursorW.set('selection');
+		// }
 	}
 }

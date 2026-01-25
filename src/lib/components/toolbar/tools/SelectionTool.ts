@@ -3,6 +3,7 @@ import Tool from '../ToolClass';
 import SelectionIcon from '$lib/icons/selection.svelte';
 import { writable, type Writable } from 'svelte/store';
 import Networker from '$lib/utility/Networker';
+import SelectionRect from '$lib/p5/Overlay/SelectionRect';
 
 export default class SelectionTool extends Tool {
 	static cursor = 'selection';
@@ -22,14 +23,7 @@ export default class SelectionTool extends Tool {
 		return this.hover ? SelectionTool.cursor : 'hand';
 	}
 
-	selectionStartScreen: Coord = {
-		x: 0,
-		y: 0
-	};
-	selectionEndScreen: Coord = {
-		x: 0,
-		y: 0
-	};
+	selectionRect: SelectionRect = new SelectionRect();
 
 	dragPrevious: Coord = {
 		x: 0,
@@ -57,21 +51,65 @@ export default class SelectionTool extends Tool {
 
 	mousePressed(screenOffset: Coord): boolean {
 		this.controlManager.gridManager.screenOffset = screenOffset;
-		this.dragCurrent = this.calculatePositionOnCanvas();
+		this.dragCurrent = this.relativePositionOnCanvas();
 
+		// if hovering selection, start moving it
 		if (this.isHoveringSelection) {
 			this.dragPrevious = { ...this.dragCurrent };
 			this.isMovingSelection = true;
 			return true;
 		}
 
+		// start new selection
 		if (!this.isMovingSelection) {
-			this.selectionStartScreen.x = this.selectionEndScreen.x = this.dragCurrent.x;
-			this.selectionStartScreen.y = this.selectionEndScreen.y = this.dragCurrent.y;
+			this.selectionRect.resetAt(this.dragCurrent, this.controlManager.gridManager.currentScale);
+			this.controlManager.gridManager.addRectToOverlay(this.selectionRect);
+			this.updateSelection();
+			return true;
+		}
+		return false;
+	}
+
+	mouseMove(isMouseDown: boolean) {
+		if (isMouseDown) {
+			this.dragCurrent = this.relativePositionOnCanvas();
+			// move selection if needed
+			if (this.isMovingSelection) {
+				const deltaXScreen = this.dragCurrent.x - this.dragPrevious.x;
+				const deltaYScreen = this.dragCurrent.y - this.dragPrevious.y;
+
+				const scale = this.controlManager.gridManager.currentScale;
+				const deltaXGrid = Math.round(deltaXScreen / scale);
+				const deltaYGrid = Math.round(deltaYScreen / scale);
+
+				if (deltaXGrid !== 0 || deltaYGrid !== 0) {
+					// Apply movement exactly matching the grid step
+					const appliedDeltaX = deltaXGrid * scale;
+					const appliedDeltaY = deltaYGrid * scale;
+
+					this.selectionRect.moveRect(appliedDeltaX, appliedDeltaY);
+
+					// Manually update overlay to avoid calling updateSelection()
+					// updateSelection() resets dragPrevious to the mouse position, which we want to avoid
+					this.controlManager.gridManager.updateOverlay();
+
+					// Update dragPrevious by the amount we ACTUALLY moved (grid snapped)
+					// This keeps the accumulated drag delta accurate relative to the grid
+					this.dragPrevious.x += appliedDeltaX;
+					this.dragPrevious.y += appliedDeltaY;
+				}
+			}
+
+			// update selection size of rectangle if not moving selection
+			if (!this.isHoveringSelection && !this.isMovingSelection) {
+				this.dragPrevious = { x: 0, y: 0 };
+				this.selectionRect.resizeRect('bottom-right', this.dragCurrent);
+				this.updateSelection();
+			}
 		}
 
-		this.updateSelection();
-		return true;
+		this.defineCursor(isMouseDown);
+		return this.controlManager.gridManager.screenOffset;
 	}
 
 	mouseReleased() {
@@ -81,36 +119,17 @@ export default class SelectionTool extends Tool {
 		}
 
 		if (this.isHoveringSelection) return;
-		this.selectionEndScreen = { ...this.dragCurrent };
 		this.dragPrevious = {
 			x: 0,
 			y: 0
 		};
 	}
 
-	mouseMove(isMouseDown: boolean) {
-		if (isMouseDown) {
-			this.dragCurrent = this.calculatePositionOnCanvas();
-			if (this.isMovingSelection) {
-				const deltaXScreen = this.dragCurrent.x - this.dragPrevious.x;
-				const deltaYScreen = this.dragCurrent.y - this.dragPrevious.y;
-				this.moveSelectionByDelta(deltaXScreen, deltaYScreen);
-			}
-
-			if (!this.isHoveringSelection && !this.isMovingSelection) {
-				this.selectionEndScreen = this.dragCurrent;
-				this.updateSelection();
-			}
-		}
-		this.defineCursor(isMouseDown);
-		return this.controlManager.gridManager.screenOffset;
-	}
-
 	getType: () => null | typeof Tool = () => {
 		return SelectionTool;
 	};
 
-	protected calculatePositionOnCanvas() {
+	protected relativePositionOnCanvas(): Coord {
 		return {
 			x: this.p5.mouseX - this.controlManager.gridManager.screenOffset.x,
 			y: this.p5.mouseY - this.controlManager.gridManager.screenOffset.y
@@ -128,24 +147,12 @@ export default class SelectionTool extends Tool {
 		this.networker.placePixelsByIndex(pixels);
 	}
 
-	protected moveSelectionByDelta(deltaXScreen: number, deltaYScreen: number) {
-		this.selectionStartScreen.x += deltaXScreen;
-		this.selectionStartScreen.y += deltaYScreen;
-		this.selectionEndScreen.x += deltaXScreen;
-		this.selectionEndScreen.y += deltaYScreen;
-		this.updateSelection();
-	}
-
 	protected updateSelection() {
 		// Make sure there is an actual change
 		if (this.dragPrevious.x == this.dragCurrent.x && this.dragPrevious.y == this.dragCurrent.y)
 			return;
 		// make sure the selection is at least 1 pixel wide and high
-		this.controlManager.gridManager.updateRectangleOverlay(
-			this.selectionStartScreen,
-			this.selectionEndScreen,
-			false
-		);
+		this.controlManager.gridManager.updateOverlay();
 		this.dragPrevious = { ...this.dragCurrent };
 	}
 
@@ -153,7 +160,7 @@ export default class SelectionTool extends Tool {
 		if (isMouseDown) {
 			this.cursorW.set('selection');
 			this.isHoveringSelection = false;
-		} else if (this.controlManager.gridManager.isInSelection(this.p5.mouseX, this.p5.mouseY)) {
+		} else if (this.selectionRect.isInSelection(this.relativePositionOnCanvas())) {
 			this.isHoveringSelection = true;
 			this.cursorW.set('hand');
 		} else {
