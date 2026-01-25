@@ -18,8 +18,8 @@ const desktopToolClasses: Tools = {
 	[ToolType.Hand]: MoveTool,
 	[ToolType.Cursor]: PointTool,
 	[ToolType.Eraser]: EraserTool,
-	[ToolType.Selection]: SelectionTool,
-	[ToolType.Rect]: RectTool
+	[ToolType.Selection]: SelectionTool
+	// [ToolType.Rect]: RectTool
 };
 
 const toolClasses: Writable<Tools | undefined> = writable<Tools>(undefined);
