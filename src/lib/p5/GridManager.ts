@@ -88,7 +88,7 @@ export default class GridManager {
 
 	additionalData: { [key: string]: string } = {};
 
-	loadImage = async (base64Image: string, size: Size2D, data: { [key: string]: string }) => {
+	loadImage = async (base64Image: string, data: { [key: string]: string }) => {
 		this.additionalData = data;
 		this.p5.loadImage(base64Image, this.handleImage);
 	};

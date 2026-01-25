@@ -85,7 +85,8 @@ export default class RectTool extends Tool {
 		this.dragPrevious = { ...this.dragCurrent };
 	}
 
-	protected defineCursor(isMouseDown: boolean) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected defineCursor(_isMouseDown: boolean) {
 		// if (isMouseDown) {
 		// 	this.cursorW.set('selection');
 		// 	this.isHoveringSelection = false;

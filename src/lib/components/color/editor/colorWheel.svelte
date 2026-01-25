@@ -159,10 +159,10 @@
 		});
 	};
 
-	const onMouseLeave = (event: MouseEvent) => {
+	const onMouseLeave = (_event: MouseEvent) => {
 		// isMouseDown = false;
 	};
-	const onMouseUp = (event: MouseEvent) => {
+	const onMouseUp = (_event: MouseEvent) => {
 		isMouseDown = false;
 	};
 </script>

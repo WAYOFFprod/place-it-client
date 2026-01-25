@@ -39,7 +39,7 @@ export default class EraserTool extends Tool {
 	keyDown() {}
 
 	keyUp() {}
-
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	mousePressed(_mousePressed: Coord) {
 		this.placePixel();
 		return true;
@@ -77,7 +77,7 @@ export default class EraserTool extends Tool {
 		};
 	}
 
-	protected Pixel() {
+	protected placePixel() {
 		// calculate on which pixel the mouse is over
 		const coords: Coord = {
 			x: Math.floor(

@@ -11,12 +11,12 @@ export default class PlaceTool extends Tool {
 	static cursor = 'place';
 	static type = ToolType.Place;
 	static icon = PlusIcon;
-	static unsubscribeColors: any | undefined = undefined;
+	static unsubscribeColors: (() => void) | undefined = undefined;
 	static color: string | undefined;
 
 	cursorW: Writable<string> = writable<string>(PlaceTool.cursor);
 
-	interval: any;
+	interval: ReturnType<typeof setInterval> | undefined = undefined;
 	timer: number = 0;
 
 	networker: Networker = Networker.getInstance();
@@ -48,11 +48,13 @@ export default class PlaceTool extends Tool {
 	keyUp() {}
 
 	mousePressed(screenOffset: Coord) {
-		const distance = this.p5.dist(this.p5.touches[0].x, this.p5.touches[0].y, 0, 0);
+		const touch = this.p5.touches[0] as { x: number; y: number } | undefined;
+		if (!touch) return true;
+		const distance = this.p5.dist(touch.x, touch.y, 0, 0);
 		this.pinchDistance = distance;
 		this.controlManager.gridManager.screenOffset = screenOffset;
-		this.dragOffset.x = this.p5.touches[0].x - screenOffset.x;
-		this.dragOffset.y = this.p5.touches[0].y - screenOffset.y;
+		this.dragOffset.x = touch.x - screenOffset.x;
+		this.dragOffset.y = touch.y - screenOffset.y;
 		this.startTimer();
 		return true;
 	}
@@ -66,24 +68,24 @@ export default class PlaceTool extends Tool {
 			this.placePixel();
 			this.pixels = [];
 		}
-		clearInterval(this.interval);
+		if (this.interval) {
+			clearInterval(this.interval);
+		}
 		this.timer = 0;
 	}
 
 	mouseMove(isMouseDown: boolean) {
 		if ((this.dragOffset.x == 0 && this.dragOffset.y == 0) || !isMouseDown)
 			return this.controlManager.gridManager.screenOffset;
-		if (this.p5.touches.length >= 2) {
+
+		const touch1 = this.p5.touches[0] as { x: number; y: number } | undefined;
+		const touch2 = this.p5.touches[1] as { x: number; y: number } | undefined;
+		if (touch1 && touch2) {
 			// zoom
-			const distance = this.p5.dist(
-				this.p5.touches[0].x,
-				this.p5.touches[0].y,
-				this.p5.touches[1].x,
-				this.p5.touches[1].y
-			);
+			const distance = this.p5.dist(touch1.x, touch1.y, touch2.x, touch2.y);
 			const scaleFactor = distance / this.pinchDistance;
 			const newCurrentScale = this.controlManager.gridManager.currentScale * scaleFactor;
-			let newScaleFactor = newCurrentScale / this.controlManager.gridManager.currentScale;
+			const newScaleFactor = newCurrentScale / this.controlManager.gridManager.currentScale;
 			this.controlManager.scroll(newScaleFactor);
 
 			this.pinchDistance = distance;

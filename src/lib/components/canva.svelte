@@ -76,7 +76,7 @@
 		networker.connectToSocket(gridManager);
 
 		const pixels = networker.tempPoints as { [key: string]: string };
-		gridManager.loadImage(canvasData.data.image, canvasData.size, pixels);
+		gridManager.loadImage(canvasData.data.image, pixels);
 		// color = data.colors[0];
 		updateColorPalette(canvasData.data.colors);
 		networker.joinLiveCanva(canvasData.id);

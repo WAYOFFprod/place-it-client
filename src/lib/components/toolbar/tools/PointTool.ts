@@ -20,6 +20,7 @@ export default class PointTool extends Tool {
 	pixels: Coord[] = [];
 
 	protected init() {
+		this.p5.frameRate(120);
 		PointTool.color = get(selectedColor);
 		PointTool.unsubscribeColors = selectedColor.subscribe((newColor) => {
 			PointTool.color = newColor;
@@ -31,7 +32,7 @@ export default class PointTool extends Tool {
 	keyUp() {}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	mousePressed(mousePressed: Coord) {
+	mousePressed(_mousePressed: Coord) {
 		this.placePixel();
 		return true;
 	}
