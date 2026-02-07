@@ -63,6 +63,12 @@ export default {
 						lineHeight: '17.14px'
 					}
 				],
+				'2xl': [
+					'28px',
+					{
+						fontWeight: 700
+					}
+				],
 				'3xl': [
 					'32px',
 					{

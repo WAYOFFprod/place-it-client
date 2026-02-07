@@ -7,6 +7,7 @@
 	import ToggleButton from '$lib/components/form/toggleButton.svelte';
 	import Header from '$lib/components/header.svelte';
 	import Modal from '$lib/components/modal.svelte';
+	import Versioning from '$lib/components/versioning/index.svelte';
 	import { openedModal } from '$lib/stores/modalStore';
 	import Networker from '$lib/utility/Networker';
 	import CanvaPreview from '$lib/components/canvaPreview.svelte';
@@ -236,6 +237,7 @@
 	/>
 </svelte:head>
 <Modal></Modal>
+<Versioning></Versioning>
 <div class="flex flex-col h-full">
 	<Header class="top-0">
 		<div class="border-b-2 border-black">

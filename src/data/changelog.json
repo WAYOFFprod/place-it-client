@@ -1,0 +1,13 @@
+{
+	"0.0.0": {
+		"added": ["a basic app to draw pixel art collaboratively in real time :)"]
+	},
+	"0.0.1": {
+		"fixed": ["fixed some issues with mobile devices"]
+	},
+	"0.1.0": {
+		"added": ["added this new feature"],
+		"fix": ["fixed issue with pointer tool", "fixed issues with zooming when arriving on canva"],
+		"security": ["improved minimum password requirements"]
+	}
+}
