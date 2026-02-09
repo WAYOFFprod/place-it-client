@@ -1,3 +1,7 @@
+# This workflow automates the preparation of release branches in a GitHub repository.
+# It listens for pushes to branches following the pattern 'release/**', extracts the version number,
+# updates package.json, and creates pull requests to both main and develop branches.
+
 name: Prepare Release Branch
 
 on:

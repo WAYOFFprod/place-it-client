@@ -3,15 +3,11 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-# GitHub recommends pinning actions to a commit SHA.
-# To get a newer version, you will need to update the SHA.
-# You can also reference a tag or branch, but the action may change without warning.
-
-name: Build and push to registry
+name: Build, push to registry and redeploy production portainer stack
 
 on:
   push:
-    branches: ['release']
+    branches: ['main']
 
 env:
   REGISTRY: ghcr.io
@@ -22,6 +18,7 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
       packages: write
@@ -35,6 +32,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Extract version from package.json
+        id: package_version
+        run: echo "VERSION=$(npm pkg get version | tr -d '"')" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: npm ci
@@ -58,10 +59,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ env.VERSION }}
+            type=raw,value=latest
+            type=raw,value=release
             type=sha
 
       - name: Build and push Docker image
@@ -72,3 +72,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Update Portainer Stack
+        run: curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
