@@ -1,4 +1,4 @@
-interface CanvaRequestData {
+export interface CanvaRequestData {
 	width: number;
 	height: number;
 	id: number;

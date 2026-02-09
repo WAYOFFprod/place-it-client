@@ -1,0 +1,10 @@
+{
+	"0.0.0": {
+		"added": [
+			"first changelog, we have a basic app to draw pixel art collaboratively in real time :)"
+		]
+	},
+	"0.1.0": {
+		"added": ["changelog to keep track of changes and updates in the app"]
+	}
+}
