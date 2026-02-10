@@ -6,8 +6,8 @@ import Tool, { ToolType } from '$lib/components/toolbar/ToolClass';
 import MoveTool from '$lib/components/toolbar/tools/MoveTool';
 import PointTool from '$lib/components/toolbar/tools/PointTool';
 import EraserTool from '$lib/components/toolbar/tools/EraserTool';
-import PlaceTool from '$lib/components/toolbar/tools/PlaceTool';
-import SelectionTool from '$lib/components/toolbar/tools/SelectionTool';
+// import PlaceTool from '$lib/components/toolbar/tools/PlaceTool';
+// import SelectionTool from '$lib/components/toolbar/tools/SelectionTool';
 // import RectTool from '$lib/components/toolbar/tools/RectTool';
 
 interface Tools {
@@ -17,8 +17,8 @@ interface Tools {
 const desktopToolClasses: Tools = {
 	[ToolType.Hand]: MoveTool,
 	[ToolType.Cursor]: PointTool,
-	[ToolType.Eraser]: EraserTool,
-	[ToolType.Selection]: SelectionTool
+	[ToolType.Eraser]: EraserTool
+	// [ToolType.Selection]: SelectionTool
 	// [ToolType.Rect]: RectTool
 };
 
@@ -26,9 +26,9 @@ const toolClasses: Writable<Tools | undefined> = writable<Tools>(undefined);
 let tools: Tools | undefined;
 
 const mobileToolClasses: Tools = {
-	[ToolType.Hand]: MoveTool,
+	[ToolType.Hand]: MoveTool
 	// [ToolType.Eraser]: EraserTool,
-	[ToolType.Place]: PlaceTool
+	// [ToolType.Place]: PlaceTool
 };
 
 const readOnlytoolClasses: Tools = {

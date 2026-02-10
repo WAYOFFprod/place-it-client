@@ -6,5 +6,8 @@
 	},
 	"0.1.0": {
 		"added": ["changelog to keep track of changes and updates in the app"]
+	},
+	"0.1.1": {
+		"added": ["select", "release workflow to automate release branch preparation and PR creation"]
 	}
 }

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
+	import type { selectColorEvent } from './types';
 	const dispatch = createEventDispatcher<selectColorEvent>();
 
 	export let color: string;

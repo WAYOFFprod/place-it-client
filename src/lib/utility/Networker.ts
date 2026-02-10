@@ -5,6 +5,7 @@ import { PUBLIC_WEBSOCKET_URL, PUBLIC_SERVER_URL } from '$env/static/public';
 import { chatMessages } from '$lib/stores/chatStore';
 import { authStatus, tokenStore, userStore } from '$lib/stores/authStore';
 import { isReady } from '$lib/stores/canvaStore';
+import type { LoginPayload, RegisterPayload } from '$lib/components/auth/types';
 
 export default class Networker {
 	static #instance: Networker;
