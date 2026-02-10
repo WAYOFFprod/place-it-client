@@ -1,9 +1,9 @@
-interface LoginPayload {
+export interface LoginPayload {
 	email: string;
 	password: string;
 }
 
-interface RegisterPayload {
+export interface RegisterPayload {
 	name: string;
 	email: string;
 	password: string;

@@ -3,6 +3,7 @@
 	import Swatch from '../swatch.svelte';
 	import { selectedColor } from '$lib/stores/colorStore';
 	import { hexToRgb, hsv2rgb, rectToRGB, rgbToHex, rgbToHsv } from '../utils/converter';
+	import type { updateColorEvent } from '../types';
 
 	const dispatch = createEventDispatcher<updateColorEvent>();
 

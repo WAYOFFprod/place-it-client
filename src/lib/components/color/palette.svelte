@@ -5,6 +5,7 @@
 	import { onDestroy } from 'svelte';
 	import ColorEditor from './editor/colorEditor.svelte';
 	import Networker from '$lib/utility/Networker';
+	import type { selectColor } from './types';
 
 	const networker = Networker.getInstance();
 
