@@ -6,5 +6,11 @@
 	},
 	"0.1.0": {
 		"added": ["changelog to keep track of changes and updates in the app"]
+	},
+	"0.1.1": {
+		"added": [
+			"select tool improved with fast movements by filling in between pixels when the mouse moves faster than the frame rate",
+			"release workflow to automate release branch preparation and PR creation"
+		]
 	}
 }

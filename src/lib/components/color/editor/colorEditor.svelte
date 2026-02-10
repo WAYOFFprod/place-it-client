@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Panel from '$lib/components/layout/panel.svelte';
 	import { storedColors } from '$lib/stores/colorStore';
+	import type { selectColor } from '../types';
 	import ColorWheel from './colorWheel.svelte';
 
 	export let currentColorIndex: number;
