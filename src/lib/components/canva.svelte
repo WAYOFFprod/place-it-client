@@ -39,6 +39,7 @@
 	let currentTool: Tool | undefined;
 	let cursorUnsub: () => void;
 	let cursor: string;
+	let wheelHandler: (e: WheelEvent) => void;
 
 	const unsubscribeTool = selectedTool.subscribe((newTool: Tool | undefined) => {
 		if (cursorUnsub) cursorUnsub();
@@ -151,19 +152,17 @@
 			};
 
 			/* Scrolling */
-			window.addEventListener(
-				'wheel',
-				function (e: WheelEvent) {
-					e.preventDefault();
-					if (!isTargeting(e.target, 'place-it-canvas') || !controlManager) return;
-					if (e.deltaY > 0) {
-						controlManager.scroll(1 - zoomSensitivity);
-					} else {
-						controlManager.scroll(1 + zoomSensitivity);
-					}
-				},
-				{ passive: false }
-			);
+			wheelHandler = function (e: WheelEvent) {
+				e.preventDefault();
+				if (!isTargeting(e.target, 'place-it-canvas') || !controlManager) return;
+				if (e.deltaY > 0) {
+					controlManager.scroll(1 - zoomSensitivity);
+				} else {
+					controlManager.scroll(1 + zoomSensitivity);
+				}
+			};
+
+			window.addEventListener('wheel', wheelHandler, { passive: false });
 
 			p5.keyPressed = () => {
 				if (!controlManager) return;
@@ -211,6 +210,10 @@
 		if (controlManager) {
 			controlManager.destroy();
 		}
+		if (wheelHandler) {
+			window.removeEventListener('wheel', wheelHandler);
+		}
+
 		unsubscribeTool();
 		unsubscribeEvent();
 		unsubscribeReady();
