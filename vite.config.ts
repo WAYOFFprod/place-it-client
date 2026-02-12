@@ -16,5 +16,8 @@ export default defineConfig({
 		// We use JSON.stringify to ensure it's wrapped in quotes (e.g. "1.0.0")
 		// otherwise it might be inserted as 1.0.0 (which is invalid syntax)
 		__APP_VERSION__: JSON.stringify(pkg.version)
+	},
+	server: {
+		allowedHosts: ['place-it.test']
 	}
 });

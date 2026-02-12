@@ -96,7 +96,7 @@
 			class="flex justify-between items-center h-12 uppercase w-full"
 		>
 			<h3>chat</h3>
-			<button type="button"><img src="/svg/chevron-down.svg" alt="down icon" /></button>
+			<img src="/svg/chevron-down.svg" alt="down icon" />
 		</button>
 		<!-- sroll area -->
 		<div
