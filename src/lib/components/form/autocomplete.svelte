@@ -2,12 +2,25 @@
 	import { createEventDispatcher } from 'svelte';
 	import type { FormEventHandler } from 'svelte/elements';
 
-	export let placeholder: string = '';
-	export let label: string = '';
-	export let id: string;
-	export let error: string | null = null;
-	export let val = '';
-	export let options: Option[] = [];
+	interface Props {
+		placeholder?: string;
+		label?: string;
+		id: string;
+		error?: string | null;
+		val?: string;
+		options: Option[];
+		className: string;
+	}
+
+	let {
+		placeholder = '',
+		label = '',
+		id,
+		error = null,
+		val = '',
+		options = [],
+		className = ''
+	}: Props = $props();
 
 	const dispatch = createEventDispatcher();
 
@@ -66,7 +79,7 @@
 	}
 </script>
 
-<div class={$$props.class}>
+<div class={className}>
 	{#if label}
 		<label class="block mb-3" for={id}>{label}</label>
 	{/if}

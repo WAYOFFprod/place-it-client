@@ -9,7 +9,7 @@
 	import { authStatus } from '$lib/stores/authStore';
 	import { onDestroy } from 'svelte';
 
-	export let canva: CanvaPreviewData;
+	let { canva }: { canva: CanvaPreviewData } = $props();
 
 	let conenctionStatus: undefined | boolean;
 	const networker = Networker.getInstance();
@@ -55,12 +55,12 @@
 		unsubscribeStatus();
 	});
 
-	$: getDate = () => {
+	let getDate = $derived.by(() => {
 		const date = new Date(canva.created_at);
 		return date.toLocaleDateString('fr-CH', dateOptions);
-	};
+	});
 
-	$: getCategory = () => {
+	let getCategory = $derived.by(() => {
 		switch (canva.category) {
 			case 'pixelwar':
 				return 'Pixelwar';
@@ -73,9 +73,9 @@
 				break;
 		}
 		return;
-	};
+	});
 
-	$: getUserCount = () => {
+	let getUserCount = $derived.by(() => {
 		switch (canva.access) {
 			case 'open':
 				return canva.currentPlayers;
@@ -84,7 +84,7 @@
 			default:
 				break;
 		}
-	};
+	});
 </script>
 
 <div class="group" id="canva-preview-{canva.id}">
@@ -113,9 +113,9 @@
 			<!-- Bottom Section -->
 			{#if canva.visibility != 'private'}
 				<div class="h-6 border-t-2 border-black bg-white flex justify-between text-lg px-1">
-					<span>{getCategory()}</span>
+					<span>{getCategory}</span>
 					<div class="flex items-center gap-1">
-						<span>{getUserCount()}</span>
+						<span>{getUserCount}</span>
 						<span class="w-2.5 h-2.5 rounded-full border-2 border-black bg-fluorescent-cyan"></span>
 					</div>
 				</div>
@@ -177,7 +177,7 @@
 	<div class="flex flex-col gap-1 mt-4">
 		<div>{canva.name}</div>
 		<div class="text-lg">
-			Crée le {getDate()}
+			Crée le {getDate}
 		</div>
 	</div>
 </div>

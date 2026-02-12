@@ -1,13 +1,18 @@
 <script lang="ts">
-	export let placeholder: string = '';
-	export let label: string = '';
-	export let id: string;
-	export let error: string | null = null;
+	interface Props {
+		placeholder?: string;
+		label?: string;
+		id: string;
+		error?: string | null;
+		className?: string;
+	}
 
-	let passwordShow = false;
+	let { placeholder = '', label = '', id, error = null, className = '' }: Props = $props();
+
+	let passwordShow = $state(false);
 </script>
 
-<div class={$$props.class}>
+<div class={className}>
 	{#if label}
 		<label class="block mb-3" for={id}>{label}</label>
 	{/if}
@@ -23,7 +28,7 @@
 		<button
 			aria-label="Toggle {label} visibility"
 			type="button"
-			on:click={() => (passwordShow = !passwordShow)}
+			onclick={() => (passwordShow = !passwordShow)}
 			aria-pressed={passwordShow}><img src="/svg/eye.svg" alt="" /></button
 		>
 	</div>

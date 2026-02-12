@@ -1,16 +1,28 @@
 <script lang="ts">
 	import ChevronDown from '$lib/icons/chevronDown.svelte';
 
-	export let step: number = 1;
-	export let label: string = '';
-	export let placeholder: string = '';
-	export let id: string;
-	export let error: string | null = null;
-	export let disabled: boolean = false;
+	interface Props {
+		step?: number;
+		label?: string;
+		placeholder?: string;
+		id: string;
+		error?: string | null;
+		disabled?: boolean;
+		inputValue: number;
+	}
 
-	export let inputValue = 100;
+	let {
+		step = 1,
+		label = '',
+		placeholder = '',
+		id,
+		error = null,
+		disabled = false,
+		inputValue = $bindable(100)
+	}: Props = $props();
 
-	export const click = (change: number) => {
+	export const click = (e: MouseEvent, change: number) => {
+		e.preventDefault();
 		inputValue += change;
 	};
 </script>
@@ -35,14 +47,14 @@
 		>
 			<button
 				tabindex="-1"
-				on:click={() => click(step)}
+				onclick={(e) => click(e, step)}
 				type="button"
 				class="h-1/2 flex justify-center items-center bg-white text-black hover:text-fluorescent-cyan-focus"
 				><ChevronDown classes="w-4 rotate-180" /></button
 			>
 			<button
 				tabindex="-1"
-				on:click={() => click(-step)}
+				onclick={(e: MouseEvent) => click(e, -step)}
 				type="button"
 				class="h-1/2 flex justify-center items-center bg-white text-black hover:text-fluorescent-cyan-focus"
 				><ChevronDown classes="w-4 " /></button

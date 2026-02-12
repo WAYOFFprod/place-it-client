@@ -82,7 +82,7 @@
 						on:selectOption={selectOption}
 						id="friends"
 						options={friendoptions}
-						class="max-h-64 mb-6"
+						className="max-h-64 mb-6"
 					></Autocomplete>
 					<Button
 						id="see-participant-list"

@@ -4,10 +4,10 @@
 	import type { selectColor } from '../types';
 	import ColorWheel from './colorWheel.svelte';
 
-	export let currentColorIndex: number;
-	export let colorPalette: string[];
+	let { currentColorIndex, colorPalette }: { currentColorIndex: number; colorPalette: string[] } =
+		$props();
 
-	let tab: 'disk' | 'harmonie' | 'palettes' = 'disk';
+	let tab: 'disk' | 'harmonie' | 'palettes' = $state('disk');
 
 	const onUpdateColor = (event: CustomEvent<selectColor>) => {
 		if (currentColorIndex >= 0) {
@@ -16,23 +16,13 @@
 			storedColors.set(cs);
 		}
 	};
-
-	const onOpenDisk = () => {
-		tab = 'disk';
-	};
-	const onOpenHarmonie = () => {
-		tab = 'harmonie';
-	};
-	const onOpenPalettes = () => {
-		tab = 'palettes';
-	};
 </script>
 
 <Panel class="w-full " container="bg-white px-8 py-5 flex flex-col gap-10">
 	<div class="flex justify-center gap-4">
 		<button
 			aria-label="open color picker"
-			on:click={onOpenDisk}
+			onclick={() => (tab = 'disk')}
 			class="flex flex-col items-center gap-2 border-b-2 disabled:text-dark-grey disabled:cursor-not-allowed {tab ==
 			'disk'
 				? 'border-black'
@@ -43,7 +33,7 @@
 		</button>
 		<button
 			aria-label="open harmoie selector"
-			on:click={onOpenHarmonie}
+			onclick={() => (tab = 'harmonie')}
 			class="flex flex-col items-center gap-2 border-b-2 disabled:text-dark-grey disabled:cursor-not-allowed {tab ==
 			'harmonie'
 				? 'border-black'
@@ -55,7 +45,7 @@
 		</button>
 		<button
 			aria-label="open palette selector"
-			on:click={onOpenPalettes}
+			onclick={() => (tab = 'palettes')}
 			class="flex flex-col items-center gap-2 border-b-2 disabled:text-dark-grey disabled:cursor-not-allowed {tab ==
 			'palettes'
 				? 'border-black'
