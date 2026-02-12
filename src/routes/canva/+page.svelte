@@ -57,7 +57,7 @@
 		</div>
 	</Header>
 	{#if canva}
-		<Canva {canva} viewOnly={false} class="" marginBottom={52}></Canva>
+		<Canva {canva} viewOnly={false} marginBottom={52}></Canva>
 	{:else}
 		<div class="absolute top-14 bottom-0 w-full flex flex-col justify-center items-center gap-8">
 			<p class="text-3xl">Loading</p>

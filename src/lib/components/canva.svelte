@@ -16,16 +16,23 @@
 	import ZoomCounter from './metric/zoomCounter.svelte';
 	import CoordViewer from './metric/coordViewer.svelte';
 
-	export let canva: CanvaPreviewData;
-	export let viewOnly: boolean = true;
-	export let marginBottom: number = 0;
+	interface Props {
+		canva: CanvaPreviewData;
+		viewOnly: boolean;
+		marginBottom: number;
+	}
+
+	// export let canva: CanvaPreviewData;
+	// export let viewOnly: boolean = true;
+	// export let marginBottom: number = 0;
+	let { canva, viewOnly = true, marginBottom = 0 }: Props = $props();
 
 	let id = 'canvas-container';
 	let width = 32;
 	let height = 16;
 
 	let container: HTMLElement;
-	let updateColorPalette: (newColors: [string]) => void;
+	let paletteColors: string[] = $state([]);
 
 	let p5: P5;
 	let controlManager: ControlManager | undefined;
@@ -38,7 +45,6 @@
 	let currentToolType: typeof Tool = Tool;
 	let currentTool: Tool | undefined;
 	let cursorUnsub: () => void;
-	let cursor: string;
 	let wheelHandler: (e: WheelEvent) => void;
 
 	const unsubscribeTool = selectedTool.subscribe((newTool: Tool | undefined) => {
@@ -79,7 +85,7 @@
 		const pixels = networker.tempPoints as { [key: string]: string };
 		gridManager.loadImage(canvasData.data.image, pixels);
 		// color = data.colors[0];
-		updateColorPalette(canvasData.data.colors);
+		paletteColors = canvasData.data.colors;
 		networker.joinLiveCanva(canvasData.id);
 	};
 
@@ -223,11 +229,11 @@
 	// 	if (currentTool == undefined) return '';
 	// 	return 'cursor-' + currentTool.getCursor();
 	// };
-	$: cursor;
+	let cursor = $state('');
 </script>
 
 <Modal></Modal>
-<div {id} class="relative cursor-{cursor} {$$props.class}">
+<div {id} class="relative cursor-{cursor}">
 	<!-- overlay -->
 	<div class="absolute inset-0 pointer-events-none">
 		{#if currentToolType.type == ToolType.Place}
@@ -240,7 +246,7 @@
 			<Palette
 				canvasOwned={canva.owned}
 				canvaId={canva.id}
-				bind:setColors={updateColorPalette}
+				bind:colors={paletteColors}
 				childClass={'pointer-events-auto'}
 			></Palette>
 		</div>

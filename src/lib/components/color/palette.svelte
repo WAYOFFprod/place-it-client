@@ -5,26 +5,24 @@
 	import { onDestroy } from 'svelte';
 	import ColorEditor from './editor/colorEditor.svelte';
 	import Networker from '$lib/utility/Networker';
-	import type { selectColor } from './types';
 
 	const networker = Networker.getInstance();
 
-	export let childClass: string;
-	export let canvaId: number | undefined;
-	export let canvasOwned: boolean | undefined;
-	let currentColor: string;
+	interface Props {
+		childClass: string;
+		canvaId: number | undefined;
+		canvasOwned: boolean | undefined;
+		colors: string[];
+	}
+
+	let { childClass, canvaId, canvasOwned, colors = $bindable() }: Props = $props();
+
+	let currentColor: string = $state('');
 	let colorIndex: number = -1;
-	let colors: string[] = [];
 
 	let storedColorPalette: string[];
 
-	let editMode = false;
-
-	export const setColors = (newColors: [string]) => {
-		storedColors.set(newColors);
-		selectedColor.set(newColors[0]);
-		colorIndex = 0;
-	};
+	let editMode = $state(false);
 
 	const unsubscribeSelectedColor = selectedColor.subscribe((newColor) => {
 		currentColor = newColor;
@@ -35,10 +33,8 @@
 		colors = newColors;
 	});
 
-	const onUpdateSelectColor = (event: CustomEvent<selectColor>) => {
-		selectedColor.set(event.detail.color);
-		if (!editMode) {
-		}
+	const onUpdateSelectColor = (color: string) => {
+		selectedColor.set(color);
 	};
 
 	const onOpenSettings = () => {
@@ -75,7 +71,7 @@
 			{#each colors as color}
 				<Swatch
 					{color}
-					on:selectColor={onUpdateSelectColor}
+					onclick={() => onUpdateSelectColor(color)}
 					edit={editMode}
 					selected={color == currentColor}
 				></Swatch>
