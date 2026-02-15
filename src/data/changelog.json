@@ -16,5 +16,10 @@
 			"fixed a bug for unauthenticated users couldn't see public canvases",
 			"fixed scrolling issue when going back to the homepage from a canvas page"
 		]
+	},
+	"0.2.0": {
+		"updated": [
+			"upgraded frontend to svelte 5, this doesn't change much for now but it's good for the future of the project"
+		]
 	}
 }
