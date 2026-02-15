@@ -1,24 +1,28 @@
 <script lang="ts">
 	import Panel from '$lib/components/layout/panel.svelte';
 	import { storedColors } from '$lib/stores/colorStore';
-	import type { selectColor } from '../types';
+	import type { SelectColor } from '../types';
 	import ColorWheel from './colorWheel.svelte';
 
-	let { currentColorIndex, colorPalette }: { currentColorIndex: number; colorPalette: string[] } =
-		$props();
+	interface Props {
+		currentColorIndex: number;
+		colorPalette: string[];
+	}
+
+	let { currentColorIndex, colorPalette }: Props = $props();
 
 	let tab: 'disk' | 'harmonie' | 'palettes' = $state('disk');
 
-	const onUpdateColor = (event: CustomEvent<selectColor>) => {
+	const onUpdateColor = (selectedColor: SelectColor) => {
 		if (currentColorIndex >= 0) {
 			const cs = colorPalette;
-			cs[currentColorIndex] = event.detail.color;
+			cs[currentColorIndex] = selectedColor.color;
 			storedColors.set(cs);
 		}
 	};
 </script>
 
-<Panel class="w-full " container="bg-white px-8 py-5 flex flex-col gap-10">
+<Panel className="w-full " container="bg-white px-8 py-5 flex flex-col gap-10">
 	<div class="flex justify-center gap-4">
 		<button
 			aria-label="open color picker"
@@ -57,6 +61,6 @@
 		</button>
 	</div>
 	{#if tab == 'disk'}
-		<ColorWheel on:updateColor={onUpdateColor}></ColorWheel>
+		<ColorWheel updateColor={onUpdateColor}></ColorWheel>
 	{/if}
 </Panel>

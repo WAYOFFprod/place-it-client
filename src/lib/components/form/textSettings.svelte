@@ -1,22 +1,34 @@
 <script lang="ts">
-	import { createEventDispatcher, tick, onDestroy } from 'svelte';
+	import { tick, onDestroy } from 'svelte';
 	import ToggleButton from './toggleButton.svelte';
 	import { settingsInputState } from '$lib/stores/settingsInputState';
 
-	const dispatch = createEventDispatcher<SaveFieldEvent>();
+	interface Props {
+		id: string;
+		label: string;
+		placeholder?: string;
+		type?: string;
+		value?: string;
+		field: string;
+		disabled?: boolean;
+		saveField: (data: SettingOption) => void;
+	}
 
-	export let id: string;
-	export let placeholder: string = '';
-	export let label: string;
-	export let type: string = 'text';
-	export let value: string = '';
-	export let field: string;
-	export let disabled: boolean = false;
+	let {
+		id,
+		placeholder = '',
+		label,
+		type = 'text',
+		value = '',
+		field,
+		disabled = false,
+		saveField
+	}: Props = $props();
 
 	let input: HTMLInputElement;
 
-	let editable = false;
-	let buttonLabel = 'Modifier';
+	let editable = $state(false);
+	let buttonLabel = $state('Modifier');
 
 	const setEditable = async () => {
 		await tick();
@@ -24,7 +36,7 @@
 	};
 	const save = () => {
 		const data = { field: field, value: value } as SettingOption;
-		dispatch('saveField', data);
+		saveField(data);
 	};
 	const discard = () => {
 		console.log('discard');

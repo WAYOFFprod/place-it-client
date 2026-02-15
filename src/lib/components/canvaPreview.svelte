@@ -11,7 +11,7 @@
 
 	let { canva }: { canva: CanvaPreviewData } = $props();
 
-	let conenctionStatus: undefined | boolean;
+	let conenctionStatus: undefined | boolean = $state(undefined);
 	const networker = Networker.getInstance();
 
 	const onEdit = () => {
@@ -88,7 +88,7 @@
 </script>
 
 <div class="group" id="canva-preview-{canva.id}">
-	<Panel class="w-full">
+	<Panel className="w-full">
 		<!-- Overlay -->
 		<div class="absolute inset-0 flex flex-col justify-between h-full">
 			<!-- Top section -->
@@ -102,10 +102,10 @@
 						{/if}
 					</slot>
 				</button>
-				<button class="group/favorit relative" on:click={toggleLike}>
+				<button class="group/favorit relative" onclick={toggleLike}>
 					<Heart class="text-black absolute"></Heart>
 					<HeartFill
-						class="text-transparent group-hover/favorit:text-off-white z-20 data-[liked=true]:text-naples-yellow"
+						className="text-transparent group-hover/favorit:text-off-white z-20 data-[liked=true]:text-naples-yellow"
 						dataLiked={canva.isLiked}
 					></HeartFill>
 				</button>

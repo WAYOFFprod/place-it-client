@@ -301,7 +301,7 @@
 			<!-- search -->
 			<TextInput
 				on:onChange={searchUpdated}
-				class="py-2 my-0 flex-shrink grow lg:grow-0 "
+				className="py-2 my-0 flex-shrink grow lg:grow-0 "
 				id="search"
 				type="text"
 				placeholder="Chercher"
@@ -316,7 +316,7 @@
 				<ToggleButton
 					id="recent"
 					label="Récents"
-					class="hover:bg-fluorescent-cyan"
+					className="hover:bg-fluorescent-cyan"
 					classInactive="bg-white"
 					classActive="!bg-fluorescent-cyan-focus"
 					toggle={recentToggle}
@@ -325,7 +325,7 @@
 				<ToggleButton
 					id="favorit"
 					label="Favoris"
-					class="hover:bg-tea-rose"
+					className="hover:bg-tea-rose"
 					classInactive="bg-white"
 					classActive="!bg-tea-rose-focus"
 					toggle={favoritToggle}
@@ -333,7 +333,7 @@
 					on:change={toggleFavorit}><img class="icon" src="/svg/heart.svg" alt="" /></ToggleButton
 				>
 				<Select
-					class="min-w-52 hidden lg:block"
+					className="min-w-52 hidden lg:block"
 					id="canvaType"
 					placeholder="Tous"
 					options={canvaTypeOptions}
@@ -348,7 +348,7 @@
 				</div>
 			</div>
 			<div class="grow lg:grow-0 lg:hidden">
-				<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
+				<Select className="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
 				></Select>
 			</div>
 		</div>

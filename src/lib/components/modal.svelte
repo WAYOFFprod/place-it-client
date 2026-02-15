@@ -84,15 +84,14 @@
 
 <dialog
 	id="modal-container"
-	on:click={close}
-	role="none"
+	onclick={close}
 	bind:this={dialog}
 	class="bg-transparent z-10 backdrop-blur-sm m-0 w-full h-screen min-w-full min-h-full {isOpen
 		? 'flex'
 		: ''} justify-center items-center"
 >
 	<Panel
-		class="w-fit {isWindowSmall ? 'h-full min-h-full w-full' : ''}"
+		className="w-fit {isWindowSmall ? 'h-full min-h-full w-full' : ''}"
 		noShadow={isWindowSmall}
 		container="bg-off-white h-full md:h-auto"
 	>
@@ -102,7 +101,7 @@
 				class="relative h-14 mr-32 w-full border-b-2 border-black uppercase flex justify-center items-center"
 			>
 				<span>{label()}</span>
-				<button aria-label="close" class="absolute right-4 top-4" on:click={modalClosed}>
+				<button aria-label="close" class="absolute right-4 top-4" onclick={() => modalClosed()}>
 					<img src="/svg/close.svg" alt="" />
 				</button>
 			</div>
@@ -110,22 +109,22 @@
 		<!-- Body -->
 		<div class="overflow-scroll" style={isWindowSmall ? 'height: calc(100vh - 56px);' : ''}>
 			{#if openedDialog.name == 'create'}
-				<Create on:close={modalClosed}></Create>
+				<Create close={modalClosed}></Create>
 			{:else if openedDialog.name == 'login'}
-				<Auth on:close={modalClosed}></Auth>
+				<Auth close={modalClosed}></Auth>
 			{:else if openedDialog.name == 'settings'}
-				<Settings on:close={modalClosed}></Settings>
+				<Settings close={modalClosed}></Settings>
 			{:else if openedDialog.name == 'joinRequest'}
-				<JoinCanva on:close={modalClosed} canvaId={openedDialog.data.id}></JoinCanva>
+				<JoinCanva close={modalClosed} canvaId={openedDialog.data.id}></JoinCanva>
 			{:else if openedDialog.name == 'modifyCanva'}
 				<Modify
-					on:close={modalClosed}
+					close={modalClosed}
 					canvaId={openedDialog.data.id}
 					canvaName={openedDialog.data.name}
 				></Modify>
 			{:else if openedDialog.name == 'userAction'}
 				<UserActions
-					on:close={modalClosed}
+					close={modalClosed}
 					userId={openedDialog.data.id}
 					userName={openedDialog.data.name}
 				></UserActions>

@@ -6,21 +6,25 @@
 
 	const networker = Networker.getInstance();
 
-	export let canvaId: number;
+	interface Props {
+		canvaId: number;
+	}
 
-	let participants: Participant[] = [];
+	let { canvaId }: Props = $props();
+
+	let participants: Participant[] = $state([]);
 	const getData = async () => {
 		const response = await networker.getParticipants(canvaId);
 		participants = response.data;
 	};
 
-	const removeParticipant = async (event: CustomEvent<number>) => {
-		const response: any = await networker.rejectParticipationRequest(event.detail, canvaId);
+	const removeParticipant = async (participantId: number) => {
+		const response: any = await networker.rejectParticipationRequest(participantId, canvaId);
 		updateParticipantList(response.data);
 	};
 
-	const acceptRequest = async (event: CustomEvent<number>) => {
-		const response: any = await networker.acceptParticipationRequest(event.detail, canvaId);
+	const acceptRequest = async (participantId: number) => {
+		const response: any = await networker.acceptParticipationRequest(participantId, canvaId);
 		updateParticipantList(response.data);
 	};
 
@@ -39,11 +43,7 @@
 	<div class="w-full flex flex-col items-center gap-2 mx-auto custom-scroll pr-4">
 		<div class="max-h-72 overflow-y-auto flex flex-col w-full px-4 py-8">
 			{#each participants as participant}
-				<ParticipantLine
-					{participant}
-					on:removeParticipant={removeParticipant}
-					on:acceptRequest={acceptRequest}
-				></ParticipantLine>
+				<ParticipantLine {participant} {removeParticipant} {acceptRequest}></ParticipantLine>
 			{/each}
 		</div>
 	</div>

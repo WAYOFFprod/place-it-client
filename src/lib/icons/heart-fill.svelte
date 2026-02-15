@@ -1,10 +1,15 @@
 <script lang="ts">
-	export let dataLiked: boolean = false;
+	interface Props {
+		dataLiked?: boolean;
+		className?: string;
+	}
+
+	let { dataLiked = false, className = '' }: Props = $props();
 </script>
 
 <svg
 	data-liked={dataLiked}
-	class={$$props.class}
+	class={className}
 	width="24"
 	height="24"
 	viewBox="0 0 24 24"

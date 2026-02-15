@@ -3,7 +3,7 @@
 		color: string;
 		selected?: boolean;
 		edit?: boolean;
-		onclick: (event: MouseEvent) => void;
+		onclick?: (event: MouseEvent) => void;
 	}
 
 	let { color, selected = false, edit = false, onclick }: Props = $props();

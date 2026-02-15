@@ -1,16 +1,29 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Panel from '../layout/panel.svelte';
 
-	const dispatch = createEventDispatcher();
-	export let placeholder: string = '';
-	export let label: string | undefined = undefined;
-	export let id: string;
-	export let toggle = false;
-	export let disabled = false;
+	interface Props {
+		placeholder?: string;
+		label?: string;
+		id: string;
+		toggle: boolean;
+		disabled?: boolean;
+		className?: string;
+		classInactive?: string;
+		classActive?: string;
+		change?: (value: boolean) => void;
+	}
 
-	export let classInactive: string = '';
-	export let classActive: string = '';
+	let {
+		placeholder = '',
+		label = undefined,
+		id,
+		toggle = false,
+		disabled = false,
+		className = '',
+		classInactive = '',
+		classActive = '',
+		change = () => {}
+	}: Props = $props();
 
 	let hovered: boolean = false;
 	const mouseEnter = () => {
@@ -23,14 +36,14 @@
 
 	const focus = () => {};
 
-	const change = () => {
-		dispatch('change');
+	const onChange = () => {
+		change(toggle);
 	};
 
-	$: isHovering = hovered;
+	const isHovering = $derived(hovered);
 </script>
 
-<div role="presentation" on:focus={focus} on:mouseover={mouseEnter} on:mouseleave={mouseLeave}>
+<div role="presentation" onfocus={focus} onmouseover={mouseEnter} onmouseleave={mouseLeave}>
 	<Panel isSmall={disabled || isHovering || toggle}>
 		<input
 			class="peer"
@@ -39,12 +52,12 @@
 			type="checkbox"
 			{placeholder}
 			bind:checked={toggle}
-			on:change={change}
+			onchange={onChange}
 			{disabled}
 		/>
 		<label
 			class="py-2 px-2 flex justify-between gap-2 items-center peer-disabled:bg-dark-grey
-			{$$props.class}
+			{className}
       {toggle ? classActive : classInactive}
       {disabled ? 'cursor-not-allowed' : 'cursor-pointer'}"
 			for={id}

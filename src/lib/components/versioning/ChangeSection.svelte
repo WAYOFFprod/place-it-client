@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { VersionChangeEntry } from './types';
 
-	export let versionChanges: VersionChangeEntry;
+	interface Props {
+		versionChanges: VersionChangeEntry;
+	}
+
+	let { versionChanges }: Props = $props();
 </script>
 
 <h2 class="mt-2">{versionChanges[0]}</h2>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Button from '../form/button.svelte';
 	import Participants from './participants.svelte';
 	import Autocomplete from '../form/autocomplete.svelte';
@@ -8,10 +7,15 @@
 	import TextSettings from '../form/textSettings.svelte';
 	import { event } from '$lib/stores/eventStore';
 
-	const dispatch = createEventDispatcher();
 	const networker = Networker.getInstance();
-	export let canvaId: number;
-	export let canvaName: string;
+
+	interface Props {
+		canvaId: number;
+		canvaName: string;
+		close?: () => void;
+	}
+
+	let { canvaId, canvaName, close }: Props = $props();
 
 	let form: HTMLFormElement;
 
@@ -39,21 +43,21 @@
 		networker.inviteToCanva(selectedFriend.friend_id, canvaId);
 	};
 
-	const onSaveName = (event: CustomEvent<SettingOption>) => {
+	const onSaveName = (data: SettingOption) => {
 		const formData = new FormData(form);
-		const value = formData.get(event.detail.field) as string;
+		const value = formData.get(data.field) as string;
 		networker.saveCanvaInputField({
 			id: canvaId,
 			field: 'name',
 			value: value
 		});
 		wasUpdated = true;
-		close();
+		onclose();
 	};
 
-	const close = () => {
+	const onclose = () => {
 		if (wasUpdated) event.set('updateCanvas');
-		dispatch('close');
+		close?.();
 	};
 
 	getData();
@@ -70,7 +74,7 @@
 					label="Nom"
 					value={canvaName}
 					field="name"
-					on:saveField={onSaveName}
+					saveField={onSaveName}
 				></TextSettings>
 			</div>
 			<div>
@@ -79,7 +83,7 @@
 						<h3>Ajouter</h3>
 					</div>
 					<Autocomplete
-						on:selectOption={selectOption}
+						{selectOption}
 						id="friends"
 						options={friendoptions}
 						className="max-h-64 mb-6"
@@ -87,7 +91,7 @@
 					<Button
 						id="see-participant-list"
 						type="button"
-						on:click={() => (isAddingUser = !isAddingUser)}>Voir liste</Button
+						click={() => (isAddingUser = !isAddingUser)}>Voir liste</Button
 					>
 				{:else}
 					<div class="flex">
@@ -95,7 +99,7 @@
 						<h3>Participants</h3>
 					</div>
 					<Participants {canvaId}></Participants>
-					<Button id="add-participant" type="button" on:click={() => (isAddingUser = !isAddingUser)}
+					<Button id="add-participant" type="button" click={() => (isAddingUser = !isAddingUser)}>
 						><img class="icon" src="/svg/plus.svg" alt="" />Ajouter un participant</Button
 					>
 				{/if}

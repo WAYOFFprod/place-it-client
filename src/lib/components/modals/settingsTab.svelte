@@ -1,16 +1,28 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Tooltip from '../form/tooltip.svelte';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		toggleName: string;
+		disabled?: boolean;
+		value: string;
+		selectedValue: string;
+		className?: string;
+		selectValue?: () => void;
+		content?: import('svelte').Snippet;
+	}
 
-	export let toggleName: string;
-	export let disabled = false;
-	export let value: string;
-	export let selectedValue: string;
+	let {
+		toggleName,
+		disabled = false,
+		value,
+		selectedValue,
+		className = '',
+		selectValue,
+		content
+	}: Props = $props();
 
-	const selectValue = () => {
-		dispatch('selectValue');
+	const onSelectValue = () => {
+		selectValue?.();
 	};
 </script>
 
@@ -20,17 +32,17 @@
 		type="radio"
 		name={toggleName}
 		checked={selectedValue == value}
-		on:change={selectValue}
+		onchange={onSelectValue}
 		{value}
 		{disabled}
 	/>
 	<div
-		class="bg-white peer-hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan peer-disabled:text-gray-400 peer-disabled:cursor-not-allowed flex items-center justify-start gap-4 {$$props.class} grow"
+		class="bg-white peer-hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan peer-disabled:text-gray-400 peer-disabled:cursor-not-allowed flex items-center justify-start gap-4 {className} grow"
 	>
-		<slot></slot>
+		{#if content}{@render content()}{/if}
 		<div class="grow flex justify-end md:hidden">
 			<img src="/svg/chevron-right.svg" alt="" class="w-4 h-4" />
 		</div>
 	</div>
-	<Tooltip show={disabled} class="hidden peer-hover:flex">Comming soon</Tooltip>
+	<Tooltip show={disabled} className="hidden peer-hover:flex">Comming soon</Tooltip>
 </label>

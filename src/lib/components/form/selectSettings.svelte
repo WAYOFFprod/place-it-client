@@ -1,29 +1,30 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Select from './select.svelte';
 	import ToggleButton from './toggleButton.svelte';
 	import { settingsInputState } from '$lib/stores/settingsInputState';
 
-	const dispatch = createEventDispatcher<SaveFieldEvent>();
-
-	export let id: string;
-	export let placeholder: string = '';
-	export let value: string;
-	export let field: string;
+	interface Props {
+		id: string;
+		placeholder: string;
+		value?: string;
+		field: string;
+		saveField: (data: SettingOption) => void;
+	}
+	let { id, placeholder = '', value = '', field, saveField }: Props = $props();
 
 	let languages = [
 		{ label: 'Francais', value: 'fr' },
 		{ label: 'Anglais', value: 'en' }
 	];
 
-	let editable = false;
-	let buttonLabel = 'Modifier';
+	let editable = $state(false);
+	let buttonLabel = $state('Modifier');
 
 	const setEditable = async () => {};
 
 	const save = () => {
 		const data = { field: field, value: value } as SettingOption;
-		dispatch('saveField', data);
+		saveField(data);
 	};
 
 	const discard = () => {
@@ -61,7 +62,7 @@
 
 <div class="flex justify-between">
 	<Select
-		class="min-w-36"
+		className="min-w-36"
 		{id}
 		{placeholder}
 		options={languages}

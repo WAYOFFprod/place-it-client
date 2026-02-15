@@ -1,11 +1,14 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Button from '$lib/components/form/button.svelte';
 	import Networker from '$lib/utility/Networker';
 
-	export let userId: number = -1;
-	export let userName: string = '';
-	const dispatch = createEventDispatcher();
+	interface Props {
+		userId?: number;
+		userName?: string;
+		close?: () => void;
+	}
+
+	let { userId = -1, userName = '', close }: Props = $props();
 
 	const networker = Networker.getInstance();
 
@@ -17,8 +20,8 @@
 		const response = await networker.blockUser(userId);
 		console.log(response);
 	};
-	const close = () => {
-		dispatch('close');
+	const onClose = () => {
+		close?.();
 	};
 </script>
 
@@ -37,7 +40,7 @@
 	<Button classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus" disabled={true}
 		><img src="/svg/signal.svg" alt="" />Signaler</Button
 	>
-	<Button classColor="bg-tea-rose hover:bg-tea-rose-focus" on:click={close}
+	<Button classColor="bg-tea-rose hover:bg-tea-rose-focus" on:click={onClose}
 		><img src="/svg/close.svg" alt="" />Annuler</Button
 	>
 </div>

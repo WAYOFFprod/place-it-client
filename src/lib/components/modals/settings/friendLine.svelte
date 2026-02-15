@@ -1,17 +1,20 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { FriendStatus, type Friend, type removeFriendEvent } from '../types';
+	import { FriendStatus, type Friend } from '../types';
 
-	const dispatch = createEventDispatcher<removeFriendEvent>();
+	interface Props {
+		friend: Friend;
+		removeFriend?: (id: number) => void;
+		acceptRequest?: (id: number) => void;
+	}
 
-	export let friend: Friend;
+	let { friend, removeFriend, acceptRequest }: Props = $props();
 
-	const removeFriend = (id: number) => {
-		dispatch('removeFriend', id);
+	const onRemoveFriend = (id: number) => {
+		removeFriend?.(id);
 	};
 
-	const acceptRequest = (id: number) => {
-		dispatch('acceptRequest', id);
+	const onAcceptRequest = (id: number) => {
+		acceptRequest?.(id);
 	};
 </script>
 
@@ -24,7 +27,7 @@
 		{#if friend.is_sender}
 			<button
 				aria-label="accept {friend.name} as friend"
-				on:click={() => acceptRequest(friend.friend_id)}
+				onclick={() => onAcceptRequest(friend.friend_id)}
 			>
 				<img class="h-5" src="/svg/reply.svg" alt="" />
 			</button>
@@ -34,7 +37,7 @@
 	{/if}
 	<button
 		aria-label="remove {friend.name} as friend"
-		on:click={() => removeFriend(friend.friend_id)}
+		onclick={() => onRemoveFriend(friend.friend_id)}
 	>
 		<img class="h-5" src="/svg/trash.svg" alt="" />
 	</button>

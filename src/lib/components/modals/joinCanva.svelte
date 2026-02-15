@@ -1,21 +1,24 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Button from '$lib/components/form/button.svelte';
 	import Networker from '$lib/utility/Networker';
 	import { event } from '$lib/stores/eventStore';
 
-	export let canvaId: number;
-	const dispatch = createEventDispatcher();
+	interface Props {
+		canvaId: number;
+		close?: () => void;
+	}
+
+	let { canvaId, close }: Props = $props();
 
 	const networker = Networker.getInstance();
 
 	const join = async () => {
 		await networker.requestAccess(canvaId);
 		event.set('updateCanvas');
-		close();
+		clickClose();
 	};
-	const close = () => {
-		dispatch('close');
+	const clickClose = () => {
+		close?.();
 	};
 </script>
 
@@ -25,9 +28,9 @@
 		<Button
 			type="button"
 			classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
-			on:click={join}>Envoyer la demande</Button
+			click={join}>Envoyer la demande</Button
 		>
-		<Button type="button" classColor="bg-tea-rose hover:bg-tea-rose-focus" on:click={close}
+		<Button type="button" classColor="bg-tea-rose hover:bg-tea-rose-focus" click={clickClose}
 			>Annuler</Button
 		>
 	</div>

@@ -1,22 +1,26 @@
 <script lang="ts">
 	import { ToolType } from '$lib/stores/toolStore';
-	import { createEventDispatcher } from 'svelte';
-	import type { selectToolEvent } from './types';
-	const dispatch = createEventDispatcher<selectToolEvent>();
+	import type { SelectTool } from './types';
 
-	export let toolType: ToolType;
-	export let selected: boolean = false;
+	interface Props {
+		toolType: ToolType;
+		selected?: boolean;
+		selectTool?: (event: SelectTool) => void;
+	}
 
-	const select = () => {
-		dispatch('selectTool', { tool: toolType });
+	let { toolType, selected = false, selectTool }: Props = $props();
+
+	const select = (e: MouseEvent) => {
+		e.preventDefault();
+		selectTool?.({ tool: toolType } as SelectTool);
 	};
 
-	$: selectedClass = selected ? 'text-fluorescent-cyan' : 'text-black';
+	const selectedClass = $derived(selected ? 'text-fluorescent-cyan' : 'text-black');
 </script>
 
 <button
 	class="w-8 h-8 flex justify-center items-center transition-colors {selectedClass}"
-	on:click|stopPropagation={select}
+	onclick={select}
 >
 	<slot />
 </button>

@@ -2,13 +2,17 @@
 	import TextInput from '$lib/components/form/textInput.svelte';
 	import Networker from '$lib/utility/Networker';
 
-	import { createEventDispatcher } from 'svelte';
 	import Button from '$lib/components/form/button.svelte';
 	import type { Errors } from '../modals/types';
 	import PasswordInput from '../form/passwordInput.svelte';
 
-	const dispatch = createEventDispatcher();
 	let form: HTMLFormElement;
+
+	interface Props {
+		close?: () => void;
+	}
+
+	let { close }: Props = $props();
 
 	let errors: null | Errors;
 
@@ -30,11 +34,11 @@
 		if (response?.status == 422) {
 			errors = response.response.errors;
 		} else if (response?.status) {
-			dispatch('close');
+			close?.();
 		}
 	};
 
-	$: getError = (value: string) => {
+	const getError = (value: string) => {
 		if (errors?.[value]) {
 			return errors[value]?.[0];
 		}
@@ -50,7 +54,7 @@
 		class="flex flex-col gap-4 items-center"
 	>
 		<TextInput
-			class="w-full"
+			className="w-full"
 			id="name"
 			placeholder="Username"
 			label="Username"
@@ -58,7 +62,7 @@
 			error={getError('name')}
 		/>
 		<TextInput
-			class="w-full"
+			className="w-full"
 			id="email"
 			placeholder="Email"
 			label="Email"

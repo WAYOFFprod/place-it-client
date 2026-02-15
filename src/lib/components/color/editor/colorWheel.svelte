@@ -1,15 +1,19 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import Swatch from '../swatch.svelte';
 	import { selectedColor } from '$lib/stores/colorStore';
 	import { hexToRgb, hsv2rgb, rectToRGB, rgbToHex, rgbToHsv } from '../utils/converter';
-	import type { updateColorEvent } from '../types';
-
-	const dispatch = createEventDispatcher<updateColorEvent>();
+	import type { SelectColor } from '../types';
 
 	let canva: HTMLCanvasElement | undefined;
 	let context: CanvasRenderingContext2D | null;
 	let rangeInput: HTMLInputElement | undefined;
+
+	interface Props {
+		updateColor?: (event: SelectColor) => void;
+	}
+
+	let { updateColor }: Props = $props();
 
 	const size = 240;
 
@@ -18,7 +22,7 @@
 		y: 120
 	};
 
-	let pickedColorHex: string = '#E11C1A';
+	let pickedColorHex: string = $state('#E11C1A');
 	let pickedColorRgb = [];
 	let luminosity: number = 1;
 
@@ -83,7 +87,7 @@
 		luminosity = parseFloat(rangeInput.value + '') ?? 1;
 		saveColor();
 		drawPicker();
-		updateColor();
+		onUpdateColor();
 	};
 
 	const saveColor = () => {
@@ -126,7 +130,7 @@
 
 		if (saveColor()) {
 			drawPicker();
-			updateColor();
+			onUpdateColor();
 		}
 	};
 
@@ -150,14 +154,14 @@
 
 		if (saveColor()) {
 			drawPicker();
-			updateColor();
+			onUpdateColor();
 		}
 	};
 
-	const updateColor = () => {
-		dispatch('updateColor', {
+	const onUpdateColor = () => {
+		updateColor?.({
 			color: pickedColorHex
-		});
+		} as SelectColor);
 	};
 
 	const onMouseLeave = (_event: MouseEvent) => {
@@ -175,10 +179,10 @@
 		width={size}
 		height={size}
 		class="rounded-full border-2 border-black"
-		on:mousedown={onMouseDown}
-		on:mousemove={onMouseMove}
-		on:mouseleave={onMouseLeave}
-		on:mouseup={onMouseUp}
+		onmousedown={onMouseDown}
+		onmousemove={onMouseMove}
+		onmouseleave={onMouseLeave}
+		onmouseup={onMouseUp}
 	></canvas>
 	<div class="relative self-stretch flex justify-center items-center w-8">
 		<!-- <Background class="absolute rotate-90 h-36 w-4"></Background> -->
@@ -186,7 +190,7 @@
 			<input
 				class="w-56"
 				bind:this={rangeInput}
-				on:input={changeLuminosity}
+				oninput={changeLuminosity}
 				id="range"
 				type="range"
 				min="0"

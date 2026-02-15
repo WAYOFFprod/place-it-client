@@ -1,21 +1,23 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Panel from '../layout/panel.svelte';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		toggleName: string;
+		disabled?: boolean;
+		value: string;
+		selectedValue: string;
+		selectValue?: () => void;
+	}
 
-	export let toggleName: string;
-	export let disabled = false;
-	export let value: string;
-	export let selectedValue: string;
+	let { toggleName, disabled = false, value, selectedValue, selectValue }: Props = $props();
 
-	const selectValue = () => {
-		dispatch('selectValue');
+	const selectVal = () => {
+		selectValue?.();
 	};
 </script>
 
 <div>
-	<Panel class="w-full">
+	<Panel className="w-full">
 		<label>
 			<input
 				type="radio"
@@ -24,7 +26,7 @@
 				{disabled}
 				{value}
 				checked={selectedValue == value}
-				on:change={selectValue}
+				onchange={selectVal}
 			/>
 			<div
 				class="w-full h-40 md:w-64 md:h-64 flex flex-col gap-2 justify-center items-center peer-hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan hover:cursor-pointer peer-disabled:bg-dark-grey"

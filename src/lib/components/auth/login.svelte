@@ -2,18 +2,23 @@
 	import TextInput from '$lib/components/form/textInput.svelte';
 	import Networker from '$lib/utility/Networker';
 
-	import { createEventDispatcher } from 'svelte';
 	import Button from '$lib/components/form/button.svelte';
 	import type { Errors } from '../modals/types';
 	import PasswordInput from '../form/passwordInput.svelte';
 
-	const dispatch = createEventDispatcher();
 	let form: HTMLFormElement;
 
 	let errors: null | Errors;
 
+	interface Props {
+		close?: () => void;
+	}
+	let { close }: Props = $props();
+
 	const networker = Networker.getInstance();
-	const validate = async () => {
+	const validate = async (e: Event) => {
+		console.log('validate');
+		e.preventDefault();
 		const formData = new FormData(form);
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
@@ -22,15 +27,15 @@
 			email: email,
 			password: password
 		});
-
+		console.log(response);
 		if (response?.status == 422) {
 			errors = response.response.errors;
 		} else if (response?.status) {
-			dispatch('close');
+			close?.();
 		}
 	};
 
-	$: getError = (value: string) => {
+	const getError = (value: string) => {
 		if (errors?.[value]) {
 			return errors[value]?.[0];
 		}
@@ -40,14 +45,10 @@
 
 <div class="p-4 flex flex-col gap-4 items-center">
 	<h2 class="text-xl uppercase">Se Connecter</h2>
-	<form
-		bind:this={form}
-		on:submit|preventDefault={validate}
-		class="flex flex-col gap-4 items-center"
-	>
+	<form bind:this={form} onsubmit={validate} class="flex flex-col gap-4 items-center">
 		<TextInput
 			id="email"
-			class="w-full"
+			className="w-full"
 			placeholder="Email"
 			label="Email"
 			type="email"
@@ -59,6 +60,6 @@
 			label="Password"
 			error={getError('password')}
 		/>
-		<Button class="mt-4" type="submit" stretch={false} on:click={validate}>Login</Button>
+		<Button className="mt-4" type="submit" stretch={false} click={validate}>Login</Button>
 	</form>
 </div>

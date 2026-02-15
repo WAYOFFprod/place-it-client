@@ -1,16 +1,32 @@
 <script lang="ts">
 	import { mdBreak } from '$lib/stores/tailwindStore';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
-	export let placeholder: string = '';
-	export let label: string = '';
-	export let type: string = 'text';
-	export let id: string;
-	export let error: string | null = null;
-	export let liveUpdate: boolean = false;
-	export let val = '';
+	interface Props {
+		placeholder?: string;
+		label?: string;
+		type?: string;
+		id: string;
+		error?: string | null;
+		liveUpdate?: boolean;
+		val?: string;
+		className?: string;
+		onChange?: (value: string) => void;
+	}
 
-	let inputSize: number | undefined = 10;
+	let {
+		placeholder = '',
+		label = '',
+		type = 'text',
+		id,
+		error = null,
+		liveUpdate = false,
+		val = '',
+		className = '',
+		onChange = () => {}
+	}: Props = $props();
+
+	let inputSize: number | undefined = $state(10);
 	let md: number | undefined;
 
 	mdBreak.subscribe((val) => {
@@ -19,8 +35,6 @@
 		inputSize = window.innerWidth >= md ? 20 : 10;
 	});
 
-	const dispatch = createEventDispatcher<updateSearchEvent>();
-
 	let onCooldown = false;
 	let changedSinceCooldown = false;
 	const cooldown = () => {
@@ -28,13 +42,13 @@
 		setTimeout(() => {
 			onCooldown = false;
 			if (changedSinceCooldown) {
-				dispatch('onChange', val);
+				onChange(val);
 				cooldown();
 				changedSinceCooldown = false;
 			}
 		}, 1000);
 	};
-	const onChange = (event: Event) => {
+	const change = (event: Event) => {
 		const target = event.target as HTMLInputElement;
 		if (target.value == '' || (target.value.length > 2 && !onCooldown)) {
 			changedSinceCooldown = true;
@@ -55,7 +69,7 @@
 	});
 </script>
 
-<div class={$$props.class}>
+<div class={className}>
 	{#if label}
 		<label class="block mb-3" for={id}>{label}</label>
 	{/if}
@@ -71,7 +85,7 @@
 				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 {$$slots.default
 					? 'pr-8'
 					: ''}"
-				on:input={onChange}
+				oninput={change}
 				bind:value={val}
 			/>
 		{:else}

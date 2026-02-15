@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import type { FormEventHandler } from 'svelte/elements';
 
 	interface Props {
@@ -10,6 +9,7 @@
 		val?: string;
 		options: Option[];
 		className: string;
+		selectOption: (option: any) => void;
 	}
 
 	let {
@@ -19,10 +19,9 @@
 		error = null,
 		val = '',
 		options = [],
-		className = ''
+		className = '',
+		selectOption
 	}: Props = $props();
-
-	const dispatch = createEventDispatcher();
 
 	let isFocus = false;
 	let onCooldown = false;
@@ -47,7 +46,7 @@
 		}
 	};
 
-	const selectOption = (option: any) => {
+	const onSelectOption = (option: any) => {
 		selectedOption = option;
 		if (selectedOption != undefined) {
 			const newValue = options.find((x) => x.key == option);
@@ -56,7 +55,7 @@
 			}
 		}
 		isFocus = false;
-		dispatch('selectOption', option);
+		selectOption(option);
 	};
 
 	function clickOutside(element: HTMLElement, callbackFunction: () => void) {
@@ -98,8 +97,8 @@
 			type="text"
 			{placeholder}
 			class="p-2 w-full pr-8 pb-1 min-w-5 bg-transparent"
-			on:input={onChange}
-			on:focus={() => (isFocus = true)}
+			oninput={onChange}
+			onfocus={() => (isFocus = true)}
 			bind:value={val}
 			role="combobox"
 			aria-controls="listbox"
@@ -117,7 +116,7 @@
 						id={'option-' + option.key}
 						type="button"
 						class="m-2"
-						on:click={() => selectOption(option.key)}
+						onclick={() => onSelectOption(option.key)}
 						role="option"
 						aria-selected={false}
 					>

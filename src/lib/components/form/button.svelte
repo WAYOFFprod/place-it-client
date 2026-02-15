@@ -1,9 +1,5 @@
 <script lang="ts">
-	// import type { MouseEventHandler } from 'svelte/elements';
 	import Panel from '../layout/panel.svelte';
-	import { createEventDispatcher } from 'svelte';
-
-	const dispatch = createEventDispatcher();
 
 	interface Props {
 		id?: string;
@@ -13,6 +9,7 @@
 		disabled?: boolean;
 		classColor?: string;
 		className?: string;
+		click?: (e: MouseEvent) => void;
 	}
 
 	let {
@@ -22,7 +19,8 @@
 		link = '',
 		disabled = false,
 		classColor = 'bg-naples-yellow hover:bg-naples-yellow-focus',
-		className = ''
+		className = '',
+		click
 	}: Props = $props();
 
 	let hovered: boolean = false;
@@ -36,9 +34,9 @@
 
 	const focus = () => {};
 
-	const click = (e: any) => {
+	const onclick = (e: MouseEvent) => {
 		e.preventDefault();
-		dispatch('click');
+		click?.(e);
 	};
 
 	let isHovering = $derived(disabled ? false : hovered);
@@ -51,7 +49,7 @@
 	onmouseover={mouseEnter}
 	onmouseleave={mouseLeave}
 >
-	<Panel isSmall={isHovering} class={stretch ? 'w-full' : ''}>
+	<Panel isSmall={isHovering} className={stretch ? 'w-full' : ''}>
 		{#if type == 'link'}
 			<a
 				class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl {classColor} {stretch
@@ -64,7 +62,7 @@
 		{:else}
 			<button
 				id={id ? 'button-' + id : undefined}
-				onclick={click}
+				{onclick}
 				{type}
 				{disabled}
 				class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl disabled:bg-dark-grey disabled:cursor-not-allowed {classColor} {stretch

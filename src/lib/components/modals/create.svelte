@@ -9,22 +9,26 @@
 	import CanvaTypeToggle from './canvaTypeToggle.svelte';
 	import Networker from '$lib/utility/Networker';
 
-	import { createEventDispatcher } from 'svelte';
 	import { event } from '$lib/stores/eventStore';
 	import type { Errors } from './types';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		close?: () => void;
+	}
+
+	let { close }: Props = $props();
+
 	let form: HTMLFormElement;
 	let presetForm: HTMLFormElement;
 	let errors: null | Errors;
-	let customPalette = true;
-	let isCommunity = false;
+	let customPalette = $state(true);
+	let isCommunity = $state(false);
 
 	// default values
-	let selectedPreset: string = 'small';
-	let width: number = 64;
-	let height: number = 64;
-	let customSize: boolean = false;
+	let selectedPreset: string = $state('small');
+	let width: number = $state(64);
+	let height: number = $state(64);
+	let customSize: boolean = $state(false);
 
 	const gameTypeOptions = [
 		{
@@ -90,7 +94,7 @@
 			errors = canva.response.errors as Errors;
 		}
 		if (canva?.status == 201) {
-			dispatch('close');
+			close?.();
 			event.set('updateCanvas');
 		}
 	};
@@ -121,7 +125,7 @@
 		isCommunity = !isCommunity;
 	};
 
-	$: getError = (value: string) => {
+	const getError = (value: string) => {
 		if (errors?.[value]) {
 			return errors[value]?.[0];
 		}
@@ -197,7 +201,7 @@
 					<span class="text-red-500 text-sm">{getError('width')}</span>
 				{/if}
 			</div>
-			<ToggleInput id="community" label="Community" on:change={toggleCommunity} />
+			<ToggleInput id="community" label="Community" change={toggleCommunity} />
 			{#if isCommunity}
 				<Accordion>
 					<div slot="heading">Options Avancée</div>
@@ -207,7 +211,7 @@
 							id="limitedPalette"
 							label="Palette limitée"
 							toggle={customPalette}
-							on:change={() => (customPalette = !customPalette)}
+							change={() => (customPalette = !customPalette)}
 						/>
 						<Select
 							id="gameType"
@@ -221,7 +225,7 @@
 				</Accordion>
 			{/if}
 			<div class="grow justify-self-stretch flex items-end">
-				<Button type="submit" class="" on:click={validate}>
+				<Button type="submit" on:click={validate}>
 					<img src="/svg/canva-plus.svg" alt="" />
 					<span>Créer</span>
 				</Button>

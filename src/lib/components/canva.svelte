@@ -22,10 +22,9 @@
 		marginBottom: number;
 	}
 
-	// export let canva: CanvaPreviewData;
-	// export let viewOnly: boolean = true;
-	// export let marginBottom: number = 0;
 	let { canva, viewOnly = true, marginBottom = 0 }: Props = $props();
+
+	let cursor = $state('');
 
 	let id = 'canvas-container';
 	let width = 32;
@@ -34,15 +33,15 @@
 	let container: HTMLElement;
 	let paletteColors: string[] = $state([]);
 
-	let p5: P5;
-	let controlManager: ControlManager | undefined;
-	let gridManager: GridManager;
+	let p5: P5 | undefined = $state(undefined);
+	let controlManager: ControlManager | undefined = $state(undefined);
+	let gridManager: GridManager | undefined = $state(undefined);
 
 	const networker = Networker.getInstance();
 
 	const zoomSensitivity = 0.1;
 
-	let currentToolType: typeof Tool = Tool;
+	let currentToolType: typeof Tool = $state(Tool);
 	let currentTool: Tool | undefined;
 	let cursorUnsub: () => void;
 	let wheelHandler: (e: WheelEvent) => void;
@@ -80,6 +79,10 @@
 	};
 
 	const connect = async (canvasData: CanvaData) => {
+		if (gridManager == undefined) {
+			console.error('GridManager is not initialized');
+			return;
+		}
 		networker.connectToSocket(gridManager);
 
 		const pixels = networker.tempPoints as { [key: string]: string };
@@ -229,7 +232,6 @@
 	// 	if (currentTool == undefined) return '';
 	// 	return 'cursor-' + currentTool.getCursor();
 	// };
-	let cursor = $state('');
 </script>
 
 <Modal></Modal>

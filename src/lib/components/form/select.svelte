@@ -1,12 +1,27 @@
 <script lang="ts">
-	export let id: string;
-	export let label: string = '';
-	export let placeholder: string;
-	export let options: options[];
-	export let isOpen: boolean = false;
-	export let disabled: boolean = false;
-	export let selectedOption: string | null = null;
-	export let error: string | null = null;
+	interface Props {
+		id: string;
+		label?: string;
+		placeholder: string;
+		options: options[];
+		isOpen?: boolean;
+		disabled?: boolean;
+		selectedOption?: string | null;
+		className?: string;
+		error?: string | null;
+	}
+
+	let {
+		id,
+		label = '',
+		placeholder,
+		options = [],
+		isOpen = false,
+		disabled = false,
+		selectedOption = null,
+		className = '',
+		error = null
+	}: Props = $props();
 
 	const toggle = () => {
 		isOpen = !isOpen;
@@ -19,10 +34,12 @@
 		// selected = event.target.value;
 	};
 
-	$: title = selectedOption ? options.find((x) => x.value == selectedOption)?.label : placeholder;
+	const title = $derived(
+		selectedOption ? options.find((x) => x.value == selectedOption)?.label : placeholder
+	);
 </script>
 
-<div class="relative h-11 {$$props.class} z-20">
+<div class="relative h-11 {className} z-20">
 	{#if label != ''}
 		<span>{label}</span>
 	{/if}
