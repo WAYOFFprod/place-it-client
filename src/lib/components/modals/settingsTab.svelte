@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { type Snippet } from 'svelte';
 	import Tooltip from '../form/tooltip.svelte';
 
 	interface Props {
@@ -8,7 +9,7 @@
 		selectedValue: string;
 		className?: string;
 		selectValue?: () => void;
-		content?: import('svelte').Snippet;
+		content?: Snippet;
 	}
 
 	let {

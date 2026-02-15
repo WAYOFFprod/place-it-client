@@ -53,7 +53,7 @@
 				id="friend_request"
 				label="Nouvelle demande d’ami"
 				toggle={friendRequest}
-				on:change={() => {
+				change={() => {
 					friendRequest = !friendRequest;
 					onUpdateField('friend_request');
 				}}
@@ -62,7 +62,7 @@
 				id="accepted_friend_request"
 				label="Demande d’ami acceptée"
 				toggle={acceptedFriendRequest}
-				on:change={() => {
+				change={() => {
 					acceptedFriendRequest = !acceptedFriendRequest;
 					onUpdateField('accepted_friend_request');
 				}}
@@ -71,7 +71,7 @@
 				id="canva_request"
 				label="Demande pour rejoindre mon canva"
 				toggle={canvaRequest}
-				on:change={() => {
+				change={() => {
 					canvaRequest = !canvaRequest;
 					onUpdateField('canva_request');
 				}}
@@ -80,7 +80,7 @@
 				id="accepted_canva_request"
 				label="Demande pour rejoindre un canva acceptée"
 				toggle={acceptedCanvaRequest}
-				on:change={() => {
+				change={() => {
 					acceptedCanvaRequest = !acceptedCanvaRequest;
 					onUpdateField('accepted_canva_request');
 				}}

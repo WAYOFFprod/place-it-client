@@ -17,7 +17,8 @@
 	let errors: null | Errors;
 
 	const networker = Networker.getInstance();
-	const validate = async () => {
+	const validate = async (e: Event) => {
+		e.preventDefault();
 		const formData = new FormData(form);
 		const email = formData.get('email') as string;
 		const name = formData.get('name') as string;
@@ -48,11 +49,7 @@
 
 <div class="p-4 flex flex-col gap-4 items-center">
 	<h2 class="text-xl uppercase">Créer un compte</h2>
-	<form
-		bind:this={form}
-		on:submit|preventDefault={validate}
-		class="flex flex-col gap-4 items-center"
-	>
+	<form bind:this={form} onsubmit={validate} class="flex flex-col gap-4 items-center">
 		<TextInput
 			className="w-full"
 			id="name"
@@ -73,16 +70,16 @@
 			id="password"
 			placeholder="Password"
 			label="Password"
-			type="password"
 			error={getError('password')}
 		/>
 		<PasswordInput
 			id="password_confirmation"
 			placeholder="Password confirmation"
 			label="Password Confirmation"
-			type="password"
 			error={getError('password_confirmation')}
 		/>
-		<Button class="mt-4" type="submit" stretch={false} on:click={validate}>S'enregister</Button>
+		<Button className="mt-4" type="submit" stretch={false} click={validate}
+			>{#snippet content()}S'enregister{/snippet}</Button
+		>
 	</form>
 </div>

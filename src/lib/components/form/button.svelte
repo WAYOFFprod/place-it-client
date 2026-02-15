@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import Panel from '../layout/panel.svelte';
 
 	interface Props {
@@ -10,6 +11,7 @@
 		classColor?: string;
 		className?: string;
 		click?: (e: MouseEvent) => void;
+		content: Snippet;
 	}
 
 	let {
@@ -20,7 +22,8 @@
 		disabled = false,
 		classColor = 'bg-naples-yellow hover:bg-naples-yellow-focus',
 		className = '',
-		click
+		click,
+		content
 	}: Props = $props();
 
 	let hovered: boolean = false;
@@ -57,7 +60,7 @@
 					: ''}"
 				href={link}
 			>
-				<slot></slot>
+				{@render content()}
 			</a>
 		{:else}
 			<button
@@ -69,7 +72,7 @@
 					? 'w-full'
 					: ''}"
 			>
-				<slot></slot>
+				{@render content()}
 			</button>
 		{/if}
 	</Panel>

@@ -77,9 +77,11 @@
 			value={nameValue}
 			class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 min-w-5 disabled:border-transparent"
 		/>
-		<Button id="edit-username" on:click={() => (nameEditable ? saveName() : makeEditable())}
-			>Modifier</Button
-		>
+		<Button id="edit-username" click={() => (nameEditable ? saveName() : makeEditable())}>
+			{#snippet content()}
+				Modifier
+			{/snippet}
+		</Button>
 	</div>
 	<div class="py-8 w-full">
 		<div class="flex flex-col gap-4">
@@ -128,8 +130,12 @@
 					classColor="bg-bittersweet-red hover:bittersweet-red-focus"
 					type="button"
 					stretch={false}
-					click={logout}>Logout</Button
+					click={logout}
 				>
+					{#snippet content()}
+						Logout
+					{/snippet}
+				</Button>
 			</div>
 		</div>
 	</div>

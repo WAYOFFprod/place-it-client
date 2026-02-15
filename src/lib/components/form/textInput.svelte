@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { mdBreak } from '$lib/stores/tailwindStore';
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 
 	interface Props {
 		placeholder?: string;
@@ -9,11 +9,12 @@
 		id: string;
 		error?: string | null;
 		liveUpdate?: boolean;
-		val?: string;
+		value?: string;
 		className?: string;
 		onChange?: (value: string) => void;
+		startIcon?: Snippet;
+		rightIcon?: Snippet;
 	}
-
 	let {
 		placeholder = '',
 		label = '',
@@ -21,9 +22,11 @@
 		id,
 		error = null,
 		liveUpdate = false,
-		val = '',
+		value = '',
 		className = '',
-		onChange = () => {}
+		onChange = () => {},
+		rightIcon,
+		startIcon
 	}: Props = $props();
 
 	let inputSize: number | undefined = $state(10);
@@ -42,7 +45,7 @@
 		setTimeout(() => {
 			onCooldown = false;
 			if (changedSinceCooldown) {
-				onChange(val);
+				onChange(value);
 				cooldown();
 				changedSinceCooldown = false;
 			}
@@ -74,7 +77,7 @@
 		<label class="block mb-3" for={id}>{label}</label>
 	{/if}
 	<div class="relative w-full flex gap-2">
-		<slot name="startIcon" />
+		{#if startIcon}{@render startIcon()}{/if}
 		{#if liveUpdate}
 			<input
 				{id}
@@ -82,11 +85,9 @@
 				name={id}
 				type="text"
 				{placeholder}
-				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 {$$slots.default
-					? 'pr-8'
-					: ''}"
+				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 pr-8"
 				oninput={change}
-				bind:value={val}
+				bind:value
 			/>
 		{:else}
 			<input
@@ -95,13 +96,11 @@
 				name={id}
 				{type}
 				{placeholder}
-				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 {$$slots.default
-					? 'pr-8'
-					: ''}"
+				class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 pr-8"
 			/>
 		{/if}
 		<div class="absolute w-5 right-0 bottom-2">
-			<slot />
+			{#if rightIcon}{@render rightIcon()}{/if}
 		</div>
 	</div>
 	{#if error}

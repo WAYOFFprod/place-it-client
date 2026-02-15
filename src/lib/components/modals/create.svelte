@@ -50,7 +50,8 @@
 		value: 'free'
 	};
 
-	const validate = async () => {
+	const validate = async (e: Event) => {
+		e.preventDefault();
 		const formData = new FormData(form);
 		const formWidth = formData.get('width') as string;
 		const formHeight = formData.get('height') as string;
@@ -185,10 +186,12 @@
 			</form>
 		</div>
 		<!-- sidebar: canvas settings -->
-		<form bind:this={form} class="w-64 p-6 flex flex-col gap-4" on:submit|preventDefault={validate}>
-			<TextInput id="name" label="Nom" error={getError('name')}
-				><img src="/svg/edit.svg" alt="" /></TextInput
-			>
+		<form bind:this={form} class="w-64 p-6 flex flex-col gap-4" onsubmit={validate}>
+			<TextInput id="name" label="Nom" error={getError('name')}>
+				{#snippet rightIcon()}
+					<img src="/svg/edit.svg" alt="" />
+				{/snippet}
+			</TextInput>
 			<div>
 				<label class="block mb-3" for="width">Dimensions</label>
 				<div class="flex flex-row gap-2">
@@ -225,7 +228,7 @@
 				</Accordion>
 			{/if}
 			<div class="grow justify-self-stretch flex items-end">
-				<Button type="submit" on:click={validate}>
+				<Button type="submit" click={validate}>
 					<img src="/svg/canva-plus.svg" alt="" />
 					<span>Créer</span>
 				</Button>

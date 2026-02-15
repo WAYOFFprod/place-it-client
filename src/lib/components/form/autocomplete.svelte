@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { FormEventHandler } from 'svelte/elements';
 
 	interface Props {
@@ -10,6 +11,8 @@
 		options: Option[];
 		className: string;
 		selectOption: (option: any) => void;
+		startIcon?: Snippet;
+		rightIcon?: Snippet;
 	}
 
 	let {
@@ -20,14 +23,16 @@
 		val = '',
 		options = [],
 		className = '',
-		selectOption
+		selectOption,
+		startIcon,
+		rightIcon
 	}: Props = $props();
 
-	let isFocus = false;
-	let onCooldown = false;
-	let changedSinceCooldown = false;
+	let isFocus = $state(false);
+	let onCooldown = $state(false);
+	let changedSinceCooldown = $state(false);
 	let selectedOption: number | undefined;
-	let filteredOptions: Option[] = [];
+	let filteredOptions: Option[] = $state([]);
 	const cooldown = () => {
 		onCooldown = true;
 		setTimeout(() => {
@@ -90,7 +95,7 @@
 			isFocus = false;
 		}}
 	>
-		<slot name="startIcon" />
+		{#if startIcon}{@render startIcon()}{/if}
 		<input
 			{id}
 			name={id}
@@ -106,7 +111,9 @@
 			aria-expanded={false}
 		/>
 		<div class="absolute w-5 right-0 bottom-2">
-			<slot />
+			{#if rightIcon}
+				{@render rightIcon()}
+			{/if}
 		</div>
 		<!-- predictions -->
 		{#if isFocus}

@@ -27,7 +27,8 @@
 			type="button"
 			stretch={false}
 			click={switchTab}
-			classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Créer un compte</Button
+			classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
+			>{#snippet content()}Créer un compte{/snippet}</Button
 		>
 	{:else if tab == 'register'}
 		<Register close={onClose} />
@@ -35,7 +36,8 @@
 			type="button"
 			stretch={false}
 			click={switchTab}
-			classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Se connecter</Button
+			classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
+			>{#snippet content()}Se connecter{/snippet}</Button
 		>
 	{/if}
 </div>

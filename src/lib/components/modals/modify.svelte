@@ -21,8 +21,8 @@
 
 	let wasUpdated: boolean = false;
 
-	let isAddingUser: boolean = false;
-	let friendoptions: Option[] = [];
+	let isAddingUser: boolean = $state(false);
+	let friendoptions: Option[] = $state([]);
 	let friends: Friend[];
 	const getData = async () => {
 		const response = await networker.getFriends();
@@ -91,7 +91,8 @@
 					<Button
 						id="see-participant-list"
 						type="button"
-						click={() => (isAddingUser = !isAddingUser)}>Voir liste</Button
+						click={() => (isAddingUser = !isAddingUser)}
+						>{#snippet content()}Voir liste{/snippet}</Button
 					>
 				{:else}
 					<div class="flex">
@@ -100,18 +101,24 @@
 					</div>
 					<Participants {canvaId}></Participants>
 					<Button id="add-participant" type="button" click={() => (isAddingUser = !isAddingUser)}>
-						><img class="icon" src="/svg/plus.svg" alt="" />Ajouter un participant</Button
-					>
+						{#snippet content()}
+							<img class="icon" src="/svg/plus.svg" alt="" />Ajouter un participant
+						{/snippet}
+					</Button>
 				{/if}
 			</div>
 		</div>
 		<div class="flex flex-col gap-4 w-64">
-			<Button type="button" classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
-				><img src="/svg/save.svg" alt="" />Sauvegarder</Button
-			>
-			<Button type="button" classColor="bg-tea-rose hover:bg-tea-rose-focus"
-				><img src="/svg/close.svg" alt="" />Annuler</Button
-			>
+			<Button type="button" classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">
+				{#snippet content()}
+					<img src="/svg/save.svg" alt="" />Sauvegarder
+				{/snippet}
+			</Button>
+			<Button type="button" classColor="bg-tea-rose hover:bg-tea-rose-focus">
+				{#snippet content()}
+					<img src="/svg/close.svg" alt="" />Annuler
+				{/snippet}
+			</Button>
 		</div>
 	</div>
 </form>

@@ -7,9 +7,9 @@
 	import { event } from '$lib/stores/eventStore';
 	import { openedModal } from '$lib/stores/modalStore';
 	import { authStatus } from '$lib/stores/authStore';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, type Snippet } from 'svelte';
 
-	let { canva }: { canva: CanvaPreviewData } = $props();
+	let { canva, icon }: { canva: CanvaPreviewData; icon?: Snippet } = $props();
 
 	let conenctionStatus: undefined | boolean = $state(undefined);
 	const networker = Networker.getInstance();
@@ -94,13 +94,13 @@
 			<!-- Top section -->
 			<div class="flex justify-between p-4 z-20">
 				<button>
-					<slot name="icon">
-						{#if canva.access == 'open'}
-							<img class="text-black" src="/svg/earth.svg" alt="community icon" />
-						{:else if canva.access == 'request_only'}
-							<img class="text-black" src="/svg/users.svg" alt="community icon" />
-						{/if}
-					</slot>
+					{#if icon}
+						{@render icon()}
+					{:else if canva.access == 'open'}
+						<img class="text-black" src="/svg/earth.svg" alt="community icon" />
+					{:else if canva.access == 'request_only'}
+						<img class="text-black" src="/svg/users.svg" alt="community icon" />
+					{/if}
 				</button>
 				<button class="group/favorit relative" onclick={toggleLike}>
 					<Heart class="text-black absolute"></Heart>
@@ -130,7 +130,9 @@
 							<Button
 								type="link"
 								link="/canva?id={canva.id}"
-								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Jouer</Button
+								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
+							>
+								{#snippet content()}Jouer{/snippet}</Button
 							>
 						{:else if canva.participationStatus == 'sent'}
 							<Button
@@ -138,13 +140,14 @@
 								disabled={true}
 								link="/canva?id={canva.id}"
 								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus disabled:bg-white"
-								>Demande Envoyée</Button
+								>{#snippet content()}Demande Envoyée{/snippet}</Button
 							>
 						{:else if canva.participationStatus == null}
 							<Button
 								type="button"
-								on:click={onRequest}
-								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus">Rejoindre</Button
+								click={onRequest}
+								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
+								>{#snippet content()}Rejoindre{/snippet}</Button
 							>
 						{/if}
 					{/if}
@@ -152,20 +155,23 @@
 						<Button
 							type="link"
 							link="/canva/view?id={canva.id}"
-							classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Regarder</Button
+							classColor="bg-naples-yellow hover:bg-naples-yellow-focus"
+							>{#snippet content()}Regarder{/snippet}</Button
 						>
 					{/if}
 					{#if canva.owned}
 						<Button
 							id="modify"
 							type="button"
-							on:click={onEdit}
-							classColor="bg-naples-yellow hover:bg-naples-yellow-focus">Modifier</Button
+							click={onEdit}
+							classColor="bg-naples-yellow hover:bg-naples-yellow-focus"
+							>{#snippet content()}Modifier{/snippet}</Button
 						>
 						<Button
 							type="button"
-							on:click={onDelete}
-							classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus">Supprimer</Button
+							click={onDelete}
+							classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus"
+							>{#snippet content()}Supprimer{/snippet}</Button
 						>
 					{/if}
 				</div>

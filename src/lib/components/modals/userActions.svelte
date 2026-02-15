@@ -29,18 +29,34 @@
 	<div class="flex justify-center items-center gap-2 mb-2">
 		<img src="/svg/user.svg" alt="" />{userName}
 	</div>
-	<Button classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus" disabled={true}
-		><img src="/svg/cursor.svg" alt="" /> Suivre le curseur</Button
-	>
-	<Button on:click={addAsFriend}><img src="/svg/plus.svg" alt="" />Ajouter en ami</Button>
-	<Button disabled={true}><img src="/svg/plus.svg" alt="" />Ajouter sur Discord</Button>
-	<Button on:click={block} classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus"
-		><img src="/svg/block.svg" alt="" />Bloquer</Button
-	>
-	<Button classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus" disabled={true}
-		><img src="/svg/signal.svg" alt="" />Signaler</Button
-	>
-	<Button classColor="bg-tea-rose hover:bg-tea-rose-focus" on:click={onClose}
-		><img src="/svg/close.svg" alt="" />Annuler</Button
-	>
+	<Button classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus" disabled={true}>
+		{#snippet content()}
+			<img src="/svg/cursor.svg" alt="" />Suivre le curseur
+		{/snippet}
+	</Button>
+	<Button click={addAsFriend}
+		>{#snippet content()}
+			<img src="/svg/plus.svg" alt="" />Ajouter en ami
+		{/snippet}
+	</Button>
+	<Button disabled={true}
+		>{#snippet content()}
+			<img src="/svg/plus.svg" alt="" />Ajouter sur Discord
+		{/snippet}
+	</Button>
+	<Button click={block} classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus">
+		{#snippet content()}
+			<img src="/svg/block.svg" alt="" />Bloquer
+		{/snippet}
+	</Button>
+	<Button classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus" disabled={true}>
+		{#snippet content()}
+			<img src="/svg/signal.svg" alt="" />Signaler
+		{/snippet}
+	</Button>
+	<Button classColor="bg-tea-rose hover:bg-tea-rose-focus" click={onClose}>
+		{#snippet content()}
+			<img src="/svg/close.svg" alt="" />Annuler
+		{/snippet}
+	</Button>
 </div>
