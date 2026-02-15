@@ -1,17 +1,19 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { type Participant, type removeParticipantEvent } from './types';
+	import { type Participant } from './types';
+	interface Props {
+		participant: Participant;
+		removeParticipant?: (id: number) => void;
+		acceptRequest?: (id: number) => void;
+	}
 
-	const dispatch = createEventDispatcher<removeParticipantEvent>();
+	let { participant, removeParticipant, acceptRequest }: Props = $props();
 
-	export let participant: Participant;
-
-	const removeParticipant = (id: number) => {
-		dispatch('removeParticipant', id);
+	const onRemoveParticipant = (id: number) => {
+		removeParticipant?.(id);
 	};
 
-	const acceptRequest = (id: number) => {
-		dispatch('acceptRequest', id);
+	const onAcceptRequest = (id: number) => {
+		acceptRequest?.(id);
 	};
 </script>
 
@@ -20,7 +22,7 @@
 	{#if participant.status != 'accepted' && participant.status != 'invited'}
 		<button
 			aria-label="accept {participant.name} as friend"
-			on:click={() => acceptRequest(participant.id)}
+			onclick={() => onAcceptRequest(participant.id)}
 		>
 			<img class="h-5" src="/svg/reply.svg" alt="" />
 		</button>
@@ -31,7 +33,7 @@
 	{#if participant.status != 'rejected'}
 		<button
 			aria-label="remove {participant.name} as friend"
-			on:click={() => removeParticipant(participant.id)}
+			onclick={() => onRemoveParticipant(participant.id)}
 		>
 			<img class="h-5" src="/svg/trash.svg" alt="" />
 		</button>

@@ -1,18 +1,33 @@
 <script lang="ts">
-	export let placeholder: string = '';
-	export let label: string = '';
-	export let id: string;
-	export let error: string | null = null;
+	import type { Snippet } from 'svelte';
 
-	let passwordShow = false;
+	interface Props {
+		placeholder?: string;
+		label?: string;
+		id: string;
+		error?: string | null;
+		className?: string;
+		startIcon?: Snippet;
+	}
+
+	let {
+		placeholder = '',
+		label = '',
+		id,
+		error = null,
+		className = '',
+		startIcon
+	}: Props = $props();
+
+	let passwordShow = $state(false);
 </script>
 
-<div class={$$props.class}>
+<div class={className}>
 	{#if label}
 		<label class="block mb-3" for={id}>{label}</label>
 	{/if}
 	<div class="relative flex gap-2 w-fit">
-		<slot name="startIcon" />
+		{#if startIcon}{@render startIcon()}{/if}
 		<input
 			{id}
 			name={id}
@@ -23,7 +38,7 @@
 		<button
 			aria-label="Toggle {label} visibility"
 			type="button"
-			on:click={() => (passwordShow = !passwordShow)}
+			onclick={() => (passwordShow = !passwordShow)}
 			aria-pressed={passwordShow}><img src="/svg/eye.svg" alt="" /></button
 		>
 	</div>

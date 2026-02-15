@@ -14,9 +14,11 @@
 </script>
 
 <Panel>
-	<div class="p-2">
-		{#if zoomLevel}
-			{zoomLevel.toFixed(0)} %
-		{/if}
-	</div>
+	{#snippet content()}
+		<div class="p-2">
+			{#if zoomLevel}
+				{zoomLevel.toFixed(0)} %
+			{/if}
+		</div>
+	{/snippet}
 </Panel>

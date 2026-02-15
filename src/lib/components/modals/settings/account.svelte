@@ -5,20 +5,23 @@
 	import ToggleInput from '$lib/components/form/toggleInput.svelte';
 	import { userStore } from '$lib/stores/authStore';
 	import Networker from '$lib/utility/Networker';
-	import { createEventDispatcher, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
+	interface Props {
+		close?: () => void;
+	}
+
+	let { close }: Props = $props();
 
 	let form: HTMLFormElement;
 
-	let user: User;
+	let user: User | undefined = $state(undefined);
 
-	let darkmode = false;
+	let darkmode = $state(false);
 
-	let nameValue: string = '';
-	let nameEditable: boolean = false;
+	let nameValue: string = $state('');
+	let nameEditable: boolean = $state(false);
 
 	const networker: Networker = Networker.getInstance();
-
-	const dispatch = createEventDispatcher();
 
 	const unsubscribeUser = userStore.subscribe((newUser) => {
 		if (newUser == undefined) return;
@@ -26,12 +29,12 @@
 		nameValue = user.name;
 	});
 
-	const onSaveField = (event: CustomEvent<SettingOption>) => {
+	const onSaveField = (options: SettingOption) => {
 		const formData = new FormData(form);
-		const value = formData.get(event.detail.field) as string;
-		if (event.detail.value != value) {
+		const value = formData.get(options.field) as string;
+		if (options.value != value) {
 			networker.saveUserField({
-				field: event.detail.field,
+				field: options.field,
 				value: value
 			});
 		}
@@ -54,7 +57,7 @@
 	const logout = async () => {
 		await networker.logout();
 		userStore.set(undefined);
-		dispatch('close');
+		close?.();
 	};
 
 	onDestroy(() => {
@@ -66,7 +69,6 @@
 	<div class="w-40 flex flex-col items-center gap-2 mx-auto">
 		<div class="rounded-full w-36 h-36 border-2 border-black"></div>
 		<input
-
 			id="name"
 			name="name"
 			type="text"
@@ -75,9 +77,11 @@
 			value={nameValue}
 			class="border-b-2 autofill:border-tea-rose border-black bg-transparent focus:border-fluorescent-cyan-focus w-full pb-1 min-w-5 disabled:border-transparent"
 		/>
-		<Button id="edit-username" on:click={() => (nameEditable ? saveName() : makeEditable())}
-			>Modifier</Button
-		>
+		<Button id="edit-username" click={() => (nameEditable ? saveName() : makeEditable())}>
+			{#snippet content()}
+				Modifier
+			{/snippet}
+		</Button>
 	</div>
 	<div class="py-8 w-full">
 		<div class="flex flex-col gap-4">
@@ -85,16 +89,16 @@
 				id="darkmode"
 				label="Dark Mode"
 				toggle={darkmode}
-				on:change={() => (darkmode = !darkmode)}
+				change={() => (darkmode = !darkmode)}
 				disabled={true}
 			/>
 			<TextSettings
 				type="text"
 				id="email"
 				label="Email"
-				value={user.email}
+				value={user?.email}
 				field="email"
-				on:saveField={onSaveField}
+				saveField={onSaveField}
 				disabled={true}
 			></TextSettings>
 			<TextSettings
@@ -103,31 +107,35 @@
 				label="password"
 				value="thisismypassword"
 				field="password"
-				on:saveField={onSaveField}
+				saveField={onSaveField}
 				disabled={true}
 			></TextSettings>
 			<TextSettings
 				type="text"
 				id="discord_user"
 				label="Compte Discord"
-				value={user.discord_user}
+				value={user?.discord_user}
 				field="discord_user"
-				on:saveField={onSaveField}
+				saveField={onSaveField}
 			></TextSettings>
 			<SelectSettings
 				id="language"
 				placeholder="Langue"
 				field="language"
-				value={user.language}
-				on:saveField={onSaveField}
+				value={user?.language}
+				saveField={onSaveField}
 			></SelectSettings>
 			<div class="flex justify-center">
 				<Button
 					classColor="bg-bittersweet-red hover:bittersweet-red-focus"
 					type="button"
 					stretch={false}
-					on:click={logout}>Logout</Button
+					click={logout}
 				>
+					{#snippet content()}
+						Logout
+					{/snippet}
+				</Button>
 			</div>
 		</div>
 	</div>

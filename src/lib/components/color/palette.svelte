@@ -5,22 +5,33 @@
 	import { onDestroy } from 'svelte';
 	import ColorEditor from './editor/colorEditor.svelte';
 	import Networker from '$lib/utility/Networker';
-	import type { selectColor } from './types';
 
 	const networker = Networker.getInstance();
 
-	export let childClass: string;
-	export let canvaId: number | undefined;
-	export let canvasOwned: boolean | undefined;
-	let currentColor: string;
-	let colorIndex: number = -1;
-	let colors: string[] = [];
+	interface Props {
+		childClass: string;
+		canvaId: number | undefined;
+		canvasOwned: boolean | undefined;
+		colors: string[];
+		setColors: (newColors: [string]) => void;
+	}
+
+	let {
+		childClass,
+		canvaId,
+		canvasOwned,
+		colors = $bindable(),
+		setColors = $bindable()
+	}: Props = $props();
+
+	let currentColor: string = $state('');
+	let colorIndex: number = $state(-1);
 
 	let storedColorPalette: string[];
 
-	let editMode = false;
+	let editMode = $state(false);
 
-	export const setColors = (newColors: [string]) => {
+	setColors = (newColors: [string]) => {
 		storedColors.set(newColors);
 		selectedColor.set(newColors[0]);
 		colorIndex = 0;
@@ -35,10 +46,8 @@
 		colors = newColors;
 	});
 
-	const onUpdateSelectColor = (event: CustomEvent<selectColor>) => {
-		selectedColor.set(event.detail.color);
-		if (!editMode) {
-		}
+	const onUpdateSelectColor = (color: string) => {
+		selectedColor.set(color);
 	};
 
 	const onOpenSettings = () => {
@@ -70,26 +79,29 @@
 	{#if editMode}
 		<ColorEditor currentColorIndex={colorIndex} colorPalette={colors}></ColorEditor>
 	{/if}
-	<Panel class="w-fit" container="bg-white flex items-center">
-		<div class="grid grid-cols-8 gap-2 p-2 m-2">
-			{#each colors as color}
-				<Swatch
-					{color}
-					on:selectColor={onUpdateSelectColor}
-					edit={editMode}
-					selected={color == currentColor}
-				></Swatch>
-			{/each}
-		</div>
-		{#if canvasOwned}
-			<div class="flex gap-4 pr-4">
-				{#if editMode}
-					<button on:click={onUndo}><img src="/svg/undo.svg" alt="undo icon" /></button>
-					<button on:click={onSave}><img src="/svg/save.svg" alt="save icon" /></button>
-				{:else}
-					<button on:click={onOpenSettings}><img src="/svg/settings.svg" alt="edit icon" /></button>
-				{/if}
+	<Panel className="w-fit" container="bg-white flex items-center">
+		{#snippet content()}
+			<div class="grid grid-cols-8 gap-2 p-2 m-2">
+				{#each colors as color}
+					<Swatch
+						{color}
+						onclick={() => onUpdateSelectColor(color)}
+						edit={editMode}
+						selected={color == currentColor}
+					></Swatch>
+				{/each}
 			</div>
-		{/if}
+			{#if canvasOwned}
+				<div class="flex gap-4 pr-4">
+					{#if editMode}
+						<button onclick={onUndo}><img src="/svg/undo.svg" alt="undo icon" /></button>
+						<button onclick={onSave}><img src="/svg/save.svg" alt="save icon" /></button>
+					{:else}
+						<button onclick={onOpenSettings}><img src="/svg/settings.svg" alt="edit icon" /></button
+						>
+					{/if}
+				</div>
+			{/if}
+		{/snippet}
 	</Panel>
 </div>

@@ -1,13 +1,15 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { FriendStatus, type Friend, type unblockAccountEvent } from '../types';
+	import { FriendStatus, type Friend } from '../types';
 
-	const dispatch = createEventDispatcher<unblockAccountEvent>();
+	interface Props {
+		account: Friend;
+		unblockAccount?: (id: number) => void;
+	}
 
-	export let account: Friend;
+	let { account, unblockAccount }: Props = $props();
 
-	const unblockAccount = (id: number) => {
-		dispatch('unblockAccount', id);
+	const onUnblockAccount = (id: number) => {
+		unblockAccount?.(id);
 	};
 </script>
 
@@ -30,7 +32,7 @@
 	{/if}
 	<button
 		aria-label="remove {account.name} as friend"
-		on:click={() => unblockAccount(account.friend_id)}
+		onclick={() => onUnblockAccount(account.friend_id)}
 	>
 		<img class="h-5" src="/svg/trash.svg" alt="" />
 	</button>

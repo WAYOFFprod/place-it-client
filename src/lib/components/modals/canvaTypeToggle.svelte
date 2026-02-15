@@ -1,36 +1,51 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import type { Snippet } from 'svelte';
 	import Panel from '../layout/panel.svelte';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		toggleName: string;
+		disabled?: boolean;
+		value: string;
+		selectedValue: string;
+		selectValue?: () => void;
+		content?: Snippet;
+	}
 
-	export let toggleName: string;
-	export let disabled = false;
-	export let value: string;
-	export let selectedValue: string;
+	let {
+		toggleName,
+		disabled = false,
+		value,
+		selectedValue,
+		selectValue,
+		content: subContent
+	}: Props = $props();
 
-	const selectValue = () => {
-		dispatch('selectValue');
+	const selectVal = () => {
+		selectValue?.();
 	};
 </script>
 
 <div>
-	<Panel class="w-full">
-		<label>
-			<input
-				type="radio"
-				name={toggleName}
-				class="absolute opacity-0 h-0 w-0 peer"
-				{disabled}
-				{value}
-				checked={selectedValue == value}
-				on:change={selectValue}
-			/>
-			<div
-				class="w-full h-40 md:w-64 md:h-64 flex flex-col gap-2 justify-center items-center peer-hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan hover:cursor-pointer peer-disabled:bg-dark-grey"
-			>
-				<slot></slot>
-			</div>
-		</label>
+	<Panel className="w-full">
+		{#snippet content()}
+			<label>
+				<input
+					type="radio"
+					name={toggleName}
+					class="absolute opacity-0 h-0 w-0 peer"
+					{disabled}
+					{value}
+					checked={selectedValue == value}
+					onchange={selectVal}
+				/>
+				<div
+					class="w-full h-40 md:w-64 md:h-64 flex flex-col gap-2 justify-center items-center peer-hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan hover:cursor-pointer peer-disabled:bg-dark-grey"
+				>
+					{#if subContent}
+						{@render subContent()}
+					{/if}
+				</div>
+			</label>
+		{/snippet}
 	</Panel>
 </div>

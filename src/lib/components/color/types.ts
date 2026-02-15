@@ -1,9 +1,9 @@
 export interface selectColorEvent {
-	selectColor: selectColor;
+	selectColor: SelectColor;
 }
 export interface updateColorEvent {
-	updateColor: selectColor;
+	updateColor: SelectColor;
 }
-export interface selectColor {
+export interface SelectColor {
 	color: string;
 }

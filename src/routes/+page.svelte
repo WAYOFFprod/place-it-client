@@ -19,6 +19,8 @@
 	let canvasScope: 'community' | 'personal' = 'personal';
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
 
+	const networker = Networker.getInstance();
+
 	let searchTerm: string = '';
 	let sort: undefined | 'asc' | 'desc';
 	let favoritFilter: undefined | 1;
@@ -137,8 +139,7 @@
 		pushWindowState();
 	};
 
-	const searchUpdated = async (event: CustomEvent<string>) => {
-		searchTerm = event.detail;
+	const searchUpdated = async (searchTerm: string) => {
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
 		canvas = data.data;
 	};
@@ -161,7 +162,6 @@
 		canvas = data.data;
 	};
 
-	const networker = Networker.getInstance();
 	const fetchData = async () => {
 		// trigger function to fetch data in background
 		networker.getSession();
@@ -239,59 +239,66 @@
 <Modal></Modal>
 <Versioning></Versioning>
 <div class="flex flex-col h-full">
-	<Header class="top-0">
-		<div class="border-b-2 border-black">
-			<div class="relative container mx-auto flex justify-between items-stretch h-20 lg:h-24">
-				<a class="flex grow justify-center lg:justify-start items-end lg:items-center p-4" href="/">
-					<img class="h-7 lg:h-10" src="/svg/logo.svg" alt="place-it logo" />
-				</a>
-				<div
-					class="absolute right-0 bottom-0 lg:relative flex gap-2 lg:border-l-2 lg:pl-32 border-black items-center p-4"
-				>
-					<Button
-						classColor="bg-tea-rose hover:bg-tea-rose-focus"
-						stretch={false}
-						type="button"
-						on:click={onclickNotification}
+	<Header className="top-0">
+		{#snippet content()}
+			<div class="border-b-2 border-black">
+				<div class="relative container mx-auto flex justify-between items-stretch h-20 lg:h-24">
+					<a
+						class="flex grow justify-center lg:justify-start items-end lg:items-center p-4"
+						href="/"
 					>
-						<img class="icon" src="/svg/alarm.svg" alt="" />
-						<span class="hidden lg:inline">Notifications</span>
-					</Button>
+						<img class="h-7 lg:h-10" src="/svg/logo.svg" alt="place-it logo" />
+					</a>
+					<div
+						class="absolute right-0 bottom-0 lg:relative flex gap-2 lg:border-l-2 lg:pl-32 border-black items-center p-4"
+					>
+						<Button
+							classColor="bg-tea-rose hover:bg-tea-rose-focus"
+							stretch={false}
+							type="button"
+							click={onclickNotification}
+						>
+							{#snippet content()}
+								<img class="icon" src="/svg/alarm.svg" alt="" />
+								<span class="hidden lg:inline">Notifications</span>
+							{/snippet}
+						</Button>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="container mx-auto flex h-16 items-stretch px-4">
-			<div
-				class="border-r-2 border-black flex gap-4 lg:gap-6 pr-4 lg:pr-32 items-center grow lg:grow-0"
-			>
-				<button
-					id="button-my-canvas"
-					on:click={openMyCanvas}
-					class="border-b-2 {tab == 'my-canvas' ? 'border-black' : 'border-transparent'}"
-					><span class="uppercase">Mes canvas</span></button
+			<div class="container mx-auto flex h-16 items-stretch px-4">
+				<div
+					class="border-r-2 border-black flex gap-4 lg:gap-6 pr-4 lg:pr-32 items-center grow lg:grow-0"
 				>
-				<button
-					id="button-community-canvas"
-					on:click={openCommunityCanvas}
-					class="border-b-2 {tab == 'community-canvas' ? 'border-black' : 'border-transparent'}"
-					><span class="uppercase">Communauté</span></button
-				>
+					<button
+						id="button-my-canvas"
+						onclick={openMyCanvas}
+						class="border-b-2 {tab == 'my-canvas' ? 'border-black' : 'border-transparent'}"
+						><span class="uppercase">Mes canvas</span></button
+					>
+					<button
+						id="button-community-canvas"
+						onclick={openCommunityCanvas}
+						class="border-b-2 {tab == 'community-canvas' ? 'border-black' : 'border-transparent'}"
+						><span class="uppercase">Communauté</span></button
+					>
+				</div>
+				<div class="flex flex-row-reverse items-center grow-0 lg:grow pl-4">
+					<button
+						id="button-profile"
+						onclick={onClickLogin}
+						class="flex items-center gap-2 uppercase"
+					>
+						{#if isConnected}
+							<div class="hidden lg:block">{userName}</div>
+						{:else if isConnected === false}
+							<div>Login</div>
+						{/if}
+						<div class="rounded-full border-2 border-black w-8 h-8"></div>
+					</button>
+				</div>
 			</div>
-			<div class="flex flex-row-reverse items-center grow-0 lg:grow pl-4">
-				<button
-					id="button-profile"
-					on:click={onClickLogin}
-					class="flex items-center gap-2 uppercase"
-				>
-					{#if isConnected}
-						<div class="hidden lg:block">{userName}</div>
-					{:else if isConnected === false}
-						<div>Login</div>
-					{/if}
-					<div class="rounded-full border-2 border-black w-8 h-8"></div>
-				</button>
-			</div>
-		</div>
+		{/snippet}
 	</Header>
 	<div
 		class="overflow-y-scroll w-full"
@@ -300,55 +307,65 @@
 		<div class="container mx-auto flex flex-row flex-wrap gap-4 lg:gap-8 py-8 px-8">
 			<!-- search -->
 			<TextInput
-				on:onChange={searchUpdated}
-				class="py-2 my-0 flex-shrink grow lg:grow-0 "
+				onChange={searchUpdated}
+				className="py-2 my-0 flex-shrink grow lg:grow-0 "
 				id="search"
 				type="text"
 				placeholder="Chercher"
 				value={searchTerm}
 				liveUpdate={true}
 			>
-				<div slot="startIcon">
+				{#snippet startIcon()}
 					<img src="/svg/search.svg" alt="" />
-				</div>
+				{/snippet}
 			</TextInput>
 			<div class="flex gap-4 lg:gap-8 justify-start lg:grow">
 				<ToggleButton
 					id="recent"
 					label="Récents"
-					class="hover:bg-fluorescent-cyan"
+					className="hover:bg-fluorescent-cyan"
 					classInactive="bg-white"
 					classActive="!bg-fluorescent-cyan-focus"
 					toggle={recentToggle}
-					on:change={toggleRecent}><img class="icon" src="/svg/time.svg" alt="" /></ToggleButton
+					change={toggleRecent}
 				>
+					{#snippet content()}
+						<img class="icon" src="/svg/time.svg" alt="" />
+					{/snippet}
+				</ToggleButton>
 				<ToggleButton
 					id="favorit"
 					label="Favoris"
-					class="hover:bg-tea-rose"
+					className="hover:bg-tea-rose"
 					classInactive="bg-white"
 					classActive="!bg-tea-rose-focus"
 					toggle={favoritToggle}
 					disabled={!isConnected}
-					on:change={toggleFavorit}><img class="icon" src="/svg/heart.svg" alt="" /></ToggleButton
+					change={toggleFavorit}
 				>
+					{#snippet content()}
+						<img class="icon" src="/svg/heart.svg" alt="" />
+					{/snippet}
+				</ToggleButton>
 				<Select
-					class="min-w-52 hidden lg:block"
+					className="min-w-52 hidden lg:block"
 					id="canvaType"
 					placeholder="Tous"
 					options={canvaTypeOptions}
 				></Select>
 				<div class="flex grow justify-end">
 					{#if isConnected}
-						<Button stretch={false} on:click={onCreateCanva}>
-							<img class="icon" src="/svg/plus.svg" alt="" />
-							<span class="hidden xl:inline">Créer un nouveau canva</span>
+						<Button stretch={false} click={onCreateCanva}>
+							{#snippet content()}
+								<img class="icon" src="/svg/plus.svg" alt="" />
+								<span class="hidden xl:inline">Créer un nouveau canva</span>
+							{/snippet}
 						</Button>
 					{/if}
 				</div>
 			</div>
 			<div class="grow lg:grow-0 lg:hidden">
-				<Select class="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
+				<Select className="min-w-52" id="canvaType" placeholder="Tous" options={canvaTypeOptions}
 				></Select>
 			</div>
 		</div>

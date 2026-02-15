@@ -1,17 +1,30 @@
 <script lang="ts">
-	// import type { MouseEventHandler } from 'svelte/elements';
+	import type { Snippet } from 'svelte';
 	import Panel from '../layout/panel.svelte';
-	import { createEventDispatcher } from 'svelte';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		id?: string;
+		type?: 'button' | 'reset' | 'submit' | 'link';
+		stretch?: boolean;
+		link?: string;
+		disabled?: boolean;
+		classColor?: string;
+		className?: string;
+		click?: (e: MouseEvent) => void;
+		content: Snippet;
+	}
 
-	export let id: string | undefined = undefined;
-	export let type: 'button' | 'reset' | 'submit' | 'link' = 'button';
-	export let stretch: boolean = true;
-	export let link: string = '';
-	export let disabled: boolean = false;
-
-	export let classColor: string = 'bg-naples-yellow hover:bg-naples-yellow-focus';
+	let {
+		id,
+		type = 'button',
+		stretch = true,
+		link = '',
+		disabled = false,
+		classColor = 'bg-naples-yellow hover:bg-naples-yellow-focus',
+		className = '',
+		click,
+		content: subContent
+	}: Props = $props();
 
 	let hovered: boolean = false;
 	const mouseEnter = () => {
@@ -24,43 +37,45 @@
 
 	const focus = () => {};
 
-	const click = (e: any) => {
+	const onclick = (e: MouseEvent) => {
 		e.preventDefault();
-		dispatch('click');
+		click?.(e);
 	};
 
-	$: isHovering = disabled ? false : hovered;
+	let isHovering = $derived(disabled ? false : hovered);
 </script>
 
 <div
-	class="{stretch ? 'w-full' : ''} {$$props.class}"
+	class="{stretch ? 'w-full' : ''} {className}"
 	role="presentation"
-	on:focus={focus}
-	on:mouseover={mouseEnter}
-	on:mouseleave={mouseLeave}
+	onfocus={focus}
+	onmouseover={mouseEnter}
+	onmouseleave={mouseLeave}
 >
-	<Panel isSmall={isHovering} class={stretch ? 'w-full' : ''}>
-		{#if type == 'link'}
-			<a
-				class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl {classColor} {stretch
-					? 'w-full'
-					: ''}"
-				href={link}
-			>
-				<slot></slot>
-			</a>
-		{:else}
-			<button
-				id={id ? 'button-' + id : undefined}
-				on:click|preventDefault={click}
-				{type}
-				{disabled}
-				class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl disabled:bg-dark-grey disabled:cursor-not-allowed {classColor} {stretch
-					? 'w-full'
-					: ''}"
-			>
-				<slot></slot>
-			</button>
-		{/if}
+	<Panel isSmall={isHovering} className={stretch ? 'w-full' : ''}>
+		{#snippet content()}
+			{#if type == 'link'}
+				<a
+					class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl {classColor} {stretch
+						? 'w-full'
+						: ''}"
+					href={link}
+				>
+					{@render subContent()}
+				</a>
+			{:else}
+				<button
+					id={id ? 'button-' + id : undefined}
+					{onclick}
+					{type}
+					{disabled}
+					class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl disabled:bg-dark-grey disabled:cursor-not-allowed {classColor} {stretch
+						? 'w-full'
+						: ''}"
+				>
+					{@render subContent()}
+				</button>
+			{/if}
+		{/snippet}
 	</Panel>
 </div>

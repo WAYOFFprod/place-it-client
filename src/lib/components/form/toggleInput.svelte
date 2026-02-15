@@ -1,17 +1,27 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Background from '../svg/toggle/background.svelte';
 	import Knob from '../svg/toggle/knob.svelte';
 
-	const dispatch = createEventDispatcher();
-	export let placeholder: string = '';
-	export let label: string;
-	export let id: string;
-	export let toggle = false;
-	export let disabled = false;
+	interface Props {
+		placeholder?: string;
+		label: string;
+		id: string;
+		toggle?: boolean;
+		disabled?: boolean;
+		change?: (value: boolean) => void;
+	}
 
-	const change = () => {
-		dispatch('change');
+	let {
+		placeholder = '',
+		label,
+		id,
+		toggle = false,
+		disabled = false,
+		change = () => {}
+	}: Props = $props();
+
+	const onChange = () => {
+		change(toggle);
 	};
 </script>
 
@@ -22,7 +32,7 @@
 		type="checkbox"
 		{placeholder}
 		bind:checked={toggle}
-		on:change={change}
+		onchange={onChange}
 		{disabled}
 	/>
 	<label

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import SettingsTab from './settingsTab.svelte';
 	import Account from './settings/account.svelte';
 	import Friends from './settings/friends.svelte';
@@ -8,19 +8,23 @@
 	import { mdBreak } from '$lib/stores/tailwindStore';
 	import { userStore } from '$lib/stores/authStore';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		close?: () => void;
+	}
+	let { close }: Props = $props();
+
 	// mobile only
-	let isOnNav: boolean = true;
+	let isOnNav: boolean = $state(true);
 
-	let selectedTab: string = '';
+	let selectedTab: string = $state('');
 
-	let userName: string = '';
+	let userName: string = $state('');
 	const unsubscribeUser = userStore.subscribe((newUser) => {
 		if (newUser == undefined) return;
 		userName = newUser.name;
 	});
 
-	let isWindowSmall: boolean | undefined = false;
+	let isWindowSmall: boolean | undefined = $state(false);
 	let md: number | undefined;
 
 	mdBreak.subscribe((val) => {
@@ -30,7 +34,7 @@
 		selectedTab = isWindowSmall ? '' : 'general';
 	});
 
-	let tabForm: HTMLFormElement;
+	let tabForm: HTMLFormElement | undefined = $state();
 
 	const selectTab = () => {
 		const formData = new FormData(tabForm);
@@ -38,8 +42,8 @@
 		if (isWindowSmall) isOnNav = false;
 	};
 
-	const close = () => {
-		dispatch('close');
+	const onClose = () => {
+		close?.();
 	};
 
 	const onResize = () => {
@@ -73,44 +77,52 @@
 				class="flex flex-col items-start md:border-r-2 border-black min-w-full md:min-w-fit h-full md:h-auto"
 			>
 				<SettingsTab
-					class="py-4 px-8 md:px-5 border-t-2 md:border-t-0 border-black"
+					className="py-4 px-8 md:px-5 border-t-2 md:border-t-0 border-black"
 					value="general"
-					on:selectValue={selectTab}
+					selectValue={selectTab}
 					selectedValue={selectedTab}
 					toggleName="settings-tab"
 				>
-					<img src="/svg/cursor.svg" alt="" />
-					<span>Général</span>
+					{#snippet content()}
+						<img src="/svg/cursor.svg" alt="" />
+						<span>Général</span>
+					{/snippet}
 				</SettingsTab>
 				<SettingsTab
-					class="py-4 px-8 md:px-5"
+					className="py-4 px-8 md:px-5"
 					value="friends"
-					on:selectValue={selectTab}
+					selectValue={selectTab}
 					selectedValue={selectedTab}
 					toggleName="settings-tab"
 				>
-					<img src="/svg/users.svg" alt="" />
-					<span>Amis</span>
+					{#snippet content()}
+						<img src="/svg/users.svg" alt="" />
+						<span>Amis</span>
+					{/snippet}
 				</SettingsTab>
 				<SettingsTab
-					class="py-4 px-8 md:px-5"
+					className="py-4 px-8 md:px-5"
 					value="blocked"
-					on:selectValue={selectTab}
+					selectValue={selectTab}
 					selectedValue={selectedTab}
 					toggleName="settings-tab"
 				>
-					<img src="/svg/block.svg" alt="" />
-					<span>Compte bloqués</span>
+					{#snippet content()}
+						<img src="/svg/block.svg" alt="" />
+						<span>Compte bloqués</span>
+					{/snippet}
 				</SettingsTab>
 				<SettingsTab
-					class="py-4 px-8 md:px-5"
+					className="py-4 px-8 md:px-5"
 					value="notification"
-					on:selectValue={selectTab}
+					selectValue={selectTab}
 					selectedValue={selectedTab}
 					toggleName="settings-tab"
 				>
-					<img src="/svg/alarm.svg" alt="" />
-					<span>Notifications</span>
+					{#snippet content()}
+						<img src="/svg/alarm.svg" alt="" />
+						<span>Notifications</span>
+					{/snippet}
 				</SettingsTab>
 			</form>
 		{/if}
@@ -120,7 +132,7 @@
 				{#if isWindowSmall && !isOnNav}
 					<button
 						class="border-black border-b-2 flex justify-between items-center px-4"
-						on:click={() => {
+						onclick={() => {
 							isOnNav = true;
 							selectedTab = '';
 						}}
@@ -130,7 +142,7 @@
 					</button>
 				{/if}
 				{#if selectedTab == 'general'}
-					<Account on:close={close}></Account>
+					<Account close={onClose}></Account>
 				{:else if selectedTab == 'friends'}
 					<Friends></Friends>
 				{:else if selectedTab == 'blocked'}

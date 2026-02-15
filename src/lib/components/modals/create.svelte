@@ -9,22 +9,26 @@
 	import CanvaTypeToggle from './canvaTypeToggle.svelte';
 	import Networker from '$lib/utility/Networker';
 
-	import { createEventDispatcher } from 'svelte';
 	import { event } from '$lib/stores/eventStore';
 	import type { Errors } from './types';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		close?: () => void;
+	}
+
+	let { close }: Props = $props();
+
 	let form: HTMLFormElement;
 	let presetForm: HTMLFormElement;
 	let errors: null | Errors;
-	let customPalette = true;
-	let isCommunity = false;
+	let customPalette = $state(true);
+	let isCommunity = $state(false);
 
 	// default values
-	let selectedPreset: string = 'small';
-	let width: number = 64;
-	let height: number = 64;
-	let customSize: boolean = false;
+	let selectedPreset: string = $state('small');
+	let width: number = $state(64);
+	let height: number = $state(64);
+	let customSize: boolean = $state(false);
 
 	const gameTypeOptions = [
 		{
@@ -46,7 +50,8 @@
 		value: 'free'
 	};
 
-	const validate = async () => {
+	const validate = async (e: Event) => {
+		e.preventDefault();
 		const formData = new FormData(form);
 		const formWidth = formData.get('width') as string;
 		const formHeight = formData.get('height') as string;
@@ -90,7 +95,7 @@
 			errors = canva.response.errors as Errors;
 		}
 		if (canva?.status == 201) {
-			dispatch('close');
+			close?.();
 			event.set('updateCanvas');
 		}
 	};
@@ -121,7 +126,7 @@
 		isCommunity = !isCommunity;
 	};
 
-	$: getError = (value: string) => {
+	const getError = (value: string) => {
 		if (errors?.[value]) {
 			return errors[value]?.[0];
 		}
@@ -143,48 +148,58 @@
 					toggleName="canva-type"
 					value="small"
 					selectedValue={selectedPreset}
-					on:selectValue={selectPreset}
+					selectValue={selectPreset}
 				>
-					<img src="/svg/small-canva.svg" alt="" class="mb-2" />
-					<span>Petit Canva</span>
-					<span class="text-md">64 x 64</span>
+					{#snippet content()}
+						<img src="/svg/small-canva.svg" alt="" class="mb-2" />
+						<span>Petit Canva</span>
+						<span class="text-md">64 x 64</span>
+					{/snippet}
 				</CanvaTypeToggle>
 				<CanvaTypeToggle
 					toggleName="canva-type"
 					value="big"
 					selectedValue={selectedPreset}
-					on:selectValue={selectPreset}
+					selectValue={selectPreset}
 				>
-					<img src="/svg/big-canva.svg" alt="" class="mb-2" />
-					<span>Grand Canva</span>
-					<span class="text-md">512 x 512</span>
+					{#snippet content()}
+						<img src="/svg/big-canva.svg" alt="" class="mb-2" />
+						<span>Grand Canva</span>
+						<span class="text-md">512 x 512</span>
+					{/snippet}
 				</CanvaTypeToggle>
 				<CanvaTypeToggle
 					toggleName="canva-type"
 					disabled
 					value="infinit"
 					selectedValue={selectedPreset}
-					on:selectValue={selectPreset}
+					selectValue={selectPreset}
 				>
-					<img src="/svg/infinit.svg" alt="" class="mb-2" />
-					<span>Infini</span>
+					{#snippet content()}
+						<img src="/svg/infinit.svg" alt="" class="mb-2" />
+						<span>Infini</span>
+					{/snippet}
 				</CanvaTypeToggle>
 				<CanvaTypeToggle
 					toggleName="canva-type"
 					value="custom"
 					selectedValue={selectedPreset}
-					on:selectValue={selectPreset}
+					selectValue={selectPreset}
 				>
-					<img src="/svg/custom-canva.png" alt="" class="mb-2 w-16 h-16" />
-					<span>Personalisé</span>
+					{#snippet content()}
+						<img src="/svg/custom-canva.png" alt="" class="mb-2 w-16 h-16" />
+						<span>Personalisé</span>
+					{/snippet}
 				</CanvaTypeToggle>
 			</form>
 		</div>
 		<!-- sidebar: canvas settings -->
-		<form bind:this={form} class="w-64 p-6 flex flex-col gap-4" on:submit|preventDefault={validate}>
-			<TextInput id="name" label="Nom" error={getError('name')}
-				><img src="/svg/edit.svg" alt="" /></TextInput
-			>
+		<form bind:this={form} class="w-64 p-6 flex flex-col gap-4" onsubmit={validate}>
+			<TextInput id="name" label="Nom" error={getError('name')}>
+				{#snippet rightIcon()}
+					<img src="/svg/edit.svg" alt="" />
+				{/snippet}
+			</TextInput>
 			<div>
 				<label class="block mb-3" for="width">Dimensions</label>
 				<div class="flex flex-row gap-2">
@@ -197,33 +212,39 @@
 					<span class="text-red-500 text-sm">{getError('width')}</span>
 				{/if}
 			</div>
-			<ToggleInput id="community" label="Community" on:change={toggleCommunity} />
+			<ToggleInput id="community" label="Community" change={toggleCommunity} />
 			{#if isCommunity}
 				<Accordion>
-					<div slot="heading">Options Avancée</div>
-					<div slot="content" class="flex flex-col gap-4">
-						<ToggleInput id="joinRequest" label="Joindre sur demande" toggle={false} />
-						<ToggleInput
-							id="limitedPalette"
-							label="Palette limitée"
-							toggle={customPalette}
-							on:change={() => (customPalette = !customPalette)}
-						/>
-						<Select
-							id="gameType"
-							label="Catégorie du canva"
-							placeholder="Type de canva"
-							options={gameTypeOptions}
-							selectedOption={selectedOption.value}
-							error={getError('category')}
-						></Select>
-					</div>
+					{#snippet heading()}
+						Options Avancée
+					{/snippet}
+					{#snippet content()}
+						<div class="flex flex-col gap-4">
+							<ToggleInput id="joinRequest" label="Joindre sur demande" toggle={false} />
+							<ToggleInput
+								id="limitedPalette"
+								label="Palette limitée"
+								toggle={customPalette}
+								change={() => (customPalette = !customPalette)}
+							/>
+							<Select
+								id="gameType"
+								label="Catégorie du canva"
+								placeholder="Type de canva"
+								options={gameTypeOptions}
+								selectedOption={selectedOption.value}
+								error={getError('category')}
+							></Select>
+						</div>
+					{/snippet}
 				</Accordion>
 			{/if}
 			<div class="grow justify-self-stretch flex items-end">
-				<Button type="submit" class="" on:click={validate}>
-					<img src="/svg/canva-plus.svg" alt="" />
-					<span>Créer</span>
+				<Button type="submit" click={validate}>
+					{#snippet content()}
+						<img src="/svg/canva-plus.svg" alt="" />
+						<span>Créer</span>
+					{/snippet}
 				</Button>
 			</div>
 		</form>

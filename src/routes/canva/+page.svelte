@@ -42,22 +42,28 @@
 </svelte:head>
 <div class="flex flex-col h-full">
 	<Header>
-		<div class="flex justify-between h-10 items-center p-6">
-			<a aria-label="homepage" href="/">
-				<img src="/svg/home.svg" alt="" />
-			</a>
-			<div class="uppercase">
-				{#if canva}
-					{canva.name}
-				{/if}
+		{#snippet content()}
+			<div class="flex justify-between h-10 items-center p-6">
+				<a aria-label="homepage" href="/">
+					<img src="/svg/home.svg" alt="" />
+				</a>
+				<div class="uppercase">
+					{#if canva}
+						{canva.name}
+					{/if}
+				</div>
+				<div class="flex gap-2">
+					<Button stretch={false} type="button" click={onclickExport} disabled>
+						{#snippet content()}
+							Export
+						{/snippet}
+					</Button>
+				</div>
 			</div>
-			<div class="flex gap-2">
-				<Button stretch={false} type="button" on:click={onclickExport} disabled>Export</Button>
-			</div>
-		</div>
+		{/snippet}
 	</Header>
 	{#if canva}
-		<Canva {canva} viewOnly={false} class="" marginBottom={52}></Canva>
+		<Canva {canva} viewOnly={false} marginBottom={52}></Canva>
 	{:else}
 		<div class="absolute top-14 bottom-0 w-full flex flex-col justify-center items-center gap-8">
 			<p class="text-3xl">Loading</p>

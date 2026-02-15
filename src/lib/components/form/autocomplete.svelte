@@ -1,21 +1,38 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import type { Snippet } from 'svelte';
 	import type { FormEventHandler } from 'svelte/elements';
 
-	export let placeholder: string = '';
-	export let label: string = '';
-	export let id: string;
-	export let error: string | null = null;
-	export let val = '';
-	export let options: Option[] = [];
+	interface Props {
+		placeholder?: string;
+		label?: string;
+		id: string;
+		error?: string | null;
+		val?: string;
+		options: Option[];
+		className: string;
+		selectOption: (option: any) => void;
+		startIcon?: Snippet;
+		rightIcon?: Snippet;
+	}
 
-	const dispatch = createEventDispatcher();
+	let {
+		placeholder = '',
+		label = '',
+		id,
+		error = null,
+		val = '',
+		options = [],
+		className = '',
+		selectOption,
+		startIcon,
+		rightIcon
+	}: Props = $props();
 
-	let isFocus = false;
-	let onCooldown = false;
-	let changedSinceCooldown = false;
+	let isFocus = $state(false);
+	let onCooldown = $state(false);
+	let changedSinceCooldown = $state(false);
 	let selectedOption: number | undefined;
-	let filteredOptions: Option[] = [];
+	let filteredOptions: Option[] = $state([]);
 	const cooldown = () => {
 		onCooldown = true;
 		setTimeout(() => {
@@ -34,7 +51,7 @@
 		}
 	};
 
-	const selectOption = (option: any) => {
+	const onSelectOption = (option: any) => {
 		selectedOption = option;
 		if (selectedOption != undefined) {
 			const newValue = options.find((x) => x.key == option);
@@ -43,7 +60,7 @@
 			}
 		}
 		isFocus = false;
-		dispatch('selectOption', option);
+		selectOption(option);
 	};
 
 	function clickOutside(element: HTMLElement, callbackFunction: () => void) {
@@ -66,7 +83,7 @@
 	}
 </script>
 
-<div class={$$props.class}>
+<div class={className}>
 	{#if label}
 		<label class="block mb-3" for={id}>{label}</label>
 	{/if}
@@ -78,15 +95,15 @@
 			isFocus = false;
 		}}
 	>
-		<slot name="startIcon" />
+		{#if startIcon}{@render startIcon()}{/if}
 		<input
 			{id}
 			name={id}
 			type="text"
 			{placeholder}
 			class="p-2 w-full pr-8 pb-1 min-w-5 bg-transparent"
-			on:input={onChange}
-			on:focus={() => (isFocus = true)}
+			oninput={onChange}
+			onfocus={() => (isFocus = true)}
 			bind:value={val}
 			role="combobox"
 			aria-controls="listbox"
@@ -94,7 +111,9 @@
 			aria-expanded={false}
 		/>
 		<div class="absolute w-5 right-0 bottom-2">
-			<slot />
+			{#if rightIcon}
+				{@render rightIcon()}
+			{/if}
 		</div>
 		<!-- predictions -->
 		{#if isFocus}
@@ -104,7 +123,7 @@
 						id={'option-' + option.key}
 						type="button"
 						class="m-2"
-						on:click={() => selectOption(option.key)}
+						onclick={() => onSelectOption(option.key)}
 						role="option"
 						aria-selected={false}
 					>

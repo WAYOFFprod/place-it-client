@@ -12,19 +12,19 @@
 		friends = response.data;
 	};
 
-	const removeFriend = async (event: CustomEvent<number>) => {
-		const isRemoved = await networker.removeFriend(event.detail);
+	const removeFriend = async (accountId: number) => {
+		const isRemoved = await networker.removeFriend(accountId);
 		console.log('isRemoved', isRemoved);
 		if (isRemoved) {
-			const index = friends.findIndex((obj) => obj.friend_id == event.detail);
+			const index = friends.findIndex((obj) => obj.friend_id == accountId);
 			if (index != -1) {
 				friends[index].noDisplay = true;
 			}
 		}
 	};
 
-	const acceptRequest = async (event: CustomEvent<number>) => {
-		const response = await networker.acceptFriendRequest(event.detail);
+	const acceptRequest = async (accountId: number) => {
+		const response = await networker.acceptFriendRequest(accountId);
 		const index = friends.findIndex((obj) => obj.friend_id == response.data.friend_id);
 		if (index >= 0) {
 			friends[index] = response.data;
@@ -40,8 +40,7 @@
 		<div class="min-h-60 max-h-96 overflow-y-scroll flex flex-col w-full px-10 py-8">
 			{#each friends as friend}
 				{#if !friend.noDisplay}
-					<FriendLine {friend} on:removeFriend={removeFriend} on:acceptRequest={acceptRequest}
-					></FriendLine>
+					<FriendLine {friend} {removeFriend} {acceptRequest}></FriendLine>
 				{/if}
 			{/each}
 		</div>

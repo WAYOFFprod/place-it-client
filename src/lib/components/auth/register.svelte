@@ -2,18 +2,23 @@
 	import TextInput from '$lib/components/form/textInput.svelte';
 	import Networker from '$lib/utility/Networker';
 
-	import { createEventDispatcher } from 'svelte';
 	import Button from '$lib/components/form/button.svelte';
 	import type { Errors } from '../modals/types';
 	import PasswordInput from '../form/passwordInput.svelte';
 
-	const dispatch = createEventDispatcher();
 	let form: HTMLFormElement;
+
+	interface Props {
+		close?: () => void;
+	}
+
+	let { close }: Props = $props();
 
 	let errors: null | Errors;
 
 	const networker = Networker.getInstance();
-	const validate = async () => {
+	const validate = async (e: Event) => {
+		e.preventDefault();
 		const formData = new FormData(form);
 		const email = formData.get('email') as string;
 		const name = formData.get('name') as string;
@@ -30,11 +35,11 @@
 		if (response?.status == 422) {
 			errors = response.response.errors;
 		} else if (response?.status) {
-			dispatch('close');
+			close?.();
 		}
 	};
 
-	$: getError = (value: string) => {
+	const getError = (value: string) => {
 		if (errors?.[value]) {
 			return errors[value]?.[0];
 		}
@@ -44,13 +49,9 @@
 
 <div class="p-4 flex flex-col gap-4 items-center">
 	<h2 class="text-xl uppercase">Créer un compte</h2>
-	<form
-		bind:this={form}
-		on:submit|preventDefault={validate}
-		class="flex flex-col gap-4 items-center"
-	>
+	<form bind:this={form} onsubmit={validate} class="flex flex-col gap-4 items-center">
 		<TextInput
-			class="w-full"
+			className="w-full"
 			id="name"
 			placeholder="Username"
 			label="Username"
@@ -58,7 +59,7 @@
 			error={getError('name')}
 		/>
 		<TextInput
-			class="w-full"
+			className="w-full"
 			id="email"
 			placeholder="Email"
 			label="Email"
@@ -69,16 +70,16 @@
 			id="password"
 			placeholder="Password"
 			label="Password"
-			type="password"
 			error={getError('password')}
 		/>
 		<PasswordInput
 			id="password_confirmation"
 			placeholder="Password confirmation"
 			label="Password Confirmation"
-			type="password"
 			error={getError('password_confirmation')}
 		/>
-		<Button class="mt-4" type="submit" stretch={false} on:click={validate}>S'enregister</Button>
+		<Button className="mt-4" type="submit" stretch={false} click={validate}
+			>{#snippet content()}S'enregister{/snippet}</Button
+		>
 	</form>
 </div>

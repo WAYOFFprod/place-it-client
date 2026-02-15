@@ -1,19 +1,17 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import type { selectColorEvent } from './types';
-	const dispatch = createEventDispatcher<selectColorEvent>();
+	interface Props {
+		color: string;
+		selected?: boolean;
+		edit?: boolean;
+		onclick?: (event: MouseEvent) => void;
+	}
 
-	export let color: string;
-	export let selected = false;
-	export let edit = false;
-
-	const select = () => {
-		dispatch('selectColor', { color: color });
-	};
+	let { color, selected = false, edit = false, onclick }: Props = $props();
 </script>
 
 <button
+	title={color}
 	class="h-6 w-6 border-2"
 	style="background-color: {color}; border-color:{!selected ? 'black' : edit ? '#49E8E0' : color}"
-	on:click|stopPropagation={select}
+	{onclick}
 ></button>

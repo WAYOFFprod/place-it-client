@@ -1,12 +1,26 @@
 <script lang="ts">
-	export let isSmall: boolean = false;
-	export let container: string = 'bg-off-white';
-	export let noShadow: boolean = false;
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		isSmall?: boolean;
+		container?: string;
+		noShadow?: boolean;
+		className?: string;
+		content: Snippet;
+	}
+
+	let {
+		isSmall = false,
+		container = 'bg-off-white',
+		noShadow = false,
+		className = '',
+		content
+	}: Props = $props();
 </script>
 
-<div class="relative {$$props.class}">
+<div class="relative {className}">
 	<div class="relative border-2 border-solid rounded border-black z-10 overflow-hidden {container}">
-		<slot />
+		{@render content()}
 	</div>
 	{#if !noShadow}
 		<div

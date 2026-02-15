@@ -6,6 +6,7 @@ import { chatMessages } from '$lib/stores/chatStore';
 import { authStatus, tokenStore, userStore } from '$lib/stores/authStore';
 import { isReady } from '$lib/stores/canvaStore';
 import type { LoginPayload, RegisterPayload } from '$lib/components/auth/types';
+import type { UserData } from './types';
 
 export default class Networker {
 	static #instance: Networker;
@@ -440,7 +441,7 @@ export default class Networker {
 		const index = this.gridManager.addPixelOnCanvas(coord, color);
 		if (index === false) return;
 		if (this.socket != undefined) {
-			const auth: any = {
+			const auth: UserData = {
 				user_id: this.userData?.id,
 				token: this.canvaToken
 			};
@@ -464,7 +465,7 @@ export default class Networker {
 		// }
 
 		if (this.socket != undefined) {
-			const auth: any = {
+			const auth: UserData = {
 				user_id: this.userData?.id,
 				token: this.canvaToken
 			};

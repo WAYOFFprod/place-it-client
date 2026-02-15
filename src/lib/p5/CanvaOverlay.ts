@@ -1,8 +1,8 @@
 import P5 from 'p5';
 import type GridManager from './GridManager';
 import { selectedColor } from '$lib/stores/colorStore';
-import type { Unsubscriber } from 'svelte/motion';
 import SelectionRect from './Overlay/SelectionRect';
+import type { Unsubscriber } from 'svelte/store';
 
 // the overlay is used to draw selection rectangle
 // and other temporary shapes
