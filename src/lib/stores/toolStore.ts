@@ -45,7 +45,6 @@ let p5: P5 | undefined;
 const selectedTool = writable<Tool | undefined>();
 
 const destroyActiveTool = () => {
-	console.log('Destroying active tool', activeTool);
 	if (activeTool != undefined) {
 		activeTool.destroy();
 	}

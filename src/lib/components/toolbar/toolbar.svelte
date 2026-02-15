@@ -6,7 +6,7 @@
 	import { selectedTool, setTool, toolClasses } from '$lib/stores/toolStore';
 	import { onDestroy } from 'svelte';
 	import ToolIcon from './toolIcon.svelte';
-	import type { selectTool } from './types';
+	import type { SelectTool } from './types';
 
 	import { isWindowSmall } from '$lib/stores/tailwindStore';
 
@@ -33,8 +33,8 @@
 		currentToolType = currentTool.getType();
 	});
 
-	const updateSelectTool = (event: CustomEvent<selectTool>) => {
-		setTool(event.detail.tool);
+	const updateSelectTool = (selectedTool: SelectTool) => {
+		setTool(selectedTool.tool);
 		if (isWindowSmall) expandedToolbar = false;
 	};
 
@@ -48,13 +48,13 @@
 </script>
 
 <div class="{$$props.class} cursor-hand">
-	<Panel class="w-fit">
+	<Panel className="w-fit">
 		<div class="grid grid-cols-1 gap-2 p-1 m-1 md:m-2">
 			{#if tools != undefined}
 				{#if !windowSmall || expandedToolbar}
 					{#each tools as t}
 						<ToolIcon
-							on:selectTool={updateSelectTool}
+							selectTool={updateSelectTool}
 							toolType={t.type}
 							selected={currentToolType == t}
 						>
@@ -65,7 +65,7 @@
 					<ToolIcon
 						toolType={currentToolType.type}
 						selected={true}
-						on:selectTool={toggleToolbarLength}
+						selectTool={toggleToolbarLength}
 					>
 						<svelte:component this={currentToolType.icon} />
 					</ToolIcon>

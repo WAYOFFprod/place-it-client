@@ -20,7 +20,7 @@ export default class ControlManager {
 	MIN_ZOOM = 0.5;
 	MAX_ZOOM = 128;
 
-	static instance: ControlManager;
+	static instance: ControlManager | undefined;
 
 	// original position on start of dragging
 	grabStart: Coord = {
@@ -37,7 +37,14 @@ export default class ControlManager {
 				"Can't initialize ControlManager, you need to provide p5, size, viewOnly and marginBottom"
 			);
 		if (!gridManager) throw new Error('you need to provide gridManager');
-		new ControlManager(p5, viewOnly, gridManager);
+
+		ControlManager.instance = new ControlManager(p5, viewOnly, gridManager);
+
+		if (p5) {
+			ControlManager.instance.p5 = p5;
+			ControlManager.instance.gridManager = gridManager;
+		}
+		console.log('ControlManager instance created');
 		return ControlManager.instance;
 	}
 
@@ -138,5 +145,6 @@ export default class ControlManager {
 	}
 	destroy() {
 		this.toolManager.destroy();
+		delete ControlManager.instance;
 	}
 }
