@@ -23,7 +23,7 @@
 		classColor = 'bg-naples-yellow hover:bg-naples-yellow-focus',
 		className = '',
 		click,
-		content
+		content: subContent
 	}: Props = $props();
 
 	let hovered: boolean = false;
@@ -53,27 +53,29 @@
 	onmouseleave={mouseLeave}
 >
 	<Panel isSmall={isHovering} className={stretch ? 'w-full' : ''}>
-		{#if type == 'link'}
-			<a
-				class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl {classColor} {stretch
-					? 'w-full'
-					: ''}"
-				href={link}
-			>
-				{@render content()}
-			</a>
-		{:else}
-			<button
-				id={id ? 'button-' + id : undefined}
-				{onclick}
-				{type}
-				{disabled}
-				class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl disabled:bg-dark-grey disabled:cursor-not-allowed {classColor} {stretch
-					? 'w-full'
-					: ''}"
-			>
-				{@render content()}
-			</button>
-		{/if}
+		{#snippet content()}
+			{#if type == 'link'}
+				<a
+					class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl {classColor} {stretch
+						? 'w-full'
+						: ''}"
+					href={link}
+				>
+					{@render subContent()}
+				</a>
+			{:else}
+				<button
+					id={id ? 'button-' + id : undefined}
+					{onclick}
+					{type}
+					{disabled}
+					class="px-2 md:px-4 py-2 flex justify-center items-center gap-4 text-xl disabled:bg-dark-grey disabled:cursor-not-allowed {classColor} {stretch
+						? 'w-full'
+						: ''}"
+				>
+					{@render subContent()}
+				</button>
+			{/if}
+		{/snippet}
 	</Panel>
 </div>

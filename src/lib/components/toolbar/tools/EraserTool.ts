@@ -3,8 +3,7 @@ import Tool from '../ToolClass';
 import EraseIcon from '$lib/icons/erase.svelte';
 import Networker from '$lib/utility/Networker';
 import { selectedColor } from '$lib/stores/colorStore';
-import type { Unsubscriber } from 'svelte/motion';
-import { writable, type Writable } from 'svelte/store';
+import { writable, type Unsubscriber, type Writable } from 'svelte/store';
 
 export default class EraserTool extends Tool {
 	static cursor = 'eraser';

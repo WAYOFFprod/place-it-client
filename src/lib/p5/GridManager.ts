@@ -281,7 +281,6 @@ export default class GridManager {
 
 	// check if pixel is in bound of canva
 	private isSectionIndexInBound(coord: Coord): boolean {
-		console.log('checking if coord is in bound', coord);
 		if (coord.x < 0 || coord.x >= this.canvas.width) {
 			console.error('grid section not in bound x', coord.x);
 			return false;

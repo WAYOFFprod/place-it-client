@@ -50,7 +50,7 @@
 	>
 		<button
 			aria-label="toggle {label} list"
-			on:click={toggle}
+			onclick={toggle}
 			aria-pressed={isOpen}
 			type="button"
 			{disabled}
@@ -68,7 +68,7 @@
 						name={id}
 						type="radio"
 						class="peer hidden"
-						on:change={onChange}
+						onchange={onChange}
 						value={option.value}
 						checked={selectedOption == option.value}
 					/>

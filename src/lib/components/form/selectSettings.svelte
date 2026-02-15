@@ -74,6 +74,10 @@
 		classActive="bg-fluorescent-cyan-focus"
 		id="{id}-edit"
 		toggle={editable}
-		on:change={change}><span>{buttonLabel}</span></ToggleButton
+		{change}
 	>
+		{#snippet content()}
+			<span>{buttonLabel}</span>
+		{/snippet}
+	</ToggleButton>
 </div>

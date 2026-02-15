@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import Panel from '../layout/panel.svelte';
 
 	interface Props {
@@ -11,6 +12,7 @@
 		classInactive?: string;
 		classActive?: string;
 		change?: (value: boolean) => void;
+		content?: Snippet;
 	}
 
 	let {
@@ -22,7 +24,8 @@
 		className = '',
 		classInactive = '',
 		classActive = '',
-		change = () => {}
+		change = () => {},
+		content: subContent
 	}: Props = $props();
 
 	let hovered: boolean = false;
@@ -45,29 +48,31 @@
 
 <div role="presentation" onfocus={focus} onmouseover={mouseEnter} onmouseleave={mouseLeave}>
 	<Panel isSmall={disabled || isHovering || toggle}>
-		<input
-			class="peer"
-			name={id}
-			{id}
-			type="checkbox"
-			{placeholder}
-			bind:checked={toggle}
-			onchange={onChange}
-			{disabled}
-		/>
-		<label
-			class="py-2 px-2 flex justify-between gap-2 items-center peer-disabled:bg-dark-grey
+		{#snippet content()}
+			<input
+				class="peer"
+				name={id}
+				{id}
+				type="checkbox"
+				{placeholder}
+				bind:checked={toggle}
+				onchange={onChange}
+				{disabled}
+			/>
+			<label
+				class="py-2 px-2 flex justify-between gap-2 items-center peer-disabled:bg-dark-grey
 			{className}
       {toggle ? classActive : classInactive}
       {disabled ? 'cursor-not-allowed' : 'cursor-pointer'}"
-			for={id}
-		>
-			{#if $$slots.default}
-				<slot></slot>
-			{/if}
-			{#if label}
-				<span class="hidden md:inline">{label}</span>
-			{/if}
-		</label>
+				for={id}
+			>
+				{#if subContent}
+					{@render subContent()}
+				{/if}
+				{#if label}
+					<span class="hidden md:inline">{label}</span>
+				{/if}
+			</label>
+		{/snippet}
 	</Panel>
 </div>

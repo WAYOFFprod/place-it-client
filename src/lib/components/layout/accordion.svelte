@@ -1,5 +1,14 @@
 <script lang="ts">
-	let isOpen: boolean = false;
+	import type { Snippet } from 'svelte';
+
+	let isOpen: boolean = $state(false);
+
+	interface Props {
+		heading?: Snippet;
+		content?: Snippet;
+	}
+
+	let { heading, content }: Props = $props();
 
 	const toggleOpen = () => {
 		isOpen = !isOpen;
@@ -10,15 +19,19 @@
 	<!-- heading -->
 	<button
 		aria-pressed={isOpen}
-		on:click={toggleOpen}
+		onclick={toggleOpen}
 		type="button"
 		class="flex flex-row justify-between w-full"
 	>
-		<slot name="heading"></slot>
+		{#if heading}
+			{@render heading()}
+		{/if}
+
 		<img class={isOpen ? '' : '-rotate-90'} src="/svg/chevron-down.svg" alt="" />
 	</button>
 	<!-- content -->
 	<div class="pl-9 py-4 text-medium {isOpen ? 'hidden' : ''}">
-		<slot name="content"></slot>
+		{#if content}
+			{@render content()}{/if}
 	</div>
 </div>

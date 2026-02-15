@@ -60,6 +60,8 @@
 			label="Password"
 			error={getError('password')}
 		/>
-		<Button className="mt-4" type="submit" stretch={false} click={validate}>Login</Button>
+		<Button className="mt-4" type="submit" stretch={false} click={validate}>
+			{#snippet content()}Login{/snippet}
+		</Button>
 	</form>
 </div>

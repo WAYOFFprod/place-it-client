@@ -28,10 +28,16 @@
 		<Button
 			type="button"
 			classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
-			click={join}>Envoyer la demande</Button
+			click={join}
 		>
-		<Button type="button" classColor="bg-tea-rose hover:bg-tea-rose-focus" click={clickClose}
-			>Annuler</Button
-		>
+			{#snippet content()}
+				Envoyer la demande
+			{/snippet}
+		</Button>
+		<Button type="button" classColor="bg-tea-rose hover:bg-tea-rose-focus" click={clickClose}>
+			{#snippet content()}
+				Annuler
+			{/snippet}
+		</Button>
 	</div>
 </div>

@@ -327,8 +327,12 @@
 					classInactive="bg-white"
 					classActive="!bg-fluorescent-cyan-focus"
 					toggle={recentToggle}
-					on:change={toggleRecent}><img class="icon" src="/svg/time.svg" alt="" /></ToggleButton
+					change={toggleRecent}
 				>
+					{#snippet content()}
+						<img class="icon" src="/svg/time.svg" alt="" />
+					{/snippet}
+				</ToggleButton>
 				<ToggleButton
 					id="favorit"
 					label="Favoris"
@@ -337,8 +341,12 @@
 					classActive="!bg-tea-rose-focus"
 					toggle={favoritToggle}
 					disabled={!isConnected}
-					on:change={toggleFavorit}><img class="icon" src="/svg/heart.svg" alt="" /></ToggleButton
+					change={toggleFavorit}
 				>
+					{#snippet content()}
+						<img class="icon" src="/svg/heart.svg" alt="" />
+					{/snippet}
+				</ToggleButton>
 				<Select
 					className="min-w-52 hidden lg:block"
 					id="canvaType"

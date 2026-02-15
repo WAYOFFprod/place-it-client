@@ -113,7 +113,6 @@ export default class PointTool extends Tool {
 	}
 
 	protected placePixel() {
-		console.log('placing pixel', this.p5.mouseX, this.p5.mouseY, PointTool.color);
 		if (!PointTool.color) return;
 		// calculate on which pixel the mouse is over
 		const coords: Coord = {

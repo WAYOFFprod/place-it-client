@@ -18,7 +18,7 @@
 	let { childClass, canvaId, canvasOwned, colors = $bindable() }: Props = $props();
 
 	let currentColor: string = $state('');
-	let colorIndex: number = -1;
+	let colorIndex: number = $state(-1);
 
 	let storedColorPalette: string[];
 
@@ -66,26 +66,29 @@
 	{#if editMode}
 		<ColorEditor currentColorIndex={colorIndex} colorPalette={colors}></ColorEditor>
 	{/if}
-	<Panel class="w-fit" container="bg-white flex items-center">
-		<div class="grid grid-cols-8 gap-2 p-2 m-2">
-			{#each colors as color}
-				<Swatch
-					{color}
-					onclick={() => onUpdateSelectColor(color)}
-					edit={editMode}
-					selected={color == currentColor}
-				></Swatch>
-			{/each}
-		</div>
-		{#if canvasOwned}
-			<div class="flex gap-4 pr-4">
-				{#if editMode}
-					<button on:click={onUndo}><img src="/svg/undo.svg" alt="undo icon" /></button>
-					<button on:click={onSave}><img src="/svg/save.svg" alt="save icon" /></button>
-				{:else}
-					<button on:click={onOpenSettings}><img src="/svg/settings.svg" alt="edit icon" /></button>
-				{/if}
+	<Panel className="w-fit" container="bg-white flex items-center">
+		{#snippet content()}
+			<div class="grid grid-cols-8 gap-2 p-2 m-2">
+				{#each colors as color}
+					<Swatch
+						{color}
+						onclick={() => onUpdateSelectColor(color)}
+						edit={editMode}
+						selected={color == currentColor}
+					></Swatch>
+				{/each}
 			</div>
-		{/if}
+			{#if canvasOwned}
+				<div class="flex gap-4 pr-4">
+					{#if editMode}
+						<button onclick={onUndo}><img src="/svg/undo.svg" alt="undo icon" /></button>
+						<button onclick={onSave}><img src="/svg/save.svg" alt="save icon" /></button>
+					{:else}
+						<button onclick={onOpenSettings}><img src="/svg/settings.svg" alt="edit icon" /></button
+						>
+					{/if}
+				</div>
+			{/if}
+		{/snippet}
 	</Panel>
 </div>

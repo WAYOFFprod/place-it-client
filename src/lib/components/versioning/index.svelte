@@ -23,23 +23,25 @@
 
 {#if __APP_VERSION__ != localAppVersion && !isClosed}
 	<div class="absolute inset-0 z-50 flex justify-center items-center backdrop-blur-sm">
-		<Panel title="Update Available" class="m-8 w-fit">
-			<div class="p-4 max-h-screen overflow-y-auto">
-				<h1 class="mt-2 text-2xl uppercase">Version Update</h1>
-				{#each changelogSinceLastVersion as versionDetail}
-					<div class="mt-4">
-						<h2 class="text-xl font-bold">{versionDetail[0]}</h2>
-						<ul class="list-disc list-inside">
-							{#each Object.entries(versionDetail[1]) as changeTypeEntry}
-								<ChangeSection versionChanges={changeTypeEntry} />
-							{/each}
-						</ul>
-					</div>
-				{/each}
-			</div>
-			<button aria-label="close" class="absolute right-4 top-4" on:click={modalClosed}>
-				<img src="/svg/close.svg" alt="" />
-			</button>
+		<Panel className="m-8 w-fit">
+			{#snippet content()}
+				<div class="p-4 max-h-screen overflow-y-auto">
+					<h1 class="mt-2 text-2xl uppercase">Version Update</h1>
+					{#each changelogSinceLastVersion as versionDetail}
+						<div class="mt-4">
+							<h2 class="text-xl font-bold">{versionDetail[0]}</h2>
+							<ul class="list-disc list-inside">
+								{#each Object.entries(versionDetail[1]) as changeTypeEntry}
+									<ChangeSection versionChanges={changeTypeEntry} />
+								{/each}
+							</ul>
+						</div>
+					{/each}
+				</div>
+				<button aria-label="close" class="absolute right-4 top-4" on:click={modalClosed}>
+					<img src="/svg/close.svg" alt="" />
+				</button>
+			{/snippet}
 		</Panel>
 	</div>
 {/if}

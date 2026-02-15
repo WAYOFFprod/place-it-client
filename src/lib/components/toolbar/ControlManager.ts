@@ -44,7 +44,6 @@ export default class ControlManager {
 			ControlManager.instance.p5 = p5;
 			ControlManager.instance.gridManager = gridManager;
 		}
-		console.log('ControlManager instance created');
 		return ControlManager.instance;
 	}
 

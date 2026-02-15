@@ -45,5 +45,9 @@
 			<img src="/svg/chevron-right.svg" alt="" class="w-4 h-4" />
 		</div>
 	</div>
-	<Tooltip show={disabled} className="hidden peer-hover:flex">Comming soon</Tooltip>
+	<Tooltip show={disabled} className="hidden peer-hover:flex">
+		{#snippet content()}
+			Comming soon
+		{/snippet}
+	</Tooltip>
 </label>

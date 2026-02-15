@@ -49,28 +49,34 @@
 
 <div class="{$$props.class} cursor-hand">
 	<Panel className="w-fit">
-		<div class="grid grid-cols-1 gap-2 p-1 m-1 md:m-2">
-			{#if tools != undefined}
-				{#if !windowSmall || expandedToolbar}
-					{#each tools as t}
+		{#snippet content()}
+			<div class="grid grid-cols-1 gap-2 p-1 m-1 md:m-2">
+				{#if tools != undefined}
+					{#if !windowSmall || expandedToolbar}
+						{#each tools as t}
+							<ToolIcon
+								selectTool={updateSelectTool}
+								toolType={t.type}
+								selected={currentToolType == t}
+							>
+								{#snippet content()}
+									<svelte:component this={t.icon} />
+								{/snippet}
+							</ToolIcon>
+						{/each}
+					{:else if windowSmall && currentToolType != null}
 						<ToolIcon
-							selectTool={updateSelectTool}
-							toolType={t.type}
-							selected={currentToolType == t}
+							toolType={currentToolType.type}
+							selected={true}
+							selectTool={toggleToolbarLength}
 						>
-							<svelte:component this={t.icon} />
+							{#snippet content()}
+								<svelte:component this={currentToolType?.icon} />
+							{/snippet}
 						</ToolIcon>
-					{/each}
-				{:else if windowSmall && currentToolType != null}
-					<ToolIcon
-						toolType={currentToolType.type}
-						selected={true}
-						selectTool={toggleToolbarLength}
-					>
-						<svelte:component this={currentToolType.icon} />
-					</ToolIcon>
+					{/if}
 				{/if}
-			{/if}
-		</div>
+			</div>
+		{/snippet}
 	</Panel>
 </div>

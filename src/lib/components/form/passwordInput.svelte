@@ -1,13 +1,23 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+
 	interface Props {
 		placeholder?: string;
 		label?: string;
 		id: string;
 		error?: string | null;
 		className?: string;
+		startIcon?: Snippet;
 	}
 
-	let { placeholder = '', label = '', id, error = null, className = '' }: Props = $props();
+	let {
+		placeholder = '',
+		label = '',
+		id,
+		error = null,
+		className = '',
+		startIcon
+	}: Props = $props();
 
 	let passwordShow = $state(false);
 </script>
@@ -17,7 +27,7 @@
 		<label class="block mb-3" for={id}>{label}</label>
 	{/if}
 	<div class="relative flex gap-2 w-fit">
-		<slot name="startIcon" />
+		{#if startIcon}{@render startIcon()}{/if}
 		<input
 			{id}
 			name={id}

@@ -12,10 +12,10 @@
 		accounts = response.data;
 	};
 
-	const unblockAccount = async (event: CustomEvent<number>) => {
-		const isRemoved = await networker.unblockAccount(event.detail);
+	const unblockAccount = async (accountId: number) => {
+		const isRemoved = await networker.unblockAccount(accountId);
 		if (isRemoved) {
-			const index = accounts.findIndex((obj) => obj.friend_id == event.detail);
+			const index = accounts.findIndex((obj) => obj.friend_id == accountId);
 			if (index != -1) {
 				accounts[index].noDisplay = true;
 			}
@@ -31,7 +31,7 @@
 		<div class="min-h-60 max-h-96 overflow-y-scroll flex flex-col w-full px-10 py-8">
 			{#each accounts as account}
 				{#if !account.noDisplay}
-					<BlockedLine {account} on:unblockAccount={unblockAccount}></BlockedLine>
+					<BlockedLine {account} {unblockAccount}></BlockedLine>
 				{/if}
 			{/each}
 		</div>

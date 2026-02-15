@@ -95,6 +95,10 @@
 		id="{id}-edit"
 		toggle={editable}
 		{disabled}
-		on:change={change}><span>{buttonLabel}</span></ToggleButton
+		{change}
 	>
+		{#snippet content()}
+			<span>{buttonLabel}</span>
+		{/snippet}
+	</ToggleButton>
 </div>

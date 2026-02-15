@@ -148,40 +148,48 @@
 					toggleName="canva-type"
 					value="small"
 					selectedValue={selectedPreset}
-					on:selectValue={selectPreset}
+					selectValue={selectPreset}
 				>
-					<img src="/svg/small-canva.svg" alt="" class="mb-2" />
-					<span>Petit Canva</span>
-					<span class="text-md">64 x 64</span>
+					{#snippet content()}
+						<img src="/svg/small-canva.svg" alt="" class="mb-2" />
+						<span>Petit Canva</span>
+						<span class="text-md">64 x 64</span>
+					{/snippet}
 				</CanvaTypeToggle>
 				<CanvaTypeToggle
 					toggleName="canva-type"
 					value="big"
 					selectedValue={selectedPreset}
-					on:selectValue={selectPreset}
+					selectValue={selectPreset}
 				>
-					<img src="/svg/big-canva.svg" alt="" class="mb-2" />
-					<span>Grand Canva</span>
-					<span class="text-md">512 x 512</span>
+					{#snippet content()}
+						<img src="/svg/big-canva.svg" alt="" class="mb-2" />
+						<span>Grand Canva</span>
+						<span class="text-md">512 x 512</span>
+					{/snippet}
 				</CanvaTypeToggle>
 				<CanvaTypeToggle
 					toggleName="canva-type"
 					disabled
 					value="infinit"
 					selectedValue={selectedPreset}
-					on:selectValue={selectPreset}
+					selectValue={selectPreset}
 				>
-					<img src="/svg/infinit.svg" alt="" class="mb-2" />
-					<span>Infini</span>
+					{#snippet content()}
+						<img src="/svg/infinit.svg" alt="" class="mb-2" />
+						<span>Infini</span>
+					{/snippet}
 				</CanvaTypeToggle>
 				<CanvaTypeToggle
 					toggleName="canva-type"
 					value="custom"
 					selectedValue={selectedPreset}
-					on:selectValue={selectPreset}
+					selectValue={selectPreset}
 				>
-					<img src="/svg/custom-canva.png" alt="" class="mb-2 w-16 h-16" />
-					<span>Personalisé</span>
+					{#snippet content()}
+						<img src="/svg/custom-canva.png" alt="" class="mb-2 w-16 h-16" />
+						<span>Personalisé</span>
+					{/snippet}
 				</CanvaTypeToggle>
 			</form>
 		</div>
@@ -207,30 +215,36 @@
 			<ToggleInput id="community" label="Community" change={toggleCommunity} />
 			{#if isCommunity}
 				<Accordion>
-					<div slot="heading">Options Avancée</div>
-					<div slot="content" class="flex flex-col gap-4">
-						<ToggleInput id="joinRequest" label="Joindre sur demande" toggle={false} />
-						<ToggleInput
-							id="limitedPalette"
-							label="Palette limitée"
-							toggle={customPalette}
-							change={() => (customPalette = !customPalette)}
-						/>
-						<Select
-							id="gameType"
-							label="Catégorie du canva"
-							placeholder="Type de canva"
-							options={gameTypeOptions}
-							selectedOption={selectedOption.value}
-							error={getError('category')}
-						></Select>
-					</div>
+					{#snippet heading()}
+						Options Avancée
+					{/snippet}
+					{#snippet content()}
+						<div class="flex flex-col gap-4">
+							<ToggleInput id="joinRequest" label="Joindre sur demande" toggle={false} />
+							<ToggleInput
+								id="limitedPalette"
+								label="Palette limitée"
+								toggle={customPalette}
+								change={() => (customPalette = !customPalette)}
+							/>
+							<Select
+								id="gameType"
+								label="Catégorie du canva"
+								placeholder="Type de canva"
+								options={gameTypeOptions}
+								selectedOption={selectedOption.value}
+								error={getError('category')}
+							></Select>
+						</div>
+					{/snippet}
 				</Accordion>
 			{/if}
 			<div class="grow justify-self-stretch flex items-end">
 				<Button type="submit" click={validate}>
-					<img src="/svg/canva-plus.svg" alt="" />
-					<span>Créer</span>
+					{#snippet content()}
+						<img src="/svg/canva-plus.svg" alt="" />
+						<span>Créer</span>
+					{/snippet}
 				</Button>
 			</div>
 		</form>

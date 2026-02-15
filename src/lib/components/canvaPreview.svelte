@@ -89,96 +89,99 @@
 
 <div class="group" id="canva-preview-{canva.id}">
 	<Panel className="w-full">
-		<!-- Overlay -->
-		<div class="absolute inset-0 flex flex-col justify-between h-full">
-			<!-- Top section -->
-			<div class="flex justify-between p-4 z-20">
-				<button>
-					{#if icon}
-						{@render icon()}
-					{:else if canva.access == 'open'}
-						<img class="text-black" src="/svg/earth.svg" alt="community icon" />
-					{:else if canva.access == 'request_only'}
-						<img class="text-black" src="/svg/users.svg" alt="community icon" />
-					{/if}
-				</button>
-				<button class="group/favorit relative" onclick={toggleLike}>
-					<Heart class="text-black absolute"></Heart>
-					<HeartFill
-						className="text-transparent group-hover/favorit:text-off-white z-20 data-[liked=true]:text-naples-yellow"
-						dataLiked={canva.isLiked}
-					></HeartFill>
-				</button>
-			</div>
-			<!-- Bottom Section -->
-			{#if canva.visibility != 'private'}
-				<div class="h-6 border-t-2 border-black bg-white flex justify-between text-lg px-1">
-					<span>{getCategory}</span>
-					<div class="flex items-center gap-1">
-						<span>{getUserCount}</span>
-						<span class="w-2.5 h-2.5 rounded-full border-2 border-black bg-fluorescent-cyan"></span>
-					</div>
+		{#snippet content()}
+			<!-- Overlay -->
+			<div class="absolute inset-0 flex flex-col justify-between h-full">
+				<!-- Top section -->
+				<div class="flex justify-between p-4 z-20">
+					<button>
+						{#if icon}
+							{@render icon()}
+						{:else if canva.access == 'open'}
+							<img class="text-black" src="/svg/earth.svg" alt="community icon" />
+						{:else if canva.access == 'request_only'}
+							<img class="text-black" src="/svg/users.svg" alt="community icon" />
+						{/if}
+					</button>
+					<button class="group/favorit relative" onclick={toggleLike}>
+						<Heart class="text-black absolute"></Heart>
+						<HeartFill
+							className="text-transparent group-hover/favorit:text-off-white z-20 data-[liked=true]:text-naples-yellow"
+							dataLiked={canva.isLiked}
+						></HeartFill>
+					</button>
 				</div>
-			{/if}
-			<!-- Hover -->
-			<div
-				class="absolute invisible inset-0 bg-black/50 opacity-0 group-hover:opacity-100 px-16 md:px-28 group-hover:visible"
-			>
-				<div class="relative flex flex-col justify-center items-center gap-4 h-full z-30">
-					{#if (canva.access != 'closed' || canva.owned) && conenctionStatus}
-						{#if canva.participationStatus == 'accepted'}
+				<!-- Bottom Section -->
+				{#if canva.visibility != 'private'}
+					<div class="h-6 border-t-2 border-black bg-white flex justify-between text-lg px-1">
+						<span>{getCategory}</span>
+						<div class="flex items-center gap-1">
+							<span>{getUserCount}</span>
+							<span class="w-2.5 h-2.5 rounded-full border-2 border-black bg-fluorescent-cyan"
+							></span>
+						</div>
+					</div>
+				{/if}
+				<!-- Hover -->
+				<div
+					class="absolute invisible inset-0 bg-black/50 opacity-0 group-hover:opacity-100 px-16 md:px-28 group-hover:visible"
+				>
+					<div class="relative flex flex-col justify-center items-center gap-4 h-full z-30">
+						{#if (canva.access != 'closed' || canva.owned) && conenctionStatus}
+							{#if canva.participationStatus == 'accepted'}
+								<Button
+									type="link"
+									link="/canva?id={canva.id}"
+									classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
+								>
+									{#snippet content()}Jouer{/snippet}</Button
+								>
+							{:else if canva.participationStatus == 'sent'}
+								<Button
+									type="button"
+									disabled={true}
+									link="/canva?id={canva.id}"
+									classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus disabled:bg-white"
+									>{#snippet content()}Demande Envoyée{/snippet}</Button
+								>
+							{:else if canva.participationStatus == null}
+								<Button
+									type="button"
+									click={onRequest}
+									classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
+									>{#snippet content()}Rejoindre{/snippet}</Button
+								>
+							{/if}
+						{/if}
+						{#if canva.access != 'closed'}
 							<Button
 								type="link"
-								link="/canva?id={canva.id}"
-								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
-							>
-								{#snippet content()}Jouer{/snippet}</Button
-							>
-						{:else if canva.participationStatus == 'sent'}
-							<Button
-								type="button"
-								disabled={true}
-								link="/canva?id={canva.id}"
-								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus disabled:bg-white"
-								>{#snippet content()}Demande Envoyée{/snippet}</Button
-							>
-						{:else if canva.participationStatus == null}
-							<Button
-								type="button"
-								click={onRequest}
-								classColor="bg-fluorescent-cyan hover:bg-fluorescent-cyan-focus"
-								>{#snippet content()}Rejoindre{/snippet}</Button
+								link="/canva/view?id={canva.id}"
+								classColor="bg-naples-yellow hover:bg-naples-yellow-focus"
+								>{#snippet content()}Regarder{/snippet}</Button
 							>
 						{/if}
-					{/if}
-					{#if canva.access != 'closed'}
-						<Button
-							type="link"
-							link="/canva/view?id={canva.id}"
-							classColor="bg-naples-yellow hover:bg-naples-yellow-focus"
-							>{#snippet content()}Regarder{/snippet}</Button
-						>
-					{/if}
-					{#if canva.owned}
-						<Button
-							id="modify"
-							type="button"
-							click={onEdit}
-							classColor="bg-naples-yellow hover:bg-naples-yellow-focus"
-							>{#snippet content()}Modifier{/snippet}</Button
-						>
-						<Button
-							type="button"
-							click={onDelete}
-							classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus"
-							>{#snippet content()}Supprimer{/snippet}</Button
-						>
-					{/if}
+						{#if canva.owned}
+							<Button
+								id="modify"
+								type="button"
+								click={onEdit}
+								classColor="bg-naples-yellow hover:bg-naples-yellow-focus"
+								>{#snippet content()}Modifier{/snippet}</Button
+							>
+							<Button
+								type="button"
+								click={onDelete}
+								classColor="bg-bittersweet-red hover:bg-bittersweet-red-focus"
+								>{#snippet content()}Supprimer{/snippet}</Button
+							>
+						{/if}
+					</div>
 				</div>
 			</div>
-		</div>
-		<!-- Image -->
-		<img class="w-96 h-64 disable-blur object-cover" src={canva.image} alt="canva {canva.id}" />
+			<!-- Image -->
+			<img class="w-96 h-64 disable-blur object-cover" src={canva.image} alt="canva {canva.id}" />
+		{/snippet}
 	</Panel>
 	<div class="flex flex-col gap-1 mt-4">
 		<div>{canva.name}</div>
