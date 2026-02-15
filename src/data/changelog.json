@@ -19,7 +19,8 @@
 	},
 	"0.2.0": {
 		"updated": [
-			"upgraded frontend to svelte 5, this doesn't change much for now but it's good for the future of the project"
+			"upgraded frontend to svelte 5, this doesn't change much for now but it's good for the future of the project",
+			"updated backend dependencies as well"
 		]
 	}
 }

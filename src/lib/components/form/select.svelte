@@ -4,7 +4,7 @@
 		label?: string;
 		placeholder: string;
 		options: options[];
-		isOpen?: boolean;
+		isInitiallyOpen?: boolean;
 		disabled?: boolean;
 		selectedOption?: string | null;
 		className?: string;
@@ -16,22 +16,24 @@
 		label = '',
 		placeholder,
 		options = [],
-		isOpen = false,
+		isInitiallyOpen = false,
 		disabled = false,
-		selectedOption = null,
+		selectedOption = $bindable(null),
 		className = '',
 		error = null
 	}: Props = $props();
 
+	// svelte-ignore state_referenced_locally
+	let isOpen = $state(isInitiallyOpen);
+
 	const toggle = () => {
 		isOpen = !isOpen;
+		console.log(isOpen);
 	};
 
-	const onChange = (event: Event) => {
-		const target = event.target as HTMLSelectElement;
-		selectedOption = target.value;
+	const selectOption = (value: string) => {
+		selectedOption = value;
 		isOpen = false;
-		// selected = event.target.value;
 	};
 
 	const title = $derived(
@@ -59,26 +61,28 @@
 			<span>{title}</span>
 			<img class="w-4" src="/svg/chevron-down.svg" alt="" />
 		</button>
-		<div class="flex flex-col {isOpen && !disabled ? '' : 'hidden'} relative">
-			{#each options as option}
-				<label for={option.value} class="relative px-2 py-1">
-					<input
-						{disabled}
-						id={option.value}
-						name={id}
-						type="radio"
-						class="peer hidden"
-						onchange={onChange}
-						value={option.value}
-						checked={selectedOption == option.value}
-					/>
-					<span class="relative z-10 pointer-events-none">{option.label}</span>
-					<div
-						class="absolute inset-0 bg-white hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan z-0"
-					></div>
-				</label>
-			{/each}
-		</div>
+		{#if isOpen && !disabled}
+			<div class="flex flex-col relative">
+				{#each options as option}
+					<label for={option.value} class="relative px-2 py-1">
+						<input
+							{disabled}
+							id={option.value}
+							name={id}
+							type="radio"
+							class="peer hidden"
+							value={option.value}
+							onclick={() => selectOption(option.value)}
+							checked={selectedOption == option.value}
+						/>
+						<span class="relative z-10 pointer-events-none">{option.label}</span>
+						<div
+							class="absolute inset-0 bg-white hover:bg-naples-yellow peer-checked:bg-fluorescent-cyan z-0"
+						></div>
+					</label>
+				{/each}
+			</div>
+		{/if}
 	</div>
 	{#if error}
 		<div class="mt-12 text-red-500 text-sm">{error}</div>

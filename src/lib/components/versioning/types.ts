@@ -14,5 +14,6 @@ export enum changeType {
 	CHANGED = 'changed',
 	DEPRECATED = 'deprecated',
 	REMOVED = 'removed',
-	SECURITY = 'security'
+	SECURITY = 'security',
+	UPDATED = 'updated'
 }

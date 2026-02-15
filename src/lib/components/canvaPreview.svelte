@@ -11,6 +11,8 @@
 
 	let { canva, icon }: { canva: CanvaPreviewData; icon?: Snippet } = $props();
 
+	let isLiked: boolean = $state(canva.isLiked);
+
 	let conenctionStatus: undefined | boolean = $state(undefined);
 	const networker = Networker.getInstance();
 
@@ -42,7 +44,7 @@
 	};
 
 	const toggleLike = async () => {
-		canva.isLiked = await networker.likeCanva(canva.id);
+		isLiked = canva.isLiked = await networker.likeCanva(canva.id);
 	};
 
 	const dateOptions: Intl.DateTimeFormatOptions = {
@@ -85,6 +87,10 @@
 				break;
 		}
 	});
+	$effect(() => {
+		// This code will run whenever canva.isLiked changes
+		console.log(`Canva ${canva.id} isLiked status: ${canva.isLiked}`);
+	});
 </script>
 
 <div class="group" id="canva-preview-{canva.id}">
@@ -107,7 +113,7 @@
 						<Heart class="text-black absolute"></Heart>
 						<HeartFill
 							className="text-transparent group-hover/favorit:text-off-white z-20 data-[liked=true]:text-naples-yellow"
-							dataLiked={canva.isLiked}
+							dataLiked={isLiked}
 						></HeartFill>
 					</button>
 				</div>
