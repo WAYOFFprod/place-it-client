@@ -13,9 +13,16 @@
 		canvaId: number | undefined;
 		canvasOwned: boolean | undefined;
 		colors: string[];
+		setColors: (newColors: [string]) => void;
 	}
 
-	let { childClass, canvaId, canvasOwned, colors = $bindable() }: Props = $props();
+	let {
+		childClass,
+		canvaId,
+		canvasOwned,
+		colors = $bindable(),
+		setColors = $bindable()
+	}: Props = $props();
 
 	let currentColor: string = $state('');
 	let colorIndex: number = $state(-1);
@@ -23,6 +30,12 @@
 	let storedColorPalette: string[];
 
 	let editMode = $state(false);
+
+	setColors = (newColors: [string]) => {
+		storedColors.set(newColors);
+		selectedColor.set(newColors[0]);
+		colorIndex = 0;
+	};
 
 	const unsubscribeSelectedColor = selectedColor.subscribe((newColor) => {
 		currentColor = newColor;

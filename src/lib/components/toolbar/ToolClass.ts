@@ -28,7 +28,6 @@ export default class Tool {
 	controlManager: ControlManager;
 
 	constructor(p5: P5) {
-		console.log('initializing tool', (this.constructor as typeof Tool).type, p5);
 		this.p5 = p5;
 		this.init();
 		this.controlManager = ControlManager.getInstance();

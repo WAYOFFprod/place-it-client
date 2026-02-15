@@ -17,7 +17,8 @@ export default class P5Manager {
 		private canva: CanvaPreviewData,
 		private viewOnly: boolean,
 		private marginBottom: number,
-		private setPaletteColors: (colors: string[]) => void
+		private setPaletteColors: (colors: string[]) => void,
+		private updateColorPaletteCallback: (newColors: [string]) => void
 	) {
 		this.networker = Networker.getInstance();
 
@@ -74,6 +75,7 @@ export default class P5Manager {
 		const pixels = this.networker.tempPoints as { [key: string]: string };
 		this.gridManager.loadImage(canvasData.data.image, pixels);
 		this.setPaletteColors(canvasData.data.colors);
+		this.updateColorPaletteCallback(canvasData.data.colors);
 		this.networker.joinLiveCanva(canvasData.id);
 	}
 

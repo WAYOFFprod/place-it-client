@@ -23,8 +23,9 @@
 	let cursor = $state('');
 	let id = 'canvas-container';
 	let container: HTMLElement;
-	let paletteColors: string[] = $state([]);
 	let p5Manager: P5Manager | undefined = $state(undefined);
+	let triggerUpdateColorPalette = $state<(newColors: [string]) => void>(() => {});
+	let paletteColors: string[] = $state([]);
 
 	let currentToolType: typeof Tool = $state(Tool);
 	let currentTool: Tool | undefined;
@@ -55,7 +56,8 @@
 				canva,
 				viewOnly,
 				marginBottom,
-				(colors) => (paletteColors = colors)
+				(colors) => (paletteColors = colors),
+				triggerUpdateColorPalette
 			);
 
 			return () => {
@@ -90,6 +92,7 @@
 				canvasOwned={canva.owned}
 				canvaId={canva.id}
 				bind:colors={paletteColors}
+				bind:setColors={triggerUpdateColorPalette}
 				childClass={'pointer-events-auto'}
 			></Palette>
 		</div>
