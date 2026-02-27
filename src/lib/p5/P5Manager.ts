@@ -11,6 +11,7 @@ export default class P5Manager {
 	private controlManager!: ControlManager;
 	private networker: Networker;
 	private wheelHandler!: (e: WheelEvent) => void;
+	private readonly containerElement: HTMLElement;
 
 	constructor(
 		container: HTMLElement,
@@ -21,6 +22,7 @@ export default class P5Manager {
 		private updateColorPaletteCallback: (newColors: [string]) => void
 	) {
 		this.networker = Networker.getInstance();
+		this.containerElement = container;
 
 		const script = (canvas: P5) => {
 			this.p5 = canvas;
@@ -46,15 +48,18 @@ export default class P5Manager {
 		this.initManagers();
 
 		this.wheelHandler = (e: WheelEvent) => {
+			if (!this.isWithinCanvasContainer(e.target)) {
+				return;
+			}
+
 			e.preventDefault();
-			if (!this.isTargeting(e.target, 'place-it-canvas')) return;
 			if (e.deltaY > 0) {
 				this.controlManager.scroll(1 - 0.1);
 			} else {
 				this.controlManager.scroll(1 + 0.1);
 			}
 		};
-		window.addEventListener('wheel', this.wheelHandler, { passive: false });
+		this.containerElement.addEventListener('wheel', this.wheelHandler, { passive: false });
 	}
 
 	private initManagers() {
@@ -83,6 +88,14 @@ export default class P5Manager {
 		if (target == null) return false;
 		const targetId = (target as HTMLElement).id;
 		return targetId === id;
+	}
+
+	private isWithinCanvasContainer(target: EventTarget | null): boolean {
+		if (target == null || !(target instanceof Node)) {
+			return false;
+		}
+
+		return this.containerElement.contains(target);
 	}
 
 	private draw() {
@@ -167,7 +180,7 @@ export default class P5Manager {
 		// 	this.gridManager.destroy();
 		// }
 		if (this.wheelHandler) {
-			window.removeEventListener('wheel', this.wheelHandler);
+			this.containerElement.removeEventListener('wheel', this.wheelHandler);
 		}
 	}
 

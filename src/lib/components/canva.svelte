@@ -22,6 +22,7 @@
 
 	let cursor = $state('');
 	let id = 'canvas-container';
+	let rootContainer: HTMLDivElement;
 	let container: HTMLElement;
 	let p5Manager: P5Manager | undefined = $state(undefined);
 	let triggerUpdateColorPalette = $state<(newColors: [string]) => void>(() => {});
@@ -50,6 +51,32 @@
 	});
 
 	onMount(() => {
+		const preventTouchZoom = (event: TouchEvent) => {
+			if (!rootContainer.contains(event.target as Node)) {
+				return;
+			}
+
+			if (event.touches.length >= 2) {
+				event.preventDefault();
+			}
+		};
+
+		const preventGestureZoom = (event: Event) => {
+			if (!rootContainer.contains(event.target as Node)) {
+				return;
+			}
+
+			event.preventDefault();
+		};
+
+		document.addEventListener('touchmove', preventTouchZoom, { passive: false });
+		document.addEventListener('gesturestart', preventGestureZoom as EventListener, {
+			passive: false
+		});
+		document.addEventListener('gesturechange', preventGestureZoom as EventListener, {
+			passive: false
+		});
+
 		if (container) {
 			p5Manager = new P5Manager(
 				container,
@@ -61,6 +88,9 @@
 			);
 
 			return () => {
+				document.removeEventListener('touchmove', preventTouchZoom);
+				document.removeEventListener('gesturestart', preventGestureZoom as EventListener);
+				document.removeEventListener('gesturechange', preventGestureZoom as EventListener);
 				p5Manager?.destroy();
 			};
 		}
@@ -78,7 +108,7 @@
 </script>
 
 <Modal></Modal>
-<div {id} class="relative cursor-{cursor}">
+<div bind:this={rootContainer} {id} class="relative cursor-{cursor} touch-none">
 	<!-- overlay -->
 	<div class="absolute inset-0 pointer-events-none">
 		{#if currentToolType.type == ToolType.Place}
@@ -115,5 +145,12 @@
 	</div>
 
 	<!-- canvas -->
-	<div bind:this={container}></div>
+	<div bind:this={container} class="touch-none"></div>
 </div>
+
+<style lang="postcss">
+	#canvas-container,
+	#canvas-container canvas {
+		touch-action: none;
+	}
+</style>
