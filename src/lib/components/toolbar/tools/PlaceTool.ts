@@ -28,6 +28,7 @@ export default class PlaceTool extends Tool {
 	};
 	// distance between fingers from the previous frame
 	pinchDistance: number = 0;
+	isPinching: boolean = false;
 
 	pixels: Coord[] = [];
 
@@ -72,6 +73,8 @@ export default class PlaceTool extends Tool {
 			clearInterval(this.interval);
 		}
 		this.timer = 0;
+		this.isPinching = false;
+		this.pinchDistance = 0;
 	}
 
 	mouseMove(isMouseDown: boolean) {
@@ -81,15 +84,27 @@ export default class PlaceTool extends Tool {
 		const touch1 = this.p5.touches[0] as { x: number; y: number } | undefined;
 		const touch2 = this.p5.touches[1] as { x: number; y: number } | undefined;
 		if (touch1 && touch2) {
-			// zoom
 			const distance = this.p5.dist(touch1.x, touch1.y, touch2.x, touch2.y);
+
+			if (!this.isPinching || this.pinchDistance <= 0) {
+				this.isPinching = true;
+				this.pinchDistance = distance;
+				return this.controlManager.gridManager.screenOffset;
+			}
+
 			const scaleFactor = distance / this.pinchDistance;
+			if (!Number.isFinite(scaleFactor) || scaleFactor <= 0) {
+				this.pinchDistance = distance;
+				return this.controlManager.gridManager.screenOffset;
+			}
+
 			const newCurrentScale = this.controlManager.gridManager.currentScale * scaleFactor;
 			const newScaleFactor = newCurrentScale / this.controlManager.gridManager.currentScale;
 			this.controlManager.scroll(newScaleFactor);
 
 			this.pinchDistance = distance;
 		} else {
+			this.isPinching = false;
 			// drag
 			this.controlManager.gridManager.screenOffset.x = this.p5.mouseX - this.dragOffset.x;
 			this.controlManager.gridManager.screenOffset.y = this.p5.mouseY - this.dragOffset.y;
