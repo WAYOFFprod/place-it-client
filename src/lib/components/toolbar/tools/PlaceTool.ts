@@ -65,7 +65,7 @@ export default class PlaceTool extends Tool {
 		this.interval = setInterval(() => this.timer++, 10);
 	}
 	mouseReleased() {
-		if (this.timer < 10) {
+		if (this.timer < 100) {
 			this.placePixel();
 			this.pixels = [];
 		}
