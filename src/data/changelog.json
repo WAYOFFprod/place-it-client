@@ -21,6 +21,9 @@
 		"updated": [
 			"upgraded frontend to svelte 5, this doesn't change much for now but it's good for the future of the project",
 			"updated backend dependencies as well"
+		],
+		"added": [
+			"added basic admin panel in order to have a better way to manage canvases and users."
 		]
 	}
 }
