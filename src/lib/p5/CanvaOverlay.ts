@@ -62,7 +62,10 @@ export default class CanvaOverlay {
 
 	protected drawRectangle() {
 		this.img.clear();
-		this.img.drawingContext.setLineDash([10, 10]);
+		const ctx = this.img.drawingContext as CanvasRenderingContext2D;
+		if (ctx.setLineDash) {
+			ctx.setLineDash([10, 10]);
+		}
 		this.img.strokeCap(this.p5.SQUARE);
 		if (this.fill) {
 			this.img.fill(this.savedColor);
