@@ -12,6 +12,7 @@ export default class P5Manager {
 	private networker: Networker;
 	private wheelHandler!: (e: WheelEvent) => void;
 	private readonly containerElement: HTMLElement;
+	private isPointerActive: boolean = false;
 
 	constructor(
 		container: HTMLElement,
@@ -29,9 +30,9 @@ export default class P5Manager {
 			this.p5.setup = this.setup.bind(this);
 			this.p5.draw = this.draw.bind(this);
 			this.p5.mousePressed = this.mousePressed.bind(this);
+			this.p5.mouseReleased = this.mouseReleased.bind(this);
 			this.p5.touchStarted = this.touchStarted.bind(this);
 			this.p5.touchEnded = this.touchEnded.bind(this);
-			this.p5.mouseReleased = this.mouseReleased.bind(this);
 			this.p5.keyPressed = this.keyPressed.bind(this);
 			this.p5.keyReleased = this.keyReleased.bind(this);
 		};
@@ -122,28 +123,60 @@ export default class P5Manager {
 	}
 
 	private mousePressed(e: MouseEvent) {
-		if (!this.isTargeting(e.target, 'place-it-canvas')) return;
+		console.log('mouse pressed:', e);
+		if (this.isPointerActive) {
+			return;
+		}
+
+		if (!this.isTargeting(e.target, 'place-it-canvas')) {
+			return;
+		}
+
+		this.isPointerActive = true;
 		this.controlManager.mousePressed();
 	}
 
 	private touchStarted(e: TouchEvent) {
-		if (!this.isTargeting(e.target, 'place-it-canvas')) return;
+		if (this.isPointerActive) {
+			return false;
+		}
+
+		if (!this.isWithinCanvasContainer(e.target)) {
+			return;
+		}
+
+		this.isPointerActive = true;
 		this.controlManager.mousePressed();
+		return false;
 	}
 
-	private touchEnded(e: TouchEvent) {
-		if (!this.isTargeting(e.target, 'place-it-canvas')) return;
-		this.controlManager.mouseReleased();
-	}
 
 	private mouseReleased() {
+		console.log('mouse released');
+		if (!this.isPointerActive) {
+			return;
+		}
+
+		this.isPointerActive = false;
 		this.controlManager.mouseReleased();
+	}
+
+	private touchEnded() {
+		if (!this.isPointerActive) {
+			return false;
+		}
+
+		this.isPointerActive = false;
+		this.controlManager.mouseReleased();
+		return false;
 	}
 
 	private keyPressed() {
 		this.controlManager.keyDown();
+		console.log('key pressed:', this.p5.key, this.p5.OPTION);
 		switch (this.p5.keyCode) {
 			case this.p5.OPTION:
+				console.log('option key pressed, switching to hand tool');
 				setTempTool(ToolType.Hand, this.p5);
 				break;
 			default:

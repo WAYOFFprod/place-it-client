@@ -52,8 +52,24 @@ export default class PlaceTool extends Tool {
 
 	keyUp() {}
 
+	private getPrimaryPointer(): Coord | undefined {
+		const touchPointer = this.p5.touches[0] as Coord | undefined;
+		if (touchPointer) {
+			return touchPointer;
+		}
+
+		if (!Number.isFinite(this.p5.mouseX) || !Number.isFinite(this.p5.mouseY)) {
+			return undefined;
+		}
+
+		return {
+			x: this.p5.mouseX,
+			y: this.p5.mouseY
+		};
+	}
+
 	mousePressed(screenOffset: Coord) {
-		this.startTouch = this.p5.touches[0] as Coord | undefined;
+		this.startTouch = this.getPrimaryPointer();
 		if (!this.startTouch) return true;
 		const distance = this.p5.dist(this.startTouch.x, this.startTouch.y, 0, 0);
 		this.pinchDistance = distance;
