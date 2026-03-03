@@ -7,6 +7,7 @@ import ControlManager from '../ControlManager';
 import { selectedColor } from '$lib/stores/colorStore';
 import { get, writable, type Writable } from 'svelte/store';
 
+
 export default class PlaceTool extends Tool {
 	static cursor = 'place';
 	static type = ToolType.Place;
@@ -26,6 +27,8 @@ export default class PlaceTool extends Tool {
 		x: 0,
 		y: 0
 	};
+
+	startTouch: Coord | undefined = undefined;
 	// distance between fingers from the previous frame
 	pinchDistance: number = 0;
 	isPinching: boolean = false;
@@ -49,13 +52,14 @@ export default class PlaceTool extends Tool {
 	keyUp() {}
 
 	mousePressed(screenOffset: Coord) {
-		const touch = this.p5.touches[0] as { x: number; y: number } | undefined;
-		if (!touch) return true;
-		const distance = this.p5.dist(touch.x, touch.y, 0, 0);
+		this.startTouch = this.p5.touches[0] as Coord | undefined;
+		if (!this.startTouch) return true;
+		const distance = this.p5.dist(this.startTouch.x, this.startTouch.y, 0, 0);
 		this.pinchDistance = distance;
 		this.controlManager.gridManager.screenOffset = screenOffset;
-		this.dragOffset.x = touch.x - screenOffset.x;
-		this.dragOffset.y = touch.y - screenOffset.y;
+		this.dragOffset.x = this.startTouch.x - screenOffset.x;
+		this.dragOffset.y = this.startTouch.y - screenOffset.y;
+		this.startTouch = this.startTouch;
 		this.startTimer();
 		return true;
 	}
@@ -72,9 +76,13 @@ export default class PlaceTool extends Tool {
 		if (this.interval) {
 			clearInterval(this.interval);
 		}
+		if(this.checkDistance() > 50) {
+
+		}
 		this.timer = 0;
 		this.isPinching = false;
 		this.pinchDistance = 0;
+		this.startTouch = undefined;
 	}
 
 	mouseMove(isMouseDown: boolean) {
@@ -112,6 +120,13 @@ export default class PlaceTool extends Tool {
 
 		// to move KEEP
 		return this.controlManager.gridManager.screenOffset;
+	}
+	private checkDistance() {
+		if (!this.startTouch) return 0;
+		const touch = this.p5.touches[0] as Coord | undefined;
+		if (!touch) return 0;
+
+		return this.p5.dist(this.startTouch.x, this.startTouch.y, touch.x, touch.y);
 	}
 
 	protected placePixel() {
