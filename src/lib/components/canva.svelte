@@ -108,7 +108,7 @@
 </script>
 
 <Modal></Modal>
-<div bind:this={rootContainer} {id} class="relative cursor-{cursor} touch-none">
+<div bind:this={rootContainer} {id} class="relative cursor-{cursor} touch-none" on:contextmenu|preventDefault>
 	<!-- overlay -->
 	<div class="absolute inset-0 pointer-events-none">
 		{#if currentToolType.type == ToolType.Place}
@@ -152,5 +152,8 @@
 	#canvas-container,
 	#canvas-container canvas {
 		touch-action: none;
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		user-select: none;
 	}
 </style>
