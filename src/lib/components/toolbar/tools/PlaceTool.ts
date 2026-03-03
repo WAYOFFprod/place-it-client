@@ -69,15 +69,14 @@ export default class PlaceTool extends Tool {
 		this.interval = setInterval(() => this.timer++, 10);
 	}
 	mouseReleased() {
-		if (this.timer < 100) {
+	
+
+		if (this.timer < 100 && this.checkDistance() < 10) {
 			this.placePixel();
 			this.pixels = [];
 		}
 		if (this.interval) {
 			clearInterval(this.interval);
-		}
-		if(this.checkDistance() > 50) {
-
 		}
 		this.timer = 0;
 		this.isPinching = false;
