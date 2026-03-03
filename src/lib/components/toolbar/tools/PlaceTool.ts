@@ -29,6 +29,7 @@ export default class PlaceTool extends Tool {
 	};
 
 	startTouch: Coord | undefined = undefined;
+	currentTouch: Coord | undefined = undefined;
 	// distance between fingers from the previous frame
 	pinchDistance: number = 0;
 	isPinching: boolean = false;
@@ -59,7 +60,8 @@ export default class PlaceTool extends Tool {
 		this.controlManager.gridManager.screenOffset = screenOffset;
 		this.dragOffset.x = this.startTouch.x - screenOffset.x;
 		this.dragOffset.y = this.startTouch.y - screenOffset.y;
-		this.startTouch = this.startTouch;
+		this.currentTouch = this.startTouch = this.startTouch;
+
 		this.startTimer();
 		return true;
 	}
@@ -69,9 +71,7 @@ export default class PlaceTool extends Tool {
 		this.interval = setInterval(() => this.timer++, 10);
 	}
 	mouseReleased() {
-	
-
-		if (this.timer < 100 && this.checkDistance() < 10) {
+		if (this.timer < 100 && this.checkDistanceFromStart() < 10) {
 			this.placePixel();
 			this.pixels = [];
 		}
@@ -82,14 +82,16 @@ export default class PlaceTool extends Tool {
 		this.isPinching = false;
 		this.pinchDistance = 0;
 		this.startTouch = undefined;
+		this.currentTouch = undefined;
 	}
 
 	mouseMove(isMouseDown: boolean) {
 		if ((this.dragOffset.x == 0 && this.dragOffset.y == 0) || !isMouseDown)
 			return this.controlManager.gridManager.screenOffset;
 
-		const touch1 = this.p5.touches[0] as { x: number; y: number } | undefined;
-		const touch2 = this.p5.touches[1] as { x: number; y: number } | undefined;
+		const touch1 = this.p5.touches[0] as Coord | undefined;
+		const touch2 = this.p5.touches[1] as Coord | undefined;
+		this.currentTouch = touch1;
 		if (touch1 && touch2) {
 			const distance = this.p5.dist(touch1.x, touch1.y, touch2.x, touch2.y);
 
@@ -120,12 +122,9 @@ export default class PlaceTool extends Tool {
 		// to move KEEP
 		return this.controlManager.gridManager.screenOffset;
 	}
-	private checkDistance() {
-		if (!this.startTouch) return 0;
-		const touch = this.p5.touches[0] as Coord | undefined;
-		if (!touch) return 0;
-
-		return this.p5.dist(this.startTouch.x, this.startTouch.y, touch.x, touch.y);
+	private checkDistanceFromStart() {
+		if (!this.startTouch || !this.currentTouch) return 0;
+		return this.p5.dist(this.currentTouch.x, this.currentTouch.y, this.startTouch.x, this.startTouch.y);
 	}
 
 	protected placePixel() {
