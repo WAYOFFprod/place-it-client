@@ -356,14 +356,17 @@ export default class Networker {
 		scope: 'personal' | 'community',
 		sort: undefined | 'asc' | 'desc' = undefined,
 		favorit: undefined | 1 = undefined,
+		category: undefined | string = undefined,
 		search: string = ''
 	) => {
+		console.log('fetching canvas with filters: ', { scope, sort, favorit, search, category });
 		const response: any = await this.server.get(
 			'/canvas?scope=' +
 				scope +
 				(sort != undefined ? '&sort=' + sort : '') +
 				(favorit != undefined ? '&favorit=' + favorit : '') +
-				(search != '' ? '&search=' + search : '')
+				(search != '' ? '&search=' + search : '') +
+				(category != undefined ? '&category=' + category : '')
 		);
 		return response;
 	};

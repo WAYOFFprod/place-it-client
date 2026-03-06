@@ -87,10 +87,6 @@
 				break;
 		}
 	});
-	$effect(() => {
-		// This code will run whenever canva.isLiked changes
-		console.log(`Canva ${canva.id} isLiked status: ${canva.isLiked}`);
-	});
 </script>
 
 <div class="group" id="canva-preview-{canva.id}">
