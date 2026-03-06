@@ -26,9 +26,9 @@
 	getData();
 </script>
 
-<div class="overflow-scroll w-full">
+<div class="overflow-auto w-full">
 	<div class="w-full flex flex-col items-center gap-2 mx-auto custom-scroll pr-4">
-		<div class="min-h-60 max-h-96 overflow-y-scroll flex flex-col w-full px-10 py-8">
+		<div class="min-h-60 max-h-96 overflow-y-auto flex flex-col w-full px-10 py-8">
 			{#each accounts as account}
 				{#if !account.noDisplay}
 					<BlockedLine {account} {unblockAccount}></BlockedLine>
