@@ -1,4 +1,5 @@
 <script lang="ts">
+
 	interface Props {
 		id: string;
 		label?: string;
@@ -9,6 +10,7 @@
 		selectedOption?: string | null;
 		className?: string;
 		error?: string | null;
+		change?: (value: string) => void;
 	}
 
 	let {
@@ -20,6 +22,7 @@
 		disabled = false,
 		selectedOption = $bindable(null),
 		className = '',
+		change = () => {},
 		error = null
 	}: Props = $props();
 
@@ -34,6 +37,7 @@
 	const selectOption = (value: string) => {
 		selectedOption = value;
 		isOpen = false;
+		change(value);
 	};
 
 	const title = $derived(

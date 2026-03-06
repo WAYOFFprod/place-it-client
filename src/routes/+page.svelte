@@ -19,12 +19,15 @@
 	let canvasScope: 'community' | 'personal' = 'personal';
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
 
+	type categoryOptions = 'all' | 'pixelwar' | 'artistic' | 'free';
+	
 	const networker = Networker.getInstance();
 
 	let searchTerm: string = '';
 	let sort: undefined | 'asc' | 'desc';
 	let favoritFilter: undefined | 1;
 	let userName: string | undefined;
+	let category: undefined | categoryOptions;
 	let windowSize: Size2D = {
 		width: 0,
 		height: 0
@@ -74,6 +77,12 @@
 		} else {
 			favoritFilter = undefined;
 		}
+		if (params.has('category')) {
+			const initCategory = params.get('category');
+			if (initCategory == 'all' || initCategory == 'pixelwar' || initCategory == 'artistic' || initCategory == 'free') {
+				category = initCategory as categoryOptions;
+			}
+		}
 	};
 
 	initParamsFromUrl($page.url.searchParams);
@@ -99,6 +108,11 @@
 		if (favoritFilter != undefined) {
 			queryUrl += '&favorit=true';
 			params['favorit'] = true;
+		}
+
+		if (category != undefined) {
+			queryUrl += '&category=' + category;
+			params['category'] = category;
 		}
 
 		return {
@@ -140,7 +154,7 @@
 	};
 
 	const searchUpdated = async (searchTerm: string) => {
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, category, searchTerm );
 		canvas = data.data;
 	};
 
@@ -157,8 +171,14 @@
 		pushWindowState();
 	};
 
+	const changeCanvaType = async (value: string) => {
+		category = value === 'all' ? undefined : value as categoryOptions;
+		await fetchCanvas();
+		pushWindowState();
+	};
+
 	const fetchCanvas = async () => {
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, category, searchTerm);
 		canvas = data.data;
 	};
 
@@ -168,7 +188,7 @@
 	};
 
 	const updateCanvas = async () => {
-		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, searchTerm);
+		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, category, searchTerm);
 		canvas = data.data;
 	};
 
@@ -196,7 +216,11 @@
 		},
 		{
 			label: 'Oeuvre Collaborative',
-			value: 'creative'
+			value: 'artistic'
+		},
+		{
+			label: 'Libre',
+			value: 'free'
 		}
 	] as options[];
 
@@ -352,6 +376,7 @@
 					id="canvaType"
 					placeholder="Tous"
 					options={canvaTypeOptions}
+					change={changeCanvaType}
 				></Select>
 				<div class="flex grow justify-end">
 					{#if isConnected}
