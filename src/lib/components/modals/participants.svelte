@@ -39,7 +39,7 @@
 	getData();
 </script>
 
-<div class="overflow-scroll min-w-64">
+<div class="overflow-auto min-w-64">
 	<div class="w-full flex flex-col items-center gap-2 mx-auto custom-scroll pr-4">
 		<div class="max-h-72 overflow-y-auto flex flex-col w-full px-4 py-8">
 			{#each participants as participant}

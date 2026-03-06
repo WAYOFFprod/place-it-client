@@ -108,7 +108,7 @@
 				</div>
 			{/if}
 			<!-- Body -->
-			<div class="overflow-scroll" style={isWindowSmall ? 'height: calc(100vh - 56px);' : ''}>
+			<div class="overflow-auto" style={isWindowSmall ? 'height: calc(100vh - 56px);' : ''}>
 				{#if openedDialog.name == 'create'}
 					<Create close={modalClosed}></Create>
 				{:else if openedDialog.name == 'login'}

@@ -46,7 +46,7 @@
 	getData();
 </script>
 
-<form bind:this={form} class="overflow-scroll px-20 py-6 w-full">
+<form bind:this={form} class="overflow-auto px-20 py-6 w-full">
 	<div class="py-8">
 		<div class="flex flex-col gap-4">
 			<ToggleInput
