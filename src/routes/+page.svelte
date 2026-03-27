@@ -15,6 +15,8 @@
 	import { event } from '$lib/stores/eventStore';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { isOnline } from '$lib/stores/onlineStore';
+	import { OfflineStorage } from '$lib/utility/OfflineStorage';
 
 	let canvasScope: 'community' | 'personal' = 'personal';
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
@@ -130,6 +132,7 @@
 	};
 
 	const onClickLogin = () => {
+		console.log(isConnected);
 		if (isConnected) {
 			openedModal.set({ name: 'settings' });
 		} else {
@@ -154,8 +157,9 @@
 	};
 
 	const searchUpdated = async (searchTerm: string) => {
+		if (!$isOnline) return;
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, category, searchTerm );
-		canvas = data.data;
+		if (data?.data) canvas = data.data;
 	};
 
 	const toggleRecent = async () => {
@@ -177,9 +181,36 @@
 		pushWindowState();
 	};
 
+	let isOfflineData = false;
+
+	const loadCanvasFromCache = async () => {
+		const user = $userStore;
+		if (!user) return;
+		const cached = await OfflineStorage.loadCanvasList(user.id);
+		if (cached.length > 0) {
+			canvas = cached.filter(
+				(c) => canvasScope === 'personal' ? true : (c.visibility !== 'private')
+			);
+			isOfflineData = true;
+		}
+	};
+
 	const fetchCanvas = async () => {
+		if (!$isOnline) {
+			await loadCanvasFromCache();
+			return;
+		}
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, category, searchTerm);
-		canvas = data.data;
+		if (data?.data) {
+			canvas = data.data;
+			isOfflineData = false;
+			// Persist for offline use (personal scope contains all user canvas)
+			if (canvasScope === 'personal' && $userStore) {
+				OfflineStorage.saveCanvasList($userStore.id, canvas);
+			}
+		} else {
+			await loadCanvasFromCache();
+		}
 	};
 
 	const fetchData = async () => {
@@ -188,8 +219,20 @@
 	};
 
 	const updateCanvas = async () => {
+		if (!$isOnline) {
+			await loadCanvasFromCache();
+			return;
+		}
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, category, searchTerm);
-		canvas = data.data;
+		if (data?.data) {
+			canvas = data.data;
+			isOfflineData = false;
+			if (canvasScope === 'personal' && $userStore) {
+				OfflineStorage.saveCanvasList($userStore.id, canvas);
+			}
+		} else {
+			await loadCanvasFromCache();
+		}
 	};
 
 	let isConnected: undefined | boolean = undefined;
@@ -308,18 +351,26 @@
 					>
 				</div>
 				<div class="flex flex-row-reverse items-center grow-0 lg:grow pl-4">
-					<button
-						id="button-profile"
-						onclick={onClickLogin}
-						class="flex items-center gap-2 uppercase"
-					>
-						{#if isConnected}
-							<div class="hidden lg:block">{userName}</div>
-						{:else if isConnected === false}
-							<div>Login</div>
+					<div class="flex items-center gap-2">
+						{#if !$isOnline}
+							<span class="inline-flex items-center gap-1 rounded-full bg-bittersweet-red px-2 py-0.5 text-xs text-white">
+								<span class="h-1.5 w-1.5 rounded-full bg-white"></span>
+								Hors-ligne
+							</span>
 						{/if}
-						<div class="rounded-full border-2 border-black w-8 h-8"></div>
-					</button>
+						<button
+							id="button-profile"
+							onclick={onClickLogin}
+							class="flex items-center gap-2 uppercase"
+						>
+							{#if isConnected}
+								<div class="hidden lg:block">{userName}</div>
+							{:else if isConnected === false}
+								<div>Login</div>
+							{/if}
+							<div class="rounded-full border-2 border-black w-8 h-8"></div>
+						</button>
+					</div>
 				</div>
 			</div>
 		{/snippet}
@@ -404,7 +455,7 @@
 				: 'hidden'} flex-wrap gap-5 justify-center h-fit"
 		>
 			{#each canvas as canva}
-				<CanvaPreview {canva}></CanvaPreview>
+				<CanvaPreview {canva} isOffline={!$isOnline}></CanvaPreview>
 			{/each}
 		</div>
 	</div>

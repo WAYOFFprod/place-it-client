@@ -10,6 +10,10 @@
 	import Networker from '$lib/utility/Networker';
 
 	import { event } from '$lib/stores/eventStore';
+	import { isOnline } from '$lib/stores/onlineStore';
+	import { OfflineStorage } from '$lib/utility/OfflineStorage';
+	import { userStore } from '$lib/stores/authStore';
+	import { get } from 'svelte/store';
 	import type { Errors } from './types';
 
 	interface Props {
@@ -50,6 +54,25 @@
 		value: 'free'
 	};
 
+	const defaultColors = [
+		'#ffd887',
+		'#eb9361',
+		'#da5e4e',
+		'#ab2330',
+		'#dfffff',
+		'#b5de89',
+		'#6aab7c',
+		'#26616b',
+		'#a2dceb',
+		'#759ed0',
+		'#434ea8',
+		'#2a2140',
+		'#e1a7c5',
+		'#ab7ac6',
+		'#735bab',
+		'#3b3772'
+	];
+
 	const validate = async (e: Event) => {
 		e.preventDefault();
 		const formData = new FormData(form);
@@ -59,35 +82,54 @@
 		const saveHeight = customSize ? parseInt(formHeight) : height;
 		const name = formData.get('name') as string;
 		const joinRequest = formData.get('joinRequest') as string;
-		const community = formData.get('community') as string;
+		// When offline, always force private canvas
+		const isCurrentlyOffline = !get(isOnline);
+		const community = isCurrentlyOffline ? null : formData.get('community') as string;
 		const category = formData.get('gameType') as string;
 
 		const payload = {
 			name: name,
-			category: category,
+			category: category || 'free',
 			access: joinRequest == 'on' ? 'request_only' : community ? 'open' : 'invite_only',
 			visibility: community ? 'public' : 'private',
 			width: saveWidth,
 			height: saveHeight,
-			colors: [
-				'#ffd887',
-				'#eb9361',
-				'#da5e4e',
-				'#ab2330',
-				'#dfffff',
-				'#b5de89',
-				'#6aab7c',
-				'#26616b',
-				'#a2dceb',
-				'#759ed0',
-				'#434ea8',
-				'#2a2140',
-				'#e1a7c5',
-				'#ab7ac6',
-				'#735bab',
-				'#3b3772'
-			]
+			colors: defaultColors
 		} as CreateCanvaPayload;
+
+		if (isCurrentlyOffline) {
+			// Queue creation and add a temporary local entry
+			const user = get(userStore);
+			const tempId = await OfflineStorage.enqueuePendingCreation(payload);
+			if (user) {
+				const existing = await OfflineStorage.loadCanvasList(user.id);
+				const tempEntry: CanvaPreviewData & { tempId: string } = {
+					...({
+						id: Date.now(), // temporary numeric id
+						name: payload.name,
+						width: payload.width,
+						height: payload.height,
+						colors: payload.colors,
+						owned: true,
+						visibility: 'private',
+						category: (payload.category as any) ?? 'free',
+						access: 'invite_only',
+						participationStatus: 'accepted',
+						image: '',
+						participants: 1,
+						currentPlayers: 0,
+						isLiked: false,
+						created_at: new Date().toISOString()
+					} as CanvaPreviewData),
+					tempId
+				};
+				await OfflineStorage.saveCanvasList(user.id, [tempEntry, ...existing]);
+			}
+			close?.();
+			event.set('updateCanvas');
+			return;
+		}
+
 		const networker = Networker.getInstance();
 		const canva: any = await networker.createCanva(payload);
 
@@ -212,7 +254,10 @@
 					<span class="text-red-500 text-sm">{getError('width')}</span>
 				{/if}
 			</div>
-			<ToggleInput id="community" label="Community" change={toggleCommunity} />
+			<ToggleInput id="community" label="Community" change={toggleCommunity} disabled={!$isOnline} />
+			{#if !$isOnline}
+				<p class="text-sm text-gray-500">Seuls les canva privés peuvent être créés hors-ligne.</p>
+			{/if}
 			{#if isCommunity}
 				<Accordion>
 					{#snippet heading()}
