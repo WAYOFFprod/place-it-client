@@ -7,6 +7,7 @@ import { authStatus, tokenStore, userStore } from '$lib/stores/authStore';
 import { isReady } from '$lib/stores/canvaStore';
 import type { LoginPayload, RegisterPayload } from '$lib/components/auth/types';
 import type { UserData } from './types';
+import { OfflineStorage } from './OfflineStorage';
 
 export default class Networker {
 	static #instance: Networker;
@@ -40,6 +41,19 @@ export default class Networker {
 
 	connectToSocket = (gridManager: GridManager) => {
 		this.gridManager = gridManager;
+
+		// When offline, skip the socket entirely and load cached pixels
+		if (!navigator.onLine && gridManager.canvasId != null) {
+			OfflineStorage.loadCanvasGrid(gridManager.canvasId).then((cached) => {
+				if (cached?.grid && this.gridManager) {
+					this.tempPoints = cached.grid;
+					this.gridManager.attemptAddAdditionalPixels(this.tempPoints);
+				}
+				isReady.set(true);
+			});
+			return;
+		}
+
 		this.socket = io(this.websocket);
 
 		this.socket.on('error', (payload) => {
@@ -64,6 +78,14 @@ export default class Networker {
 				if (payload) {
 					this.tempPoints = payload.pixels;
 					this.gridManager.attemptAddAdditionalPixels(this.tempPoints);
+					// Persist the received pixel grid for offline use
+					if (this.gridManager.canvasId != null) {
+						OfflineStorage.saveCanvasGrid(
+							this.gridManager.canvasId,
+							payload.pixels ?? {},
+							this.canvaToken
+						);
+					}
 				}
 		});
 
@@ -372,11 +394,21 @@ export default class Networker {
 	};
 
 	/**
-	 * fetches a single canva by its id
+	 * Fetches a single canva by its id.
+	 * When offline, falls back to the cached grid from IndexedDB.
 	 * @param id canva id
 	 * @returns Canvas resource
 	 */
 	getCanva = async (id: number) => {
+		if (!navigator.onLine) {
+			// Return the cached grid merged with whatever canvas metadata we have
+			const cached = await OfflineStorage.loadCanvasGrid(id);
+			if (cached?.token) {
+				tokenStore.set(cached.token);
+			}
+			// Return minimal offline data so the canvas page can still render
+			return null;
+		}
 		const response = await this.server.get('/canvas/' + id);
 		if (response.meta.token) {
 			tokenStore.set(response.meta.token);
@@ -426,6 +458,7 @@ export default class Networker {
 
 	/**
 	 * Saves a single pixel with a color and coordinates to the liveserver using websocket.
+	 * When offline, queues the pixel in IndexedDB for later sync.
 	 * @param coord The coordinates of the pixel to save.
 	 * @param color The color of the pixel to save.
 	 * @returns
@@ -443,6 +476,31 @@ export default class Networker {
 		}
 		const index = this.gridManager.addPixelOnCanvas(coord, color);
 		if (index === false) return;
+
+		// Queue the pixel to IndexedDB for offline sync / durability
+		if (this.gridManager.canvasId != null) {
+			OfflineStorage.enqueuePixel({
+				canvasId: this.gridManager.canvasId,
+				x: coord.x,
+				y: coord.y,
+				color
+			});
+		}
+
+		if (!navigator.onLine) {
+			// Offline: pixel is queued; update the cached grid snapshot too
+			if (this.gridManager.canvasId != null && this.tempPoints) {
+				const key = `${coord.x},${coord.y}`;
+				this.tempPoints[key] = color;
+				OfflineStorage.saveCanvasGrid(
+					this.gridManager.canvasId,
+					this.tempPoints,
+					this.canvaToken
+				);
+			}
+			return;
+		}
+
 		if (this.socket != undefined) {
 			const auth: UserData = {
 				user_id: this.userData?.id,
