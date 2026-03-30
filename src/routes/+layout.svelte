@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { isOnline } from '$lib/stores/onlineStore';
 	import { syncPending } from '$lib/utility/OfflineSync';
+	import PwaInstall from '$lib/components/pwaInstall.svelte';
 
 	let previouslyOnline = true;
 
@@ -19,3 +20,4 @@
 </script>
 
 <slot />
+<PwaInstall />
