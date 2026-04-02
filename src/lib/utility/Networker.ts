@@ -69,7 +69,6 @@ export default class Networker {
 		});
 
 		this.socket.on('live-canva-ready', (payload) => {
-			console.log('canva ready', payload);
 			isReady.set(true);
 		});
 
@@ -88,13 +87,13 @@ export default class Networker {
 		// listen to socket server message
 
 		this.socket.on('canva:new-pixel-from-others', (coord, color) => {
-			console.log('NEW PIXEL FROM OTHERS', color, coord);
+			// console.log('NEW PIXEL FROM OTHERS', color, coord);
 			if (!this.gridManager) return console.error('missing grid manager');
 			this.gridManager.addPixelOnCanvas(coord, color);
 		});
 
 		this.socket.on('canva:new-pixels-from-others', (pixels: Pixels) => {
-			console.log('NEW PIXELS FROM OTHERS', pixels);
+			// console.log('NEW PIXELS FROM OTHERS', pixels);
 			if (!this.gridManager) return console.error('missing grid manager');
 			this.gridManager.addPixelsToCanvaFromIndex(pixels);
 			this.gridManager.needsUpdate = true;
@@ -102,7 +101,7 @@ export default class Networker {
 
 		this.socket.on('chat:get-message', (message: Message) => {
 			this.messages.push(message);
-			console.log('this.messages', this.messages);
+			// console.log('this.messages', this.messages);
 			chatMessages.set(this.messages);
 		});
 
@@ -373,7 +372,6 @@ export default class Networker {
 		category: undefined | string = undefined,
 		search: string = ''
 	) => {
-		console.log('fetching canvas with filters: ', { scope, sort, favorit, search, category });
 		const response: any = await this.server.get(
 			'/canvas?scope=' +
 				scope +

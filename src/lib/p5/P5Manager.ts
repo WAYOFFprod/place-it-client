@@ -123,7 +123,6 @@ export default class P5Manager {
 	}
 
 	private mousePressed(e: MouseEvent) {
-		console.log('mouse pressed:', e);
 		if (this.isPointerActive) {
 			return;
 		}
