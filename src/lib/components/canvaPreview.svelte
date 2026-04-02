@@ -140,7 +140,7 @@
 					class="absolute invisible inset-0 bg-black/50 opacity-0 group-hover:opacity-100 px-16 md:px-28 group-hover:visible"
 				>
 					<div class="relative flex flex-col justify-center items-center gap-4 h-full z-30">
-						{#if isOffline && isEditableOffline}
+						{#if isOffline && !isEditableOffline}
 							<span class="text-white text-center text-sm uppercase">Privé uniquement<br />hors-ligne</span>
 						{:else if (canva.access != 'closed' || canva.owned) && conenctionStatus}
 							{#if canva.participationStatus == 'accepted'}
