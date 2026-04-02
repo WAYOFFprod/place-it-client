@@ -480,7 +480,7 @@ export default class Networker {
 		if (!navigator.onLine) {
 			// Offline: pixel is queued; update the cached grid snapshot too
 			if (this.gridManager.canvasId != null && this.tempPoints) {
-				const key = coord.x * this.gridManager.canvas.width + coord.y;
+				const key = coord.x + this.gridManager.canvas.width * coord.y;
 				this.tempPoints[key] = color;
 				OfflineStorage.saveCanvasGrid(
 					this.gridManager.canvasId,
