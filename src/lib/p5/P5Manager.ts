@@ -151,7 +151,6 @@ export default class P5Manager {
 
 
 	private mouseReleased() {
-		console.log('mouse released');
 		if (!this.isPointerActive) {
 			return;
 		}
