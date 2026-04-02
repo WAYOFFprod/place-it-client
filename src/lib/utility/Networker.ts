@@ -77,15 +77,7 @@ export default class Networker {
 			if (this.gridManager != undefined)
 				if (payload) {
 					this.tempPoints = payload.pixels;
-					this.gridManager.attemptAddAdditionalPixels(this.tempPoints);
-					// Persist the received pixel grid for offline use
-					if (this.gridManager.canvasId != null) {
-						OfflineStorage.saveCanvasGrid(
-							this.gridManager.canvasId,
-							payload.pixels ?? {},
-							this.canvaToken
-						);
-					}
+					this.gridManager.attemptAddAdditionalPixels(this.tempPoints);	
 				}
 		});
 
