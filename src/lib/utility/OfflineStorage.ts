@@ -125,6 +125,15 @@ export const OfflineStorage = {
 		return count > 0;
 	},
 
+	async hasQueuedPixelsForCanvas(canvasId: number): Promise<boolean> {
+		const db = await getDb();
+		const tx = db.transaction('pixelQueue', 'readonly');
+		const index = tx.store.index('byCanvasId');
+		const count = await index.count(IDBKeyRange.only(canvasId));
+		await tx.done;
+		return count > 0;
+	},
+
 	async getAllQueuedCanvasIds(): Promise<number[]> {
 		const db = await getDb();
 		const all = await db.getAll('pixelQueue');
