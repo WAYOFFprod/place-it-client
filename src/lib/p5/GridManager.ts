@@ -212,6 +212,7 @@ export default class GridManager {
 
 				this.gridSections[gridIndex].addPixelToImage(relPosition, color);
 			}
+			this.needsUpdate = true;
 		}
 	};
 
