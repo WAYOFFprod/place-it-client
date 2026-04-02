@@ -156,6 +156,12 @@ export const OfflineStorage = {
 		await db.delete('pendingCreations', key);
 	},
 
+	async getCanvasWidth(userId: number, canvasId: number): Promise<number | null> {
+		const canvas = await this.loadCanvasList(userId);
+		const found = canvas.find((c) => c.id === canvasId);
+		return found?.width ?? null;
+	},
+
 	/** After an offline-created canvas gets a real server ID, update the canvas list. */
 	async replaceTempIdInCanvasList(userId: number, tempId: string, realCanvas: CanvaPreviewData): Promise<void> {
 		const db = await getDb();

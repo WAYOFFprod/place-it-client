@@ -45,6 +45,9 @@ const syncPendingCreations = async (networker: Networker, userId: number): Promi
 // ---------------------------------------------------------------------------
 
 const syncPixelQueue = async (networker: Networker): Promise<void> => {
+	const user = get(userStore);
+	if (!user) return;
+
 	const canvasIds = await OfflineStorage.getAllQueuedCanvasIds();
 
 	for (const canvasId of canvasIds) {
@@ -57,13 +60,19 @@ const syncPixelQueue = async (networker: Networker): Promise<void> => {
 				await waitForSocket(networker);
 			}
 
-			// Build a pixel map in the format the server expects: { "x,y": "color" }
-			const pixels: { [key: string]: string } = {};
-			for (const { value } of entries) {
-				pixels[`${value.x},${value.y}`] = value.color;
+			const width = await OfflineStorage.getCanvasWidth(user.id, canvasId);
+			if (!width) {
+				console.warn(`[OfflineSync] Could not find width for canvas ${canvasId}`);
+				continue;
 			}
 
-			networker.socket?.emit(`canva:new-pixels:${canvasId}`, pixels);
+			// Build a pixel map in the format the server expects: { index: "color" }
+			const pixels: { [key: string]: string } = {};
+			for (const { value } of entries) {
+				const index = value.x + width * value.y;
+				pixels[index] = value.color;
+			}
+			networker.placePixelsByIndex(pixels, canvasId)
 
 			// Delete the drained entries
 			for (const { key } of entries) {

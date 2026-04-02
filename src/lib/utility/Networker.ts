@@ -482,7 +482,7 @@ export default class Networker {
 		if (!navigator.onLine) {
 			// Offline: pixel is queued; update the cached grid snapshot too
 			if (this.gridManager.canvasId != null && this.tempPoints) {
-				const key = `${coord.x},${coord.y}`;
+				const key = coord.x * this.gridManager.canvas.width + coord.y;
 				this.tempPoints[key] = color;
 				OfflineStorage.saveCanvasGrid(
 					this.gridManager.canvasId,
@@ -508,21 +508,14 @@ export default class Networker {
 	 * @param pixels Pixels to place in format {index: color}
 	 * @returns
 	 */
-	placePixelsByIndex = (pixels: Pixels) => {
-		if (this.gridManager == undefined) return;
-		// for (let key in pixels) {
-		//   console.log(key, pixels[key]);
-		//   const coord = this.gridManager.getCoordFromIndex(parseInt(key));
-		//   const index = this.gridManager.addPixelOnCanvas(coord, pixels[key]);
-		//   if(index === false) return
-		// }
-
+	placePixelsByIndex = (pixels: Pixels, canvasId: number) => {
 		if (this.socket != undefined) {
 			const auth: UserData = {
 				user_id: this.userData?.id,
 				token: this.canvaToken
 			};
-			this.socket.emit('canva:new-pixels:' + this.gridManager.canvasId, auth, pixels);
+
+			this.socket.emit('canva:new-pixels:' + canvasId, auth, pixels);
 		}
 	};
 
