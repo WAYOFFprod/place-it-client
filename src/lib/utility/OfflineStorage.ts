@@ -171,20 +171,6 @@ export const OfflineStorage = {
 		return found?.width ?? null;
 	},
 
-	/** Update a single canvas entry in the cached list (e.g. to refresh the base image). */
-	async updateCanvasInList(userId: number, canvas: CanvaPreviewData): Promise<void> {
-		const db = await getDb();
-		const entry = await db.get('canvasList', userId);
-		if (!entry) return;
-		const idx = entry.canvas.findIndex((c: CanvaPreviewData) => c.id === canvas.id);
-		if (idx >= 0) {
-			entry.canvas[idx] = canvas;
-		} else {
-			entry.canvas.push(canvas);
-		}
-		await db.put('canvasList', entry);
-	},
-
 	/** After an offline-created canvas gets a real server ID, update the canvas list. */
 	async replaceTempIdInCanvasList(userId: number, tempId: string, realCanvas: CanvaPreviewData): Promise<void> {
 		const db = await getDb();
