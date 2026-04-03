@@ -63,8 +63,10 @@ export const syncPixelQueueForCanvas = async (canvasId: number): Promise<void> =
 			const index = value.x + width * value.y;
 			pixels[index] = value.color;
 		}
+		
 		networker.placePixelsByIndex(pixels, canvasId);
-
+		// TODO: since when syncing points the image is already loaded we still need to add the to the current canvas,
+		// otherwise it requires us to reload to see the pixels that were placed offline
 		for (const { key } of entries) {
 			await OfflineStorage.deletePixelQueueEntry(key);
 		}
