@@ -125,13 +125,13 @@ export const OfflineStorage = {
 		return count > 0;
 	},
 
-	async hasQueuedPixelsForCanvas(canvasId: number): Promise<boolean> {
+	async hasQueuedPixelsForCanvas(canvasId: number): Promise<number> {
 		const db = await getDb();
 		const tx = db.transaction('pixelQueue', 'readonly');
 		const index = tx.store.index('byCanvasId');
 		const count = await index.count(IDBKeyRange.only(canvasId));
 		await tx.done;
-		return count > 0;
+		return count;
 	},
 
 	async getAllQueuedCanvasIds(): Promise<number[]> {
@@ -169,6 +169,20 @@ export const OfflineStorage = {
 		const canvas = await this.loadCanvasList(userId);
 		const found = canvas.find((c) => c.id === canvasId);
 		return found?.width ?? null;
+	},
+
+	/** Update a single canvas entry in the cached list (e.g. to refresh the base image). */
+	async updateCanvasInList(userId: number, canvas: CanvaPreviewData): Promise<void> {
+		const db = await getDb();
+		const entry = await db.get('canvasList', userId);
+		if (!entry) return;
+		const idx = entry.canvas.findIndex((c: CanvaPreviewData) => c.id === canvas.id);
+		if (idx >= 0) {
+			entry.canvas[idx] = canvas;
+		} else {
+			entry.canvas.push(canvas);
+		}
+		await db.put('canvasList', entry);
 	},
 
 	/** After an offline-created canvas gets a real server ID, update the canvas list. */
