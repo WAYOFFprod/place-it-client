@@ -74,7 +74,7 @@ export default class CanvaOverlay {
 		}
 		this.img.stroke('black');
 		this.img.strokeWeight(4);
-		if (!this.selectionRect) console.warn('No selection rect to draw');
+		if (!this.selectionRect) return;
 		const pos = this.selectionRect?.getScreenPosition();
 		const size = this.selectionRect?.getScreenSize();
 		if (pos && size) {
