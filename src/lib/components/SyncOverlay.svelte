@@ -11,6 +11,7 @@
 
 	type SyncState = 'idle' | 'syncing' | 'done' | 'hidden';
 	let state: SyncState = $state('idle');
+	let pixelsToSync: number = $state(0);
 
 	onMount(() => {
 		checkAndSync();
@@ -22,8 +23,8 @@
 			return;
 		}
 
-		const hasPending = await OfflineStorage.hasQueuedPixelsForCanvas(canvasId);
-		if (!hasPending) {
+		pixelsToSync = await OfflineStorage.hasQueuedPixelsForCanvas(canvasId);
+		if (pixelsToSync === 0) {
 			state = 'hidden';
 			return;
 		}
@@ -52,7 +53,7 @@
 				<svg class="w-10 h-10 text-white animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<path d="M21 12a9 9 0 1 1-6.22-8.56" stroke-linecap="round" />
 				</svg>
-				<span class="text-white text-sm">Synchronisation...</span>
+				<span class="text-white text-sm">Syncronising {pixelsToSync} pixels</span>
 			{:else if state === 'done'}
 				<svg class="w-10 h-10 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
 					<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
