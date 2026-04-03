@@ -15,7 +15,7 @@ export default class Networker {
 	server: ServerRequests;
 	socket: Socket | undefined;
 	gridManager: GridManager | undefined;
-	tempPoints: { [key: string]: string } | undefined;
+	newPointsBuffer: { [key: string]: string } | undefined;
 	websocket: string;
 	messages: Message[] = [];
 	userData: User | undefined;
@@ -46,8 +46,8 @@ export default class Networker {
 		if (!navigator.onLine && gridManager.canvasId != null) {
 			OfflineStorage.loadCanvasGrid(gridManager.canvasId).then((cached) => {
 				if (cached?.grid && this.gridManager) {
-					this.tempPoints = cached.grid;
-					this.gridManager.attemptAddAdditionalPixels(this.tempPoints);
+					this.newPointsBuffer = cached.grid;
+					this.gridManager.attemptAddAdditionalPixels(this.newPointsBuffer);
 				}
 				isReady.set(true);
 			});
@@ -75,8 +75,8 @@ export default class Networker {
 		this.socket.on('canva:init-pixels', (payload) => {
 			if (this.gridManager != undefined)
 				if (payload) {
-					this.tempPoints = payload.pixels;
-					this.gridManager.attemptAddAdditionalPixels(this.tempPoints);	
+					this.newPointsBuffer = payload.pixels;
+					this.gridManager.attemptAddAdditionalPixels(this.newPointsBuffer);	
 				}
 		});
 
@@ -391,12 +391,7 @@ export default class Networker {
 	 */
 	getCanva = async (id: number) => {
 		if (!navigator.onLine) {
-			// Return the cached grid merged with whatever canvas metadata we have
-			const cached = await OfflineStorage.loadCanvasGrid(id);
-			if (cached?.token) {
-				tokenStore.set(cached.token);
-			}
-			// Return minimal offline data so the canvas page can still render
+			// if offline return null
 			return null;
 		}
 		const response = await this.server.get('/canvas/' + id);
@@ -479,12 +474,12 @@ export default class Networker {
 
 		if (!navigator.onLine) {
 			// Offline: pixel is queued; update the cached grid snapshot too
-			if (this.gridManager.canvasId != null && this.tempPoints) {
+			if (this.gridManager.canvasId != null && this.newPointsBuffer) {
 				const key = coord.x + this.gridManager.canvas.width * coord.y;
-				this.tempPoints[key] = color;
+				this.newPointsBuffer[key] = color;
 				OfflineStorage.saveCanvasGrid(
 					this.gridManager.canvasId,
-					this.tempPoints,
+					this.newPointsBuffer,
 					this.canvaToken
 				);
 			}
