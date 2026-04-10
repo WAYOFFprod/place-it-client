@@ -135,7 +135,6 @@
 	};
 
 	const onClickLogin = () => {
-		console.log(isConnected);
 		if (isConnected) {
 			openedModal.set({ name: 'settings' });
 		} else {
@@ -198,18 +197,15 @@
 	};
 
 	const fetchCanvas = async () => {
-		console.log("fetchCanvas", !$isOnline)
 		if (!$isOnline) {
 			await loadCanvasFromCache();
 			return;
 		}
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, category, searchTerm);
-		console.log(data);
 		if (data?.data) {
 			canvas = data.data;
 			// Persist for offline use (personal scope contains all user canvas)
 			if (canvasScope === 'personal' && $userStore) {
-				console.log("save locally")
 				OfflineStorage.saveCanvasList($userStore.id, canvas);
 			}
 		} else {

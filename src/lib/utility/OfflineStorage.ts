@@ -112,7 +112,7 @@ export const OfflineStorage = {
 
 	async saveCanvasList(userId: number, canvas: CanvaPreviewData[]): Promise<void> {
 		const db = await getDb();
-		console.log(`save canvas ${canvas.map(canva => canva.id).join(",")} ` )
+		console.lddog(`save canvas ${canvas.map(canva => canva.id).join(",")} ` )
 		await db.put('canvasList', { userId, canvas });
 	},
 
@@ -139,7 +139,6 @@ export const OfflineStorage = {
 	): Promise<{ [key: string]: string }> {
 		try {
 			const db = await getDb();
-			console.log("get cache from db")
 			const entry = await db.get('cachedPixels', canvasId);
 			const stored = entry?.pixels ?? {};
 			const buffered = pendingPixels.get(canvasId) ?? {};

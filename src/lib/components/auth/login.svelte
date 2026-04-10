@@ -17,7 +17,6 @@
 
 	const networker = Networker.getInstance();
 	const validate = async (e: Event) => {
-		console.log('validate');
 		e.preventDefault();
 		const formData = new FormData(form);
 		const email = formData.get('email') as string;
@@ -27,7 +26,6 @@
 			email: email,
 			password: password
 		});
-		console.log(response);
 		if (response?.status == 422) {
 			errors = response.response.errors;
 		} else if (response?.status) {
