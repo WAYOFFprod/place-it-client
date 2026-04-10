@@ -491,7 +491,7 @@ export default class Networker {
 	};
 
 	/**
-	 * Places multiple pixels on the canvas.
+	 * Places multiple pixels on the canvas for other users but also on player canva.
 	 * the index is calculated from the coordinates and the canvas width
 	 * @param pixels Pixels to place in format {index: color}
 	 * @returns
