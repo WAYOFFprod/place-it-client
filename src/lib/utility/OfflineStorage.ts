@@ -58,6 +58,7 @@ export const OfflineStorage = {
 
 	async saveCanvasList(userId: number, canvas: CanvaPreviewData[]): Promise<void> {
 		const db = await getDb();
+		console.log(`save canvas ${canvas.map(canva => canva.id).join(",")} ` )
 		await db.put('canvasList', { userId, canvas });
 	},
 
@@ -67,18 +68,17 @@ export const OfflineStorage = {
 		return entry?.canvas ?? [];
 	},
 
-	// ---- Pixel grid cache ---------------------------------------------------
+	// ---- Pixel cache ---------------------------------------------------
 
-	async saveCanvasGrid(
+	async savePixelLocally(
 		canvasId: number,
 		grid: { [key: string]: string },
-		token: string | undefined
 	): Promise<void> {
 		const db = await getDb();
-		await db.put('canvasGrids', { canvasId, grid, token });
+		await db.put('canvasGrids', { canvasId, grid  });
 	},
 
-	async loadCanvasGrid(
+	async loadCanvasCache(
 		canvasId: number
 	): Promise<{ grid: { [key: string]: string }; token: string | undefined } | null> {
 		const db = await getDb();
@@ -95,7 +95,7 @@ export const OfflineStorage = {
 	},
 
 	/** Returns all queued pixels for a specific canvas, grouped ready to emit. */
-	async drainPixelsForCanvas(
+	async getPixelsForCanvas(
 		canvasId: number
 	): Promise<{ key: number; value: { canvasId: number; x: number; y: number; color: string; timestamp: number } }[]> {
 		const db = await getDb();
