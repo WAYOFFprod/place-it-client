@@ -136,7 +136,7 @@ export const OfflineStorage = {
 	
 	async loadCanvasCache(
 		canvasId: number
-	): Promise<{ [key: string]: string } | null> {
+	): Promise<{ [key: string]: string }> {
 		try {
 			const db = await getDb();
 			console.log("get cache from db")

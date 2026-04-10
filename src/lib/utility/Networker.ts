@@ -9,6 +9,7 @@ import type { LoginPayload, RegisterPayload } from '$lib/components/auth/types';
 import type { UserData } from './types';
 import { OfflineStorage } from './OfflineStorage';
 import type { CreateCanvaPayload } from '$lib/p5/types';
+import type { Pixels } from '$lib/components/types';
 
 export default class Networker {
 	static #instance: Networker;
@@ -501,6 +502,7 @@ export default class Networker {
 				user_id: this.userData?.id,
 				token: this.canvaToken
 			};
+			this.gridManager?.addPixelsToCanvaFromIndex(pixels);
 			console.log("place pixels")
 			this.socket.emit('canva:new-pixels:' + canvasId, auth, pixels);
 		}

@@ -125,7 +125,6 @@ export default class SelectionTool extends Tool {
 
 	protected pasteClipboard() {
 		const pixels = this.controlManager.gridManager.pasteClipboard();
-		this.controlManager.gridManager.addPixelsToCanvaFromIndex(pixels);
 		this.networker.placePixelsByIndex(pixels, this.controlManager.gridManager.canvasId);
 	}
 
