@@ -46,9 +46,7 @@ export default class Networker {
 
 		// When offline, skip the socket entirely and load cached pixels
 		if (!navigator.onLine && gridManager.canvasId != null) {
-			console.log("NOT ONLINE")
 			OfflineStorage.loadCanvasCache(gridManager.canvasId).then((cachedPixels) => {
-				console.log("cached data", cachedPixels);
 				if (cachedPixels && this.gridManager) {
 					this.newPointsBuffer = cachedPixels;
 					
@@ -466,9 +464,7 @@ export default class Networker {
 		}
 		const index = this.gridManager.addPixelOnCanvas(coord, color);
 		if (index === false) return;
-		console.log("ready to save pixels")
 		if (!navigator.onLine) {
-			console.log("we are offline", this.gridManager.canvasId != null && this.newPointsBuffer)
 			// Offline: pixel is queued; update the cached grid snapshot too
 			if (this.gridManager.canvasId != null && this.newPointsBuffer) {
 				const key = coord.x + this.gridManager.canvas.width * coord.y;
@@ -502,9 +498,8 @@ export default class Networker {
 				user_id: this.userData?.id,
 				token: this.canvaToken
 			};
-			this.gridManager?.addPixelsToCanvaFromIndex(pixels);
-			console.log("place pixels")
 			this.socket.emit('canva:new-pixels:' + canvasId, auth, pixels);
+			this.gridManager?.addPixelsToCanvaFromIndex(pixels);
 		}
 	};
 

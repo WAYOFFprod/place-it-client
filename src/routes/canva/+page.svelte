@@ -40,7 +40,6 @@
 				if (found && found.visibility === 'private' && found.owned) {
 					canva = found;
 				}
-				console.log("loaded offline canva", canva);
 			}
 			clearTimeout(delay);
 			return;

@@ -41,7 +41,6 @@ export const syncPendingCreations = async (): Promise<void> => {
  * Must be called when on a canvas page with a valid WebSocket connection + token.
  */
 export const syncPixelQueueForCanvas = async (canvasId: number): Promise<void> => {
-	console.log("syncPixelQueueForCanvas")
 	const networker = Networker.getInstance();
 	const user = get(userStore);
 	if (!user) return;
@@ -62,7 +61,6 @@ export const syncPixelQueueForCanvas = async (canvasId: number): Promise<void> =
 		
 		networker.placePixelsByIndex(cachedPixels, canvasId);
 
-		console.log("clear pixel cach for", canvasId);
 		OfflineStorage.clearCachedPixels(canvasId);
 
 	} catch (err) {

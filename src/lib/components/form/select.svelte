@@ -31,7 +31,6 @@
 
 	const toggle = () => {
 		isOpen = !isOpen;
-		console.log(isOpen);
 	};
 
 	const selectOption = (value: string) => {

@@ -121,7 +121,6 @@ export default class GridManager {
 	};
 
 	attemptDrawAdditionalPixels(additionalData: Pixels = {}) {
-		console.log("attempt to draw pixels", additionalData);
 		if (!this.pixelsAdded && this.imageLoaded) {
 			if (Object.keys(additionalData).length > 0) {
 				this.addPixelsToCanvaFromIndex(additionalData);
