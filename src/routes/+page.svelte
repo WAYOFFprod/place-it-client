@@ -17,6 +17,9 @@
 	import { page } from '$app/stores';
 	import { isOnline } from '$lib/stores/onlineStore';
 	import { OfflineStorage } from '$lib/utility/OfflineStorage';
+	import type { Size2D } from '$lib/p5/types';
+	import type { CanvaPreviewData } from '$lib/components/types';
+	import type { options } from '$lib/components/form/types';
 
 	let canvasScope: 'community' | 'personal' = 'personal';
 	let tab: 'my-canvas' | 'community-canvas' = 'my-canvas';
@@ -181,7 +184,7 @@
 		pushWindowState();
 	};
 
-	let isOfflineData = false;
+	
 
 	const loadCanvasFromCache = async () => {
 		const user = $userStore;
@@ -191,21 +194,22 @@
 			canvas = cached.filter(
 				(c) => canvasScope === 'personal' ? true : (c.visibility !== 'private')
 			);
-			isOfflineData = true;
 		}
 	};
 
 	const fetchCanvas = async () => {
+		console.log("fetchCanvas", !$isOnline)
 		if (!$isOnline) {
 			await loadCanvasFromCache();
 			return;
 		}
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, category, searchTerm);
+		console.log(data);
 		if (data?.data) {
 			canvas = data.data;
-			isOfflineData = false;
 			// Persist for offline use (personal scope contains all user canvas)
 			if (canvasScope === 'personal' && $userStore) {
+				console.log("save locally")
 				OfflineStorage.saveCanvasList($userStore.id, canvas);
 			}
 		} else {
@@ -226,7 +230,6 @@
 		const data = await networker.getCanvas(canvasScope, sort, favoritFilter, category, searchTerm);
 		if (data?.data) {
 			canvas = data.data;
-			isOfflineData = false;
 			if (canvasScope === 'personal' && $userStore) {
 				OfflineStorage.saveCanvasList($userStore.id, canvas);
 			}

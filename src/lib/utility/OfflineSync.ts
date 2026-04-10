@@ -3,6 +3,7 @@ import { event } from '$lib/stores/eventStore';
 import { userStore } from '$lib/stores/authStore';
 import { get } from 'svelte/store';
 import Networker from './Networker';
+import type { CanvaPreviewData } from '$lib/components/types';
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -40,12 +41,13 @@ export const syncPendingCreations = async (): Promise<void> => {
  * Must be called when on a canvas page with a valid WebSocket connection + token.
  */
 export const syncPixelQueueForCanvas = async (canvasId: number): Promise<void> => {
+	console.log("syncPixelQueueForCanvas")
 	const networker = Networker.getInstance();
 	const user = get(userStore);
 	if (!user) return;
 
-	const entries = await OfflineStorage.getPixelsForCanvas(canvasId);
-	if (entries.length === 0) return;
+	const cachedPixels = await OfflineStorage.loadCanvasCache(canvasId);
+	if(Object.keys(cachedPixels ?? {}).length === 0) return;
 
 	try {
 		if (!networker.socket || !networker.socket.connected) {
@@ -57,19 +59,14 @@ export const syncPixelQueueForCanvas = async (canvasId: number): Promise<void> =
 			console.warn(`[OfflineSync] Could not find width for canvas ${canvasId}`);
 			return;
 		}
-
-		const pixels: { [key: string]: string } = {};
-		for (const { value } of entries) {
-			const index = value.x + width * value.y;
-			pixels[index] = value.color;
-		}
 		
-		networker.placePixelsByIndex(pixels, canvasId);
+		networker.placePixelsByIndex(cachedPixels, canvasId);
+
 		// TODO: since when syncing points the image is already loaded we still need to add the to the current canvas,
-		// otherwise it requires us to reload to see the pixels that were placed offline
-		for (const { key } of entries) {
-			await OfflineStorage.deletePixelQueueEntry(key);
-		}
+		// otherwise it requires us to reload to see the pixels that were placed offlin
+		console.log("clear pixel cach for", canvasId);
+		OfflineStorage.clearCachedPixels(canvasId);
+
 	} catch (err) {
 		console.warn(`[OfflineSync] Failed to sync pixels for canvas ${canvasId}:`, err);
 	}

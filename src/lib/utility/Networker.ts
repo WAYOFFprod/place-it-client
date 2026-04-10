@@ -8,6 +8,7 @@ import { isReady } from '$lib/stores/canvaStore';
 import type { LoginPayload, RegisterPayload } from '$lib/components/auth/types';
 import type { UserData } from './types';
 import { OfflineStorage } from './OfflineStorage';
+import type { CreateCanvaPayload } from '$lib/p5/types';
 
 export default class Networker {
 	static #instance: Networker;
@@ -44,10 +45,13 @@ export default class Networker {
 
 		// When offline, skip the socket entirely and load cached pixels
 		if (!navigator.onLine && gridManager.canvasId != null) {
-			OfflineStorage.loadCanvasCache(gridManager.canvasId).then((cached) => {
-				if (cached?.grid && this.gridManager) {
-					this.newPointsBuffer = cached.grid;
-					this.gridManager.attemptAddAdditionalPixels(this.newPointsBuffer);
+			console.log("NOT ONLINE")
+			OfflineStorage.loadCanvasCache(gridManager.canvasId).then((cachedPixels) => {
+				console.log("cached data", cachedPixels);
+				if (cachedPixels && this.gridManager) {
+					this.newPointsBuffer = cachedPixels;
+					
+					this.gridManager.attemptDrawAdditionalPixels(this.newPointsBuffer);
 				}
 				isReady.set(true);
 			});
@@ -76,7 +80,7 @@ export default class Networker {
 			if (this.gridManager != undefined)
 				if (payload) {
 					this.newPointsBuffer = payload.pixels;
-					this.gridManager.attemptAddAdditionalPixels(this.newPointsBuffer);	
+					this.gridManager.attemptDrawAdditionalPixels(this.newPointsBuffer);	
 				}
 		});
 
@@ -461,18 +465,9 @@ export default class Networker {
 		}
 		const index = this.gridManager.addPixelOnCanvas(coord, color);
 		if (index === false) return;
-
-		// Queue the pixel to IndexedDB for offline sync / durability
-		if (this.gridManager.canvasId != null) {
-			OfflineStorage.enqueuePixel({
-				canvasId: this.gridManager.canvasId,
-				x: coord.x,
-				y: coord.y,
-				color
-			});
-		}
-
+		console.log("ready to save pixels")
 		if (!navigator.onLine) {
+			console.log("we are offline", this.gridManager.canvasId != null && this.newPointsBuffer)
 			// Offline: pixel is queued; update the cached grid snapshot too
 			if (this.gridManager.canvasId != null && this.newPointsBuffer) {
 				const key = coord.x + this.gridManager.canvas.width * coord.y;
@@ -506,7 +501,7 @@ export default class Networker {
 				user_id: this.userData?.id,
 				token: this.canvaToken
 			};
-
+			console.log("place pixels")
 			this.socket.emit('canva:new-pixels:' + canvasId, auth, pixels);
 		}
 	};

@@ -16,6 +16,12 @@ interface PixelData	{
 interface OfflinePixel extends PixelData {
 	timestamp: number
 }
+interface CachedPixels {
+	canvasId: number;
+	pixels: {
+		[key: string]: string
+	};
+}
 
 interface OfflineDB extends DBSchema {
 	/** Cached canvas list per user. Key = userId (number). */
@@ -23,17 +29,11 @@ interface OfflineDB extends DBSchema {
 		key: number;
 		value: { userId: number; canvas: CanvaPreviewData[] };
 	};
-	/** Cached pixel grid + participation token per canvas. Key = canvasId (number). */
-	canvasGrids: {
+	/** Cached pixels per canvas. Key = canvasId (number). */
+	cachedPixels: {
 		key: number;
-		value: { canvasId: number; grid: { [key: string]: string }; token: string | undefined };
-	};
-	/** Queue of pixels to emit when back online. Auto-increment key. */
-	pixelQueue: {
-		key: number;
-		value: OfflinePixel;
-		indexes: { byCanvasId: number };
-	};
+		value: CachedPixels;
+	};	
 	/** Canvas creation payloads to POST when back online. Auto-increment key. */
 	pendingCreations: {
 		key: number;
@@ -50,18 +50,58 @@ let dbPromise: Promise<IDBPDatabase<OfflineDB>> | null = null;
 
 const getDb = (): Promise<IDBPDatabase<OfflineDB>> => {
 	if (!dbPromise) {
-		dbPromise = openDB<OfflineDB>('place-it-offline', 1, {
-			upgrade(db) {
-				db.createObjectStore('canvasList', { keyPath: 'userId' });
-				db.createObjectStore('canvasGrids', { keyPath: 'canvasId' });
-				const pixelQueueStore = db.createObjectStore('pixelQueue', { autoIncrement: true });
-				pixelQueueStore.createIndex('byCanvasId', 'canvasId');
-				db.createObjectStore('pendingCreations', { autoIncrement: true });
+		dbPromise = openDB<OfflineDB>('place-it-offline', 2, {
+			upgrade(db, oldVersion: number) {
+				if (oldVersion < 1) {
+					db.createObjectStore('canvasList', { keyPath: 'userId' });
+					const pixelQueueStore = db.createObjectStore('pixelQueue', { autoIncrement: true });
+					pixelQueueStore.createIndex('byCanvasId', 'canvasId');
+					db.createObjectStore('pendingCreations', { autoIncrement: true });
+				}
+				if (oldVersion < 2) {
+					db.createObjectStore('cachedPixels', { keyPath: 'canvasId' });
+				}
 			}
 		});
 	}
 	return dbPromise!;
 };
+
+// ---------------------------------------------------------------------------
+// In-memory pixel buffer — batches writes, flushes to IndexedDB periodically
+// ---------------------------------------------------------------------------
+
+const FLUSH_INTERVAL_MS = 3000;
+
+const pendingPixels: Map<number, { [key: string]: string }> = new Map();
+let flushTimer: ReturnType<typeof setInterval> | null = null;
+
+function startFlushTimer(): void {
+	if (flushTimer) return;
+	flushTimer = setInterval(flushPendingPixels, FLUSH_INTERVAL_MS);
+}
+
+async function flushPendingPixels(): Promise<void> {
+	if (pendingPixels.size === 0) return;
+	const db = await getDb();
+	for (const [canvasId, pixels] of pendingPixels) {
+		try {
+			const existing = await db.get('cachedPixels', canvasId);
+			const merged = { ...existing?.pixels, ...pixels };
+			await db.put('cachedPixels', { canvasId, pixels: merged });
+		} catch {
+			await db.put('cachedPixels', { canvasId, pixels });
+		}
+	}
+	pendingPixels.clear();
+}
+
+if (typeof window !== 'undefined') {
+	document.addEventListener('visibilitychange', () => {
+		if (document.visibilityState === 'hidden') flushPendingPixels();
+	});
+	window.addEventListener('beforeunload', () => flushPendingPixels());
+}
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -84,75 +124,49 @@ export const OfflineStorage = {
 
 	// ---- Pixel cache ---------------------------------------------------
 
-	async savePixelLocally(
+	savePixelLocally(
 		canvasId: number,
-		grid: { [key: string]: string },
-	): Promise<void> {
-		const db = await getDb();
-		await db.put('canvasGrids', { canvasId, grid  });
+		pixels: { [key: string]: string },
+	): void {
+		const existing = pendingPixels.get(canvasId) ?? {};
+		pendingPixels.set(canvasId, { ...existing, ...pixels });
+		startFlushTimer();
 	},
 
+	
 	async loadCanvasCache(
 		canvasId: number
-	): Promise<{ grid: { [key: string]: string }; token: string | undefined } | null> {
-		const db = await getDb();
-		const entry = await db.get('canvasGrids', canvasId);
-		if (!entry) return null;
-		return { grid: entry.grid, token: entry.token };
-	},
-
-	// ---- Pixel queue --------------------------------------------------------
-
-	async enqueuePixel(item: PixelData): Promise<void> {
-		const db = await getDb();
-		await db.add('pixelQueue', { ...item, timestamp: Date.now() });
-	},
-
-	/** Returns all queued pixels for a specific canvas, grouped ready to emit. */
-	async getPixelsForCanvas(
-		canvasId: number
-	): Promise<{ key: number; value: OfflinePixel }[]> {
-		const db = await getDb();
-		const tx = db.transaction('pixelQueue', 'readonly');
-		const index = tx.store.index('byCanvasId');
-		const entries: {
-			key: number;
-			value: OfflinePixel;
-		}[] = [];
-		let cursor = await index.openCursor(IDBKeyRange.only(canvasId));
-		while (cursor) {
-			entries.push({ key: cursor.primaryKey, value: cursor.value });
-			cursor = await cursor.continue();
+	): Promise<{ [key: string]: string } | null> {
+		try {
+			const db = await getDb();
+			console.log("get cache from db")
+			const entry = await db.get('cachedPixels', canvasId);
+			const stored = entry?.pixels ?? {};
+			const buffered = pendingPixels.get(canvasId) ?? {};
+			return { ...stored, ...buffered };
+		} catch {
+			return {};
 		}
-		await tx.done;
-		return entries;
 	},
 
-	async deletePixelQueueEntry(key: number): Promise<void> {
-		const db = await getDb();
-		await db.delete('pixelQueue', key);
+	async hasCachedPixels(canvasId: number): Promise<number> {
+		const buffered = pendingPixels.get(canvasId);
+		if (buffered && Object.keys(buffered).length > 0) return Object.keys(buffered).length;
+		try {
+			const db = await getDb();
+			const entry = await db.get('cachedPixels', canvasId);
+			return entry ? Object.keys(entry.pixels).length : 0;
+		} catch {
+			return 0;
+		}
 	},
+	
+	
+	flushPixelBuffer: flushPendingPixels,
 
-	async hasQueuedPixels(): Promise<boolean> {
+	async clearCachedPixels(canvasId: number): Promise<void> {
 		const db = await getDb();
-		const count = await db.count('pixelQueue');
-		console.log("has pixel queued", count > 0);
-		return count > 0;
-	},
-
-	async hasQueuedPixelsForCanvas(canvasId: number): Promise<number> {
-		const db = await getDb();
-		const tx = db.transaction('pixelQueue', 'readonly');
-		const index = tx.store.index('byCanvasId');
-		const count = await index.count(IDBKeyRange.only(canvasId));
-		await tx.done;
-		return count;
-	},
-
-	async getAllQueuedCanvasIds(): Promise<number[]> {
-		const db = await getDb();
-		const all: OfflinePixel[] = await db.getAll('pixelQueue');
-		return [...new Set<number>(all.map((p) => p.canvasId))];
+		await db.delete('cachedPixels', canvasId);
 	},
 
 	// ---- Pending creations --------------------------------------------------

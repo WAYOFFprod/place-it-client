@@ -1,19 +1,19 @@
-interface CanvaData {
+export interface CanvaData {
 	id: number;
 	data: any;
 	size: Size2D;
 }
 
-interface ModalData {
+export interface ModalData {
 	name: string;
 	data?: any;
 }
 
-interface Pixels {
+export interface Pixels {
 	[key: string]: string;
 }
 
-interface CanvaPreviewData {
+export interface CanvaPreviewData {
 	id: number;
 	name: string;
 	width: number;

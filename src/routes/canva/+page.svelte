@@ -9,6 +9,7 @@
 	import { userStore } from '$lib/stores/authStore';
 	import { get } from 'svelte/store';
 	import SyncOverlay from '$lib/components/SyncOverlay.svelte';
+	import type { CanvaPreviewData } from '$lib/components/types';
 
 	const getIdFromParam = () => {
 		const queryString = window.location.search;
@@ -29,6 +30,7 @@
 		if (canva_id == null) return null;
 
 		if (!navigator.onLine) {
+			console.warn("You are currently offline, Loading canva from offline storage")
 			// Try to load the canvas from the personal cache
 			isOffline = true;
 			const user = get(userStore);
@@ -38,6 +40,7 @@
 				if (found && found.visibility === 'private' && found.owned) {
 					canva = found;
 				}
+				console.log("loaded offline canva", canva);
 			}
 			clearTimeout(delay);
 			return;

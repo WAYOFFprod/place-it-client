@@ -18,12 +18,14 @@
 	});
 
 	const checkAndSync = async () => {
+		console.log("checkAndSync");
 		if(!navigator.onLine) {
 			state = 'hidden';
 			return;
 		}
-
-		pixelsToSync = await OfflineStorage.hasQueuedPixelsForCanvas(canvasId);
+		
+		pixelsToSync = await OfflineStorage.hasCachedPixels(canvasId);
+		console.log("pixels to sync", pixelsToSync);
 		if (pixelsToSync === 0) {
 			state = 'hidden';
 			return;
@@ -39,7 +41,7 @@
 		} catch (err) {
 			console.warn('[SyncOverlay] Sync failed:', err);
 			state = 'hidden';
-			}
+		}
 	};
 </script>
 

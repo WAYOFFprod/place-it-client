@@ -1,33 +1,33 @@
-interface options {
+export interface options {
 	value: string;
 	label: string;
 }
 
-interface SaveFieldEvent {
+export interface SaveFieldEvent {
 	saveField: SettingOption;
 }
 
-interface SettingOption {
+export interface SettingOption {
 	field: string;
 	value: string;
 }
 
-interface BoolSettingOption {
+export interface BoolSettingOption {
 	field: string;
 	value: boolean;
 }
 
-interface CanvaFieldUpdate {
+export interface CanvaFieldUpdate {
 	id: number;
 	field: string;
 	value: string;
 }
 
-interface Option {
+export interface Option {
 	key: number;
 	value: string;
 }
 
-interface updateSearchEvent {
+export interface updateSearchEvent {
 	onChange: string;
 }
