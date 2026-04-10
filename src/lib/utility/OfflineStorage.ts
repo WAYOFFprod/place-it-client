@@ -1,8 +1,21 @@
+import type { CanvaPreviewData } from '$lib/components/types';
+import type { CreateCanvaPayload } from '$lib/p5/types';
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 
 // ---------------------------------------------------------------------------
 // Schema
 // ---------------------------------------------------------------------------
+
+
+interface PixelData	{
+	canvasId: number;
+	x: number;
+	y: number;
+	color: string
+}
+interface OfflinePixel extends PixelData {
+	timestamp: number
+}
 
 interface OfflineDB extends DBSchema {
 	/** Cached canvas list per user. Key = userId (number). */
@@ -18,7 +31,7 @@ interface OfflineDB extends DBSchema {
 	/** Queue of pixels to emit when back online. Auto-increment key. */
 	pixelQueue: {
 		key: number;
-		value: { canvasId: number; x: number; y: number; color: string; timestamp: number };
+		value: OfflinePixel;
 		indexes: { byCanvasId: number };
 	};
 	/** Canvas creation payloads to POST when back online. Auto-increment key. */
@@ -27,6 +40,7 @@ interface OfflineDB extends DBSchema {
 		value: { tempId: string; payload: CreateCanvaPayload; createdAt: number };
 	};
 }
+
 
 // ---------------------------------------------------------------------------
 // DB singleton
@@ -89,7 +103,7 @@ export const OfflineStorage = {
 
 	// ---- Pixel queue --------------------------------------------------------
 
-	async enqueuePixel(item: { canvasId: number; x: number; y: number; color: string }): Promise<void> {
+	async enqueuePixel(item: PixelData): Promise<void> {
 		const db = await getDb();
 		await db.add('pixelQueue', { ...item, timestamp: Date.now() });
 	},
@@ -97,13 +111,13 @@ export const OfflineStorage = {
 	/** Returns all queued pixels for a specific canvas, grouped ready to emit. */
 	async getPixelsForCanvas(
 		canvasId: number
-	): Promise<{ key: number; value: { canvasId: number; x: number; y: number; color: string; timestamp: number } }[]> {
+	): Promise<{ key: number; value: OfflinePixel }[]> {
 		const db = await getDb();
 		const tx = db.transaction('pixelQueue', 'readonly');
 		const index = tx.store.index('byCanvasId');
 		const entries: {
 			key: number;
-			value: { canvasId: number; x: number; y: number; color: string; timestamp: number };
+			value: OfflinePixel;
 		}[] = [];
 		let cursor = await index.openCursor(IDBKeyRange.only(canvasId));
 		while (cursor) {
@@ -122,6 +136,7 @@ export const OfflineStorage = {
 	async hasQueuedPixels(): Promise<boolean> {
 		const db = await getDb();
 		const count = await db.count('pixelQueue');
+		console.log("has pixel queued", count > 0);
 		return count > 0;
 	},
 
@@ -136,8 +151,8 @@ export const OfflineStorage = {
 
 	async getAllQueuedCanvasIds(): Promise<number[]> {
 		const db = await getDb();
-		const all = await db.getAll('pixelQueue');
-		return [...new Set(all.map((p) => p.canvasId))];
+		const all: OfflinePixel[] = await db.getAll('pixelQueue');
+		return [...new Set<number>(all.map((p) => p.canvasId))];
 	},
 
 	// ---- Pending creations --------------------------------------------------
@@ -157,7 +172,7 @@ export const OfflineStorage = {
 		const all = await tx.store.getAll();
 		const keys = await tx.store.getAllKeys();
 		await tx.done;
-		return all.map((val, i) => ({ key: keys[i], ...val }));
+		return all.map((val: { tempId: string; payload: CreateCanvaPayload; createdAt: number }, i: number) => ({ key: keys[i], ...val }));
 	},
 
 	async deletePendingCreation(key: number): Promise<void> {
@@ -176,7 +191,7 @@ export const OfflineStorage = {
 		const db = await getDb();
 		const entry = await db.get('canvasList', userId);
 		if (!entry) return;
-		entry.canvas = entry.canvas.map((c) => ((c as any).tempId === tempId ? realCanvas : c));
+		entry.canvas = entry.canvas.map((c: CanvaPreviewData) => ('tempId' in c && c.tempId === tempId ? realCanvas : c));
 		await db.put('canvasList', entry);
 	}
 };
