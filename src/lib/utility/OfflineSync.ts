@@ -44,7 +44,7 @@ export const syncPixelQueueForCanvas = async (canvasId: number): Promise<void> =
 	const user = get(userStore);
 	if (!user) return;
 
-	const entries = await OfflineStorage.drainPixelsForCanvas(canvasId);
+	const entries = await OfflineStorage.getPixelsForCanvas(canvasId);
 	if (entries.length === 0) return;
 
 	try {
