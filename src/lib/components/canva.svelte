@@ -11,6 +11,7 @@
 	import ZoomCounter from './metric/zoomCounter.svelte';
 	import CoordViewer from './metric/coordViewer.svelte';
 	import P5Manager from '$lib/p5/P5Manager';
+	import type { CanvaPreviewData } from './types';
 
 	interface Props {
 		canva: CanvaPreviewData;
@@ -108,7 +109,7 @@
 </script>
 
 <Modal></Modal>
-<div bind:this={rootContainer} {id} class="relative cursor-{cursor} touch-none" on:contextmenu|preventDefault>
+<div bind:this={rootContainer} {id} class="relative cursor-{cursor} touch-none" role="none" oncontextmenu={e => e.preventDefault()}>
 	<!-- overlay -->
 	<div class="absolute inset-0 pointer-events-none">
 		{#if currentToolType.type == ToolType.Place}
