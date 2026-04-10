@@ -112,7 +112,6 @@ export const OfflineStorage = {
 
 	async saveCanvasList(userId: number, canvas: CanvaPreviewData[]): Promise<void> {
 		const db = await getDb();
-		console.lddog(`save canvas ${canvas.map(canva => canva.id).join(",")} ` )
 		await db.put('canvasList', { userId, canvas });
 	},
 

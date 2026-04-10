@@ -23,7 +23,8 @@
 			"updated backend dependencies as well"
 		],
 		"added": [
-			"added basic admin panel in order to have a better way to manage canvases and users."
+			"added basic admin panel in order to have a better way to manage canvases and users.",
+			"PWA with basic offline functionality on private canva's"
 		]
 	}
 }
