@@ -44,7 +44,7 @@ export default class Networker {
 
 		// When offline, skip the socket entirely and load cached pixels
 		if (!navigator.onLine && gridManager.canvasId != null) {
-			OfflineStorage.loadCanvasGrid(gridManager.canvasId).then((cached) => {
+			OfflineStorage.loadCanvasCache(gridManager.canvasId).then((cached) => {
 				if (cached?.grid && this.gridManager) {
 					this.newPointsBuffer = cached.grid;
 					this.gridManager.attemptAddAdditionalPixels(this.newPointsBuffer);
@@ -477,10 +477,9 @@ export default class Networker {
 			if (this.gridManager.canvasId != null && this.newPointsBuffer) {
 				const key = coord.x + this.gridManager.canvas.width * coord.y;
 				this.newPointsBuffer[key] = color;
-				OfflineStorage.saveCanvasGrid(
+				OfflineStorage.savePixelLocally(
 					this.gridManager.canvasId,
-					this.newPointsBuffer,
-					this.canvaToken
+					this.newPointsBuffer
 				);
 			}
 			return;
