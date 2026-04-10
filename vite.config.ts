@@ -15,6 +15,9 @@ export default defineConfig({
 			registerType: 'autoUpdate',
 			// SvelteKit handles routing; the SW should serve index.html for all nav requests
 			injectRegister: 'auto',
+			devOptions: {
+				enabled: true
+			},
 			workbox: {
 				// Precache the built SvelteKit assets
 				globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2}'],

@@ -3,6 +3,8 @@ import GridSection from './GridSection';
 import CanvaOverlay from './CanvaOverlay';
 import { graphicToPixels } from '$lib/components/color/utils/converter';
 import type SelectionRect from './Overlay/SelectionRect';
+import type { Coord, Size2D } from './types';
+import type { Pixels } from '$lib/components/types';
 
 let PIXEL_IN_SECTION: number;
 
@@ -115,10 +117,11 @@ export default class GridManager {
 		this.imageLoaded = true;
 
 		// add pixels that were on the live server
-		this.attemptAddAdditionalPixels(this.additionalData);
+		this.attemptDrawAdditionalPixels(this.additionalData);
 	};
 
-	attemptAddAdditionalPixels(additionalData: Pixels = {}) {
+	attemptDrawAdditionalPixels(additionalData: Pixels = {}) {
+		console.log("attempt to draw pixels", additionalData);
 		if (!this.pixelsAdded && this.imageLoaded) {
 			if (Object.keys(additionalData).length > 0) {
 				this.addPixelsToCanvaFromIndex(additionalData);
@@ -212,6 +215,7 @@ export default class GridManager {
 
 				this.gridSections[gridIndex].addPixelToImage(relPosition, color);
 			}
+			this.needsUpdate = true;
 		}
 	};
 

@@ -8,6 +8,8 @@ import { isReady } from '$lib/stores/canvaStore';
 import type { LoginPayload, RegisterPayload } from '$lib/components/auth/types';
 import type { UserData } from './types';
 import { OfflineStorage } from './OfflineStorage';
+import type { CreateCanvaPayload } from '$lib/p5/types';
+import type { Pixels } from '$lib/components/types';
 
 export default class Networker {
 	static #instance: Networker;
@@ -15,7 +17,7 @@ export default class Networker {
 	server: ServerRequests;
 	socket: Socket | undefined;
 	gridManager: GridManager | undefined;
-	tempPoints: { [key: string]: string } | undefined;
+	newPointsBuffer: { [key: string]: string } | undefined;
 	websocket: string;
 	messages: Message[] = [];
 	userData: User | undefined;
@@ -44,10 +46,13 @@ export default class Networker {
 
 		// When offline, skip the socket entirely and load cached pixels
 		if (!navigator.onLine && gridManager.canvasId != null) {
-			OfflineStorage.loadCanvasGrid(gridManager.canvasId).then((cached) => {
-				if (cached?.grid && this.gridManager) {
-					this.tempPoints = cached.grid;
-					this.gridManager.attemptAddAdditionalPixels(this.tempPoints);
+			console.log("NOT ONLINE")
+			OfflineStorage.loadCanvasCache(gridManager.canvasId).then((cachedPixels) => {
+				console.log("cached data", cachedPixels);
+				if (cachedPixels && this.gridManager) {
+					this.newPointsBuffer = cachedPixels;
+					
+					this.gridManager.attemptDrawAdditionalPixels(this.newPointsBuffer);
 				}
 				isReady.set(true);
 			});
@@ -69,23 +74,14 @@ export default class Networker {
 		});
 
 		this.socket.on('live-canva-ready', (payload) => {
-			console.log('canva ready', payload);
 			isReady.set(true);
 		});
 
 		this.socket.on('canva:init-pixels', (payload) => {
 			if (this.gridManager != undefined)
 				if (payload) {
-					this.tempPoints = payload.pixels;
-					this.gridManager.attemptAddAdditionalPixels(this.tempPoints);
-					// Persist the received pixel grid for offline use
-					if (this.gridManager.canvasId != null) {
-						OfflineStorage.saveCanvasGrid(
-							this.gridManager.canvasId,
-							payload.pixels ?? {},
-							this.canvaToken
-						);
-					}
+					this.newPointsBuffer = payload.pixels;
+					this.gridManager.attemptDrawAdditionalPixels(this.newPointsBuffer);	
 				}
 		});
 
@@ -96,13 +92,13 @@ export default class Networker {
 		// listen to socket server message
 
 		this.socket.on('canva:new-pixel-from-others', (coord, color) => {
-			console.log('NEW PIXEL FROM OTHERS', color, coord);
+			// console.log('NEW PIXEL FROM OTHERS', color, coord);
 			if (!this.gridManager) return console.error('missing grid manager');
 			this.gridManager.addPixelOnCanvas(coord, color);
 		});
 
 		this.socket.on('canva:new-pixels-from-others', (pixels: Pixels) => {
-			console.log('NEW PIXELS FROM OTHERS', pixels);
+			// console.log('NEW PIXELS FROM OTHERS', pixels);
 			if (!this.gridManager) return console.error('missing grid manager');
 			this.gridManager.addPixelsToCanvaFromIndex(pixels);
 			this.gridManager.needsUpdate = true;
@@ -110,7 +106,7 @@ export default class Networker {
 
 		this.socket.on('chat:get-message', (message: Message) => {
 			this.messages.push(message);
-			console.log('this.messages', this.messages);
+			// console.log('this.messages', this.messages);
 			chatMessages.set(this.messages);
 		});
 
@@ -381,7 +377,6 @@ export default class Networker {
 		category: undefined | string = undefined,
 		search: string = ''
 	) => {
-		console.log('fetching canvas with filters: ', { scope, sort, favorit, search, category });
 		const response: any = await this.server.get(
 			'/canvas?scope=' +
 				scope +
@@ -401,12 +396,7 @@ export default class Networker {
 	 */
 	getCanva = async (id: number) => {
 		if (!navigator.onLine) {
-			// Return the cached grid merged with whatever canvas metadata we have
-			const cached = await OfflineStorage.loadCanvasGrid(id);
-			if (cached?.token) {
-				tokenStore.set(cached.token);
-			}
-			// Return minimal offline data so the canvas page can still render
+			// if offline return null
 			return null;
 		}
 		const response = await this.server.get('/canvas/' + id);
@@ -476,26 +466,16 @@ export default class Networker {
 		}
 		const index = this.gridManager.addPixelOnCanvas(coord, color);
 		if (index === false) return;
-
-		// Queue the pixel to IndexedDB for offline sync / durability
-		if (this.gridManager.canvasId != null) {
-			OfflineStorage.enqueuePixel({
-				canvasId: this.gridManager.canvasId,
-				x: coord.x,
-				y: coord.y,
-				color
-			});
-		}
-
+		console.log("ready to save pixels")
 		if (!navigator.onLine) {
+			console.log("we are offline", this.gridManager.canvasId != null && this.newPointsBuffer)
 			// Offline: pixel is queued; update the cached grid snapshot too
-			if (this.gridManager.canvasId != null && this.tempPoints) {
-				const key = `${coord.x},${coord.y}`;
-				this.tempPoints[key] = color;
-				OfflineStorage.saveCanvasGrid(
+			if (this.gridManager.canvasId != null && this.newPointsBuffer) {
+				const key = coord.x + this.gridManager.canvas.width * coord.y;
+				this.newPointsBuffer[key] = color;
+				OfflineStorage.savePixelLocally(
 					this.gridManager.canvasId,
-					this.tempPoints,
-					this.canvaToken
+					this.newPointsBuffer
 				);
 			}
 			return;
@@ -511,26 +491,20 @@ export default class Networker {
 	};
 
 	/**
-	 * Places multiple pixels on the canvas.
+	 * Places multiple pixels on the canvas for other users but also on player canva.
 	 * the index is calculated from the coordinates and the canvas width
 	 * @param pixels Pixels to place in format {index: color}
 	 * @returns
 	 */
-	placePixelsByIndex = (pixels: Pixels) => {
-		if (this.gridManager == undefined) return;
-		// for (let key in pixels) {
-		//   console.log(key, pixels[key]);
-		//   const coord = this.gridManager.getCoordFromIndex(parseInt(key));
-		//   const index = this.gridManager.addPixelOnCanvas(coord, pixels[key]);
-		//   if(index === false) return
-		// }
-
+	placePixelsByIndex = (pixels: Pixels, canvasId: number) => {
 		if (this.socket != undefined) {
 			const auth: UserData = {
 				user_id: this.userData?.id,
 				token: this.canvaToken
 			};
-			this.socket.emit('canva:new-pixels:' + this.gridManager.canvasId, auth, pixels);
+			this.gridManager?.addPixelsToCanvaFromIndex(pixels);
+			console.log("place pixels")
+			this.socket.emit('canva:new-pixels:' + canvasId, auth, pixels);
 		}
 	};
 

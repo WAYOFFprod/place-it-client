@@ -1,13 +1,13 @@
-interface Coord {
+export interface Coord {
 	x: number;
 	y: number;
 }
-interface Size2D {
+export interface Size2D {
 	width: number;
 	height: number;
 }
 
-interface CreateCanvaPayload {
+export interface CreateCanvaPayload {
 	name: string;
 	category: 'pixelwar' | 'artistic' | 'free';
 	access: 'open' | 'invite_only' | 'request_only' | 'closed';
@@ -16,7 +16,7 @@ interface CreateCanvaPayload {
 	height: number;
 	colors: string[];
 }
-interface Pixel {
+export interface Pixel {
 	x: number;
 	y: number;
 	color: string;

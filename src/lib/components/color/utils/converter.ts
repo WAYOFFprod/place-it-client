@@ -1,3 +1,5 @@
+import type { Pixels } from '$lib/components/types';
+import type { Coord, Size2D } from '$lib/p5/types';
 import type p5 from 'p5';
 
 const graphicToPixels = (graphic: p5.Graphics, offset: Coord, canvaSize: Size2D): Pixels => {
@@ -39,8 +41,8 @@ const rgbToHsl = (r: number, g: number, b: number) => {
 	const max = Math.max(r, g, b),
 		min = Math.min(r, g, b);
 	let h = 0,
-		s,
-		l = (max + min) / 2;
+		s;
+	const l = (max + min) / 2;
 
 	if (max == min) {
 		h = s = 0; // achromatic
